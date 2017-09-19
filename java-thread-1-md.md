@@ -1,7 +1,7 @@
 ---
 title: Java多线程(一)基础
 date: 2016-08-08 22:06:08
-tags: java
+tags: [java,多线程]
 categories: java
 ---
 > 对多线程复习下，汇总一下

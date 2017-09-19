@@ -1,7 +1,7 @@
 ---
 title: JVM杂谈之JIT
 date: 2017-09-14 22:41:24
-tags: [java,jit]
+tags: [java,jit,jvm]
 categories: java
 ---
 # Just In Time

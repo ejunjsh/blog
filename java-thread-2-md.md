@@ -1,7 +1,7 @@
 ---
 title: Java多线程(二) 同步和锁
 date: 2016-08-20 22:55:34
-tags: java
+tags: [java,多线程]
 categories: java
 ---
 > 记录，汇总
