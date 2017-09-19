@@ -19,23 +19,23 @@ categories: linux命令
 ````bash
 $ fdisk /dev/hdd   
 ````
-[![](/images/linux-disk-related-1.jpg)](/images/linux-disk-related-1.jpg)
+[![](http://idiotsky.me/images/linux-disk-related-1.jpg)](http://idiotsky.me/images/linux-disk-related-1.jpg)
 按"p"键打印分区表
-[![](/images/linux-disk-related-2.jpg)](/images/linux-disk-related-2.jpg)
+[![](http://idiotsky.me/images/linux-disk-related-2.jpg)](http://idiotsky.me/images/linux-disk-related-2.jpg)
 这块硬磁尚未分区
 按"n"键新建一个分区。
-[![](/images/linux-disk-related-3.jpg)](/images/linux-disk-related-3.jpg)
+[![](http://idiotsky.me/images/linux-disk-related-3.jpg)](http://idiotsky.me/images/linux-disk-related-3.jpg)
 出现两个菜单e表示扩展分区，p表示主分区
 按"p"键出现提示："Partition number (1-4): "选择主分区号
 输入"1"表示第一个主分区。
-[![](/images/linux-disk-related-4.jpg)](/images/linux-disk-related-4.jpg)
+[![](http://idiotsky.me/images/linux-disk-related-4.jpg)](http://idiotsky.me/images/linux-disk-related-4.jpg)
 直接按回车表示1柱面开始分区。
-[![](/images/linux-disk-related-5.jpg)](/images/linux-disk-related-5.jpg)
+[![](http://idiotsky.me/images/linux-disk-related-5.jpg)](http://idiotsky.me/images/linux-disk-related-5.jpg)
 提示最后一个柱面或大小。
 输入+5620M 按回车
 表示第一个分区为5G空间。
 按"p"查看一下分区
-[![](/images/linux-disk-related-6.jpg)](/images/linux-disk-related-6.jpg)
+[![](http://idiotsky.me/images/linux-disk-related-6.jpg)](http://idiotsky.me/images/linux-disk-related-6.jpg)
 这样一个主分区就分好了。
 接下来分第二个主分区，把剩余空间都给第二个主分区。
 按"n"
@@ -44,7 +44,7 @@ $ fdisk /dev/hdd
 输入"2"把主分区编号设为2
 按两下回车把剩余空间分给第二个主分区。
 按"p"键打印分区表
-[![](/images/linux-disk-related-7.jpg)](/images/linux-disk-related-7.jpg)
+[![](http://idiotsky.me/images/linux-disk-related-7.jpg)](http://idiotsky.me/images/linux-disk-related-7.jpg)
 按"w"键保存退出。 
 读者可根据自己的硬盘大小来划分合适的分区。
 

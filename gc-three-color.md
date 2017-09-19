@@ -4,7 +4,7 @@ date: 2017-08-16 01:02:35
 tags: [go,gc]
 categories: go
 ---
-[![](/images/gc-1.gif)](/images/gc-1.gif)
+[![](http://idiotsky.me/images/gc-1.gif)](http://idiotsky.me/images/gc-1.gif)
 <!-- more -->
 三色标记法是传统 Mark-Sweep 的一个改进，它是一个并发的 GC 算法。
 原理如下，

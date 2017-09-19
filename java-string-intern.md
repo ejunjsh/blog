@@ -78,7 +78,7 @@ public class InternTest01 {
 # 字符串深入分析
 ## 代码段一分析
 字符串不属于基本类型，但是可以像基本类型一样，直接通过字面量赋值，当然也可以通过new来生成一个字符串对象。不过通过字面量赋值的方式和new的方式生成字符串有本质的区别：
-[![](/images/java-string-intern-1.jpg)](/images/java-string-intern-1.jpg) 
+[![](http://idiotsky.me/images/java-string-intern-1.jpg)](http://idiotsky.me/images/java-string-intern-1.jpg) 
 
 通过字面量赋值创建字符串时，会优先在常量池中查找是否已经存在相同的字符串，倘若已经存在，栈中的引用直接指向该字符串；倘若不存在，则在常量池中生成一个字符串，再将栈中的引用指向该字符串。而通过new的方式创建字符串时，就直接在堆中生成一个字符串的对象（备注，JDK 7 以后，HotSpot 已将常量池从永久代转移到了堆中。详细信息可参考《[JDK8内存模型-消失的PermGen](/2016/07/26/java8-permgen-metaspace/)》一文），栈中的引用指向该对象。对于堆中的字符串对象，可以通过 intern() 方法来将字符串添加的常量池中，并返回指向该常量的引用。
 现在我们应该能很清楚代码段一的结果了：
@@ -86,14 +86,14 @@ public class InternTest01 {
 结果 #2：str2调用intern方法，会将str2中值（“string”）复制到常量池中，但是常量池中已经存在该字符串（即str1指向的字符串），所以直接返回该字符串的引用，因此str1==str2返回true。</font>
 
 以下运行代码段一的代码的结果：
-[![](/images/java-string-intern-2.jpg)](/images/java-string-intern-2.jpg) 
+[![](http://idiotsky.me/images/java-string-intern-2.jpg)](http://idiotsky.me/images/java-string-intern-2.jpg) 
 
 ## 代码段二分析
 对于代码段二的结果，还是通过反编译StringTest01.class文件比较容易理解：
 常量池内容（部分）：
-[![](/images/java-string-intern-3.jpg)](/images/java-string-intern-3.jpg) 
+[![](http://idiotsky.me/images/java-string-intern-3.jpg)](http://idiotsky.me/images/java-string-intern-3.jpg) 
 执行指令（部分，第二列#+序数对应常量池中的项）：
-[![](/images/java-string-intern-4.jpg)](/images/java-string-intern-4.jpg) 
+[![](http://idiotsky.me/images/java-string-intern-4.jpg)](http://idiotsky.me/images/java-string-intern-4.jpg) 
 在解释上述执行过程之前，先了解两条指令：
 
 ldc：Push item from run-time constant pool，从常量池中加载指定项的引用到栈。
@@ -161,15 +161,15 @@ astore_<n>：Store reference into local variable，将引用赋值给第n个局�
 <font color=blue>
 结果 #6 ：因为str5和str1都指向的都是常量池中的同一个字符串，所以str1==str5返回true。</font>
 运行代码段二，输出结果如下： 
-[![](/images/java-string-intern-5.jpg)](/images/java-string-intern-5.jpg) 
+[![](http://idiotsky.me/images/java-string-intern-5.jpg)](http://idiotsky.me/images/java-string-intern-5.jpg) 
 
 ## 代码段三解析：
 对于代码段三，在 JDK 1.6 和 JDK 1.7中的运行结果不同。我们先看一下运行结果，然后再来解释其原因：
 
 JDK 1.6 下的运行结果：
-[![](/images/java-string-intern-6.jpg)](/images/java-string-intern-6.jpg) 
+[![](http://idiotsky.me/images/java-string-intern-6.jpg)](http://idiotsky.me/images/java-string-intern-6.jpg) 
 JDK 1.7 下的运行结果：
-[![](/images/java-string-intern-7.jpg)](/images/java-string-intern-7.jpg) 
+[![](http://idiotsky.me/images/java-string-intern-7.jpg)](http://idiotsky.me/images/java-string-intern-7.jpg) 
 
 根据对代码段一的分析，应该可以很简单得出 JDK 1.6 的结果，因为 str2 和 str1本来就是指向不同的位置，理应返回false。
 

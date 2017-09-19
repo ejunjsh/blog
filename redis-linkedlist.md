@@ -4,6 +4,8 @@ date: 2017-09-14 23:59:31
 tags: [redis,数据结构,链表]
 categories: redis
 ---
+> 列表键的底层就是一个链表
+
 # 链表节点
 每个链表节点使用一个 adlist.h/listNode 结构来表示：
 ````c
@@ -21,7 +23,7 @@ typedef struct listNode {
 } listNode;
 ````
 多个 listNode 可以通过 prev 和 next 指针组成双端链表， 如图 3-1 所示。
-[![](/images/redis-linkedlist-1.png)](/images/redis-linkedlist-1.png)
+[![](http://idiotsky.me/images/redis-linkedlist-1.png)](http://idiotsky.me/images/redis-linkedlist-1.png)
 <!-- more -->
 # 链表
 虽然仅仅使用多个 listNode 结构就可以组成链表， 但使用 adlist.h/list 来持有链表的话， 操作起来会更方便：
@@ -54,7 +56,7 @@ list 结构为链表提供了表头指针 head 、表尾指针 tail ， 以及�
 * match 函数则用于对比链表节点所保存的值和另一个输入值是否相等。
 
 图 3-2 是由一个 list 结构和三个 listNode 结构组成的链表：
-[![](/images/redis-linkedlist-2.png)](/images/redis-linkedlist-2.png)
+[![](http://idiotsky.me/images/redis-linkedlist-2.png)](http://idiotsky.me/images/redis-linkedlist-2.png)
 
 # 总结
 Redis 的链表实现的特性可以总结如下：

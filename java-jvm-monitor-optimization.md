@@ -29,7 +29,7 @@ client|	串行|	串行
 server|	并行|	并发
 
 如果没有指定`-server`或`-client`模式，则判断方法如下：
-[![](/images/java-monitor-optimization.png)](/images/java-monitor-optimization.png)
+[![](http://idiotsky.me/images/java-monitor-optimization.png)](http://idiotsky.me/images/java-monitor-optimization.png)
 `-classpath / -cp`
 JVM加载和搜索文件的目录路径，多个路径用;分隔。注意，如果使用了`-classpath`，JVM就不会再搜索环境变量中定义的CLASSPATH路径。
 JVM搜索路径的顺序为：
@@ -52,7 +52,7 @@ JVM搜索路径的顺序为：
 ## 非标准参数
 非标准参数，是在标准参数的基础上进行扩展的参数，输入`java -X`命令，能够获得当前JVM支持的所有非标准参数列表（你会发现，其实并不多哦）。
 在不同类型的JVM中，采用的参数有所不同，在讲解非标准参数时，请参考下面的图，对内存区域的大小有个形象的了解
-[![](/images/java-monitor-optimization-1.png)](/images/java-monitor-optimization-1.png)
+[![](http://idiotsky.me/images/java-monitor-optimization-1.png)](http://idiotsky.me/images/java-monitor-optimization-1.png)
 `-Xmn`
 新生代内存大小的最大值，包括E区和两个S区的总和，使用方法如：`-Xmn65535`，`-Xmn1024k`，`-Xmn512m`，`-Xmn1g` (`-Xms`,`-Xmx`也是种写法)
 `-Xmn`只能使用在JDK1.4或之后的版本中，（之前的1.3/1.4版本中，可使用`-XX:NewSize`设置年轻代大小，用`-XX:MaxNewSize`设置年轻代最大值）；
@@ -159,7 +159,7 @@ JVM搜索路径的顺序为：
 # 收集器搭配
 在介绍了常用的配置参数之后，我们将开始真正的JVM实操征程，首先，我们要为应用程序选择一个合适的垃圾收集器组合，及上节中的行为参数。
 图中两个收集器之间有连线，说明它们可以配合使用
-[![](/images/java-memory-gc-2.jpg)](/images/java-memory-gc-2.jpg)
+[![](http://idiotsky.me/images/java-memory-gc-2.jpg)](http://idiotsky.me/images/java-memory-gc-2.jpg)
 新生代收集器如下：
 **Serial收集器**： Serial收集器是在client模式下默认的新生代收集器，其收集效率大约是100M左右的内存需要几十到100多毫秒；在client模式下，收集桌面应用的内存垃圾，基本上不影响用户体验。所以，一般的Java桌面应用中，直接使用Serial收集器（不需要配置参数，用默认即可）。
 **ParNew收集器**：Serial收集器的多线程版本，这种收集器默认开通的线程数与CPU数量相同，`-XX:ParallelGCThreads`可以用来设置开通的线程数。可以与CMS收集器配合使用，事实上用`-XX:+UseConcMarkSweepGC`选择使用CMS收集器时，默认使用的就是ParNew收集器，所以不需要额外设置-XX:+UseParNewGC，设置了也不会冲突，因为会将ParNew+Serial Old作为一个备选方案；
@@ -218,7 +218,7 @@ jps命令用于查询正在运行的JVM进程，常用的参数为：
     -v:输出虚拟机进程启动时JVM参数
 命令格式:jps [option] [hostid] 
 一个简单的例子：
-[![](/images/java-monitor-optimization-2.png)](/images/java-monitor-optimization-2.png)
+[![](http://idiotsky.me/images/java-monitor-optimization-2.png)](http://idiotsky.me/images/java-monitor-optimization-2.png)
 在上图中，有一个vid为309的apache进程在提供web服务。
 
 ## jstat
@@ -239,7 +239,7 @@ jstat有如下选项：
 命令格式:jstat [option vmid [interval[s|ms] [count]]]
 jstat可以监控远程机器，命令格式中VMID和LVMID特别说明：如果是本地虚拟机进程，VMID和LVMID是一致的，如果是远程虚拟机进程，那么VMID格式是: [protocol:][//]lvmid[@hostname[:port]/servername]，如果省略interval和count，则只查询一次
 查看gc情况的例子：
-[![](/images/java-monitor-optimization-3.png)](/images/java-monitor-optimization-3.png)
+[![](http://idiotsky.me/images/java-monitor-optimization-3.png)](http://idiotsky.me/images/java-monitor-optimization-3.png)
 在图中，命令sudo jstat -gc 309 1000 5代表着：搜集vid为309的java进程的整体gc状态， 每1000ms收集一次，共收集5次；XXXC表示该区容量，XXXU表示该区使用量，各列解释如下：
 S0C：S0区容量（S1区相同，略）
 S0U：S0区已使用
@@ -256,7 +256,7 @@ FGCT：Full GC总耗时
 GCT：GC总耗时
 
 用gcutil查看内存的例子：
-[![](/images/java-monitor-optimization-4.png)](/images/java-monitor-optimization-4.png)
+[![](http://idiotsky.me/images/java-monitor-optimization-4.png)](http://idiotsky.me/images/java-monitor-optimization-4.png)
 图中的各列与用gc参数时基本一致，不同的是这里显示的是已占用的百分比，如S0为86.53，代表着S0区已使用了86.53%
 
 ## jinfo
@@ -313,7 +313,7 @@ jinfo可以使用如下选项：
 每条verbosegc打印出的gc日志，都类似于下面的格式：
 `time [GC [<collector>: <starting occupancy1> -> <ending occupancy1>(total occupancy1), <pause time1> secs] <starting occupancy3> -> <ending occupancy3>(total occupancy3), <pause time3> secs] `
 如：
-[![](/images/java-monitor-optimization-5.png)](/images/java-monitor-optimization-5.png)
+[![](http://idiotsky.me/images/java-monitor-optimization-5.png)](http://idiotsky.me/images/java-monitor-optimization-5.png)
 这些选项的意义是：
 time：执行GC的时间，需要添加-XX:+PrintGCDateStamps参数才有；
 collector：minor gc使用的收集器的名字。
@@ -331,24 +331,24 @@ pause time3：Java应用由于执行堆空间GC（包括full GC）而停止的�
 
 ### JConsole
 JConsole工具在JDK/bin目录下，启动JConsole后，将自动搜索本机运行的jvm进程，不需要jps命令来查询指定。双击其中一个jvm进程即可开始监控，也可使用“远程进程”来连接远程服务器。
-[![](/images/java-monitor-optimization-6.jpg)](/images/java-monitor-optimization-6.jpg)
+[![](http://idiotsky.me/images/java-monitor-optimization-6.jpg)](http://idiotsky.me/images/java-monitor-optimization-6.jpg)
 进入JConsole主界面，有“概述”、“内存”、“线程”、“类”、“VM摘要”和"Mbean"六个页签：
-[![](/images/java-monitor-optimization-7.jpg)](/images/java-monitor-optimization-7.jpg)
+[![](http://idiotsky.me/images/java-monitor-optimization-7.jpg)](http://idiotsky.me/images/java-monitor-optimization-7.jpg)
 内存页签相当于jstat命令，用于监视收集器管理的虚拟机内存(Java堆和永久代)变化趋势，还可在详细信息栏观察全部GC执行的时间及次数。
-[![](/images/java-monitor-optimization-8.jpg)](/images/java-monitor-optimization-8.jpg)
+[![](http://idiotsky.me/images/java-monitor-optimization-8.jpg)](http://idiotsky.me/images/java-monitor-optimization-8.jpg)
 线程页签
-[![](/images/java-monitor-optimization-9.jpg)](/images/java-monitor-optimization-9.jpg)
+[![](http://idiotsky.me/images/java-monitor-optimization-9.jpg)](http://idiotsky.me/images/java-monitor-optimization-9.jpg)
 最后一个常用页签，VM页签，可清楚的了解显示指定的JVM参数及堆信息。
-[![](/images/java-monitor-optimization-10.jpg)](/images/java-monitor-optimization-10.jpg)
+[![](http://idiotsky.me/images/java-monitor-optimization-10.jpg)](http://idiotsky.me/images/java-monitor-optimization-10.jpg)
 
 ### VisualVM
 VisualVM是一个集成多个JDK命令行工具的可视化工具。VisualVM基于NetBeans平台开发，它具备了插件扩展功能的特性，通过插件的扩展，可用于显示虚拟机进程及进程的配置和环境信息(jps，jinfo)，监视应用程序的CPU、GC、堆、方法区及线程的信息(jstat、jstack)等。VisualVM在JDK/bin目录下。
 安装插件： 工具- 插件
-[![](/images/java-monitor-optimization-11.jpg)](/images/java-monitor-optimization-11.jpg)
+[![](http://idiotsky.me/images/java-monitor-optimization-11.jpg)](http://idiotsky.me/images/java-monitor-optimization-11.jpg)
 VisualVM主界面
-[![](/images/java-monitor-optimization-12.jpg)](/images/java-monitor-optimization-12.jpg)
+[![](http://idiotsky.me/images/java-monitor-optimization-12.jpg)](http://idiotsky.me/images/java-monitor-optimization-12.jpg)
 在VisualVM中生成dump文件：
-[![](/images/java-monitor-optimization-13.jpg)](/images/java-monitor-optimization-13.jpg)
+[![](http://idiotsky.me/images/java-monitor-optimization-13.jpg)](http://idiotsky.me/images/java-monitor-optimization-13.jpg)
 
 # 调优方法
 一切都是为了这一步，调优，在调优之前，我们需要记住下面的原则：
@@ -394,10 +394,10 @@ GC优化的目的有两个:
 笔者昨日发现部分开发测试机器出现异常：java.lang.OutOfMemoryError: GC overhead limit exceeded，这个异常代表：GC为了释放很小的空间却耗费了太多的时间，其原因一般有两个：1，堆太小，2，有死循环或大对象；
 笔者首先排除了第2个原因，因为这个应用同时是在线上运行的，如果有问题，早就挂了。所以怀疑是这台机器中堆设置太小；
 使用`ps -ef |grep "java"`查看，发现：
-[![](/images/java-monitor-optimization-14.png)](/images/java-monitor-optimization-14.png)
+[![](http://idiotsky.me/images/java-monitor-optimization-14.png)](http://idiotsky.me/images/java-monitor-optimization-14.png)
 该应用的堆区设置只有768m，而机器内存有2g，机器上只跑这一个java应用，没有其他需要占用内存的地方。另外，这个应用比较大，需要占用的内存也比较多；
 笔者通过上面的情况判断，只需要改变堆中各区域的大小设置即可，于是改成下面的情况：
-[![](/images/java-monitor-optimization-15.png)](/images/java-monitor-optimization-15.png)
+[![](http://idiotsky.me/images/java-monitor-optimization-15.png)](http://idiotsky.me/images/java-monitor-optimization-15.png)
 跟踪运行情况发现，相关异常没有再出现；
 
 ## 实例2
@@ -414,7 +414,7 @@ S0     S1    E     O       P        YGC YGCT FGC FGCT  GCT
 
 ## 实例3
 一应用在性能测试过程中，发现内存占用率很高，Full GC频繁，使用`sudo -u admin -H  jmap -dump:format=b,file=文件名.hprof pid `来dump内存，生成dump文件，并使用Eclipse下的mat差距进行分析，发现：
-[![](/images/java-monitor-optimization-16.png)](/images/java-monitor-optimization-16.png)
+[![](http://idiotsky.me/images/java-monitor-optimization-16.png)](http://idiotsky.me/images/java-monitor-optimization-16.png)
 从图中可以看出，这个线程存在问题，队列LinkedBlockingQueue所引用的大量对象并未释放，导致整个线程占用内存高达378m，此时通知开发人员进行代码优化，将相关对象释放掉即可。
 
 参考 http://www.cnblogs.com/zhguang/p/Java-JVM-GC.html

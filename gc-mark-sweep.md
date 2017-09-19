@@ -4,7 +4,7 @@ date: 2017-08-16 01:02:21
 tags: [java,gc]
 categories: java
 ---
-[![](/images/gc.gif)](/images/gc.gif)
+[![](http://idiotsky.me/images/gc.gif)](http://idiotsky.me/images/gc.gif)
 <!-- more -->
 这个算法分为两步，标记和清除。
 * 标记：从程序的根节点开始， 递归地 遍历所有对象，将能遍历到的对象打上标记。

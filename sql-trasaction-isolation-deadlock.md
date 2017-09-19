@@ -23,7 +23,7 @@ COMMIT TRAN
 <!-- more -->
 ## 事务的四个属性ACID
 ### 原子性Atomicity
-[![](/images/sql-trasaction-isolation-deadlock-1.jpg)](/images/sql-trasaction-isolation-deadlock-1.jpg) 
+[![](http://idiotsky.me/images/sql-trasaction-isolation-deadlock-1.jpg)](http://idiotsky.me/images/sql-trasaction-isolation-deadlock-1.jpg) 
 
 1. 事务必须是原子工作单元。事务中进行的修改，要么全部执行，要么全都不执行；
 2. 在事务完成之前（提交指令被记录到事务日志之前），系统出现故障或重新启动，SQL Server将会撤销在事务中进行的所有修改；
@@ -33,17 +33,17 @@ COMMIT TRAN
 6. SELECT @@TRANCOUNT可用在代码的任何位置来判断当前使用SELECT @@TRANCOUNT的地方是否位于一个打开的事务当中，如果不在任何打开的事务范围内，则该函数返回0；如果在某个打开的事务返回范围内，则返回一个大于0的值。打开一个事务，@@TRANCOUNT=@@TRANCOUNT+1；提交一个事务，@@TRANCOUNT-1。
 
 ### 一致性Consiitency
-[![](/images/sql-trasaction-isolation-deadlock-2.jpg)](/images/sql-trasaction-isolation-deadlock-2.jpg) 
+[![](http://idiotsky.me/images/sql-trasaction-isolation-deadlock-2.jpg)](http://idiotsky.me/images/sql-trasaction-isolation-deadlock-2.jpg) 
 1. 同时发生的事务在修改和查询数据时不发生冲突；
 2. 一致性取决于应用程序的需要。后面会讲到一致性级别，以及如何对一致性进行控制。
 
 ### 隔离性Isolation
-[![](/images/sql-trasaction-isolation-deadlock-3.jpg)](/images/sql-trasaction-isolation-deadlock-3.jpg) 
+[![](http://idiotsky.me/images/sql-trasaction-isolation-deadlock-3.jpg)](http://idiotsky.me/images/sql-trasaction-isolation-deadlock-3.jpg) 
 1. 用于控制数据访问，确保事务只访问处于期望的一致性级别下的数据；
 2. 使用锁对各个事务之间正在修改和查询的数据进行隔离。
 
 ### 持久性Durability
-[![](/images/sql-trasaction-isolation-deadlock-4.jpg)](/images/sql-trasaction-isolation-deadlock-4.jpg) 
+[![](http://idiotsky.me/images/sql-trasaction-isolation-deadlock-4.jpg)](http://idiotsky.me/images/sql-trasaction-isolation-deadlock-4.jpg) 
 1. 在将数据修改写入到磁盘上数据库的数据分区之前会把这些修改写入到磁盘上数据库的事务日志中，把提交指令记录到磁盘的事务日志中以后，及时数据修改还没有应用到磁盘的数据分区，也可以认为事务时持久化的。
 2. 系统重新启动（正常启动或在发生系统故障之后启动），SQL Server会每个数据库的事务日志，进行回复处理。
 3. 恢复处理包含两个阶段：重做阶段和撤销阶段。

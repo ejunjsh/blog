@@ -17,7 +17,7 @@ categories: java
 * getRequestURI 取得不包括参数的URI，即去掉协议和服务器名的URL 
 
 具体如下图：
-[![](/images/java-servlet-url.png)](/images/java-servlet-url.png)
+[![](http://idiotsky.me/images/java-servlet-url.png)](http://idiotsky.me/images/java-servlet-url.png)
 相对应的函数的值如下： 
 
 * getContextPath：/ServletTest 

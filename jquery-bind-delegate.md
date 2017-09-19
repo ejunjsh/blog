@@ -6,13 +6,13 @@ categories: jQuery
 ---
 `摘要: jQuery的.bind()、.live()和.delegate()之间的区别并非总是那么明显的，然而，如果我们对所有的不同之处都有清晰的理解的话，那么这将会有助于我们编写出更加简洁的代码，以及防止在交互应用中弹出错误。`
 
-[![](/images/jquery-1.jpg)](/images/jquery-1.jpg) 
+[![](http://idiotsky.me/images/jquery-1.jpg)](http://idiotsky.me/images/jquery-1.jpg) 
 <!-- more -->
 
 DOM树
 
 首先，可视化一个HMTL文档的DOM树是很有帮助的。一个简单的HTML页面看起来就像是这个样子：
-[![](/images/jquery-2.png)](/images/jquery-2.png) 
+[![](http://idiotsky.me/images/jquery-2.png)](http://idiotsky.me/images/jquery-2.png) 
 
 事件冒泡(又称事件传播)
 
@@ -24,11 +24,11 @@ DOM树
 ````
   
 因此一个单击操作会触发alert函数的执行。
-[![](/images/jquery-3.png)](/images/jquery-3.png) 
+[![](http://idiotsky.me/images/jquery-3.png)](http://idiotsky.me/images/jquery-3.png) 
 
 click事件接着会向树的根方向传播，广播到父元素，然后接着是每个祖先元素，只要是它的某个后代元素上的单击事件被触发，事件就会传给它。
 
-[![](/images/jquery-4.png)](/images/jquery-4.png) 
+[![](http://idiotsky.me/images/jquery-4.png)](http://idiotsky.me/images/jquery-4.png) 
 
 在操纵DOM的语境中，document是根节点。
 

@@ -4,7 +4,7 @@ date: 2017-08-19 22:50:07
 tags: [openstack,ubuntu,kvm]
 categories: openstack
 ---
-[![](/images/openstack-install-prepare-2-1.png)](/images/openstack-install-prepare-2-1.png)
+[![](http://idiotsky.me/images/openstack-install-prepare-2-1.png)](http://idiotsky.me/images/openstack-install-prepare-2-1.png)
 上图是整个openstack的架构图，里面的椭圆方块都是openstack的服务，所以安装openstack就是要安装这些服务。
 
 按照官方建议，这次openstack安装的服务为：

@@ -56,7 +56,7 @@ sudo /etc/init.d/samba restart
 ````
 # 连接
 一般树莓派跟你的WiFi相连的话，你的网络就能看到跟上面配置一样的分享名称，如mac上面这样的显示：
-[![](/images/nas-screenshot.png)](/images/nas-screenshot.png) 
+[![](http://idiotsky.me/images/nas-screenshot.png)](http://idiotsky.me/images/nas-screenshot.png) 
 如果显示没权限，可以断开连接，用你上面添加的账号登录。
 
 # 问题总结

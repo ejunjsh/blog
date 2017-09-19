@@ -4,7 +4,7 @@ date: 2017-03-06 21:22:58
 tags: docker
 categories: docker
 ---
-[![](/images/docker-blog.png)](/images/docker-blog.png)
+[![](http://idiotsky.me/images/docker-blog.png)](http://idiotsky.me/images/docker-blog.png)
 <!-- more -->
 
 # docker run --rm
