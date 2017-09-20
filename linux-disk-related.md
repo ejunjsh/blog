@@ -1,7 +1,7 @@
 ---
 title: Linux硬盘分区相关命令
 date: 2014-02-30 17:23:33
-tags: [fdisk,e2label,mkfs,mount,umount,df]
+tags: [fdisk,e2label,mkfs,mount,umount,df,du]
 categories: linux命令
 ---
 # 分区fdisk
@@ -84,4 +84,64 @@ $ e2label /dev/hdd1 mydisk
 ````bash
 $ umount /dev/hdd1 /hdd1
 $ umount /dev/hdd2 /hdd2
+````
+
+# 查看文件夹大小-du
+du的英文原义为“disk usage”，含义为显示磁盘空间的使用情况，统计目录（或文件）所占磁盘空间的大小。该命令的功能是逐级进入指定目录的每一个子目录并显示该目录占用文件系统数据块（1024字节）的情况。若没有给出指定目录，则对当前目录进行统计。
+
+df命令的各个选项含义如下：
+````
+  -s：对每个Names参数只给出占用的数据块总数。
+  -a：递归地显示指定目录中各文件及子目录中各文件占用的数据块数。若既不指定-s，也不指定-a，则只显示Names中的每一个目录及其中的各子目录所占的磁盘块数。
+  -b：以字节为单位列出磁盘空间使用情况（系统默认以k字节为单位）。
+  -k：以1024字节为单位列出磁盘空间使用情况。
+  -c：最后再加上一个总计（系统默认设置）。
+  -l：计算所有的文件大小，对硬链接文件，则计算多次。
+  -x：跳过在不同文件系统上的目录不予统计。
+  -h: 人类可读的显示出对应的文件夹的大小，例如（10K，22M）
+````
+下面举例说明du命令的使用：
+````shell
+# 查看/mnt目录占用磁盘空间的情况
+$ du –abk /mnt
+1       /mnt/cdrom
+1       /mnt/floppy
+3       /mnt
+ 
+# 列出各目录所占的磁盘空间，但不详细列出每个文件所占的空间
+# 输出清单中的第1列是以块为单位计的磁盘空间容量，第2列列出目录中使用这些空间的目录名称。
+$ du
+3684    ./log
+84      ./libnids-1.17/doc
+720     ./libnids-1.17/src
+32      ./libnids-1.17/samples
+1064    ./libnids-1.17
+4944    .
+````
+
+这可能是一个很长的清单，有时只需要一个总数。这时可在du命令中加-s选项来取得总数：
+
+````shell
+$ du –s /mnt 
+3       /mnt
+ 
+# 列出所有文件和目录所占的空间（使用a选项），并以字节为单位（使用b选项）来计算大小
+$ du –ab /root/mail
+6144    mail/sent-mail
+1024    mail/saved-messages
+8192    mail
+````
+
+其实用-h 选项可以显示更加可读的数据
+````shell
+$ du -h
+12K     ./.gnupg
+0       ./bin
+16K     ./.ssh
+0       ./.local/share/systemd
+0       ./.local/share
+0       ./.local
+8.0K    ./.vim/colors
+8.0K    ./.vim
+175M    .
 ````
