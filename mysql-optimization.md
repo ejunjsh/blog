@@ -1,6 +1,6 @@
 ---
-title: MySQL性能优化的最佳20+条经验
-date: 2017-09-20 23:53:22
+title: MySQL优化
+date: 2017-09-20 17:53:22
 tags: mysql
 categories: mysql
 ---
