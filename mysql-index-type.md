@@ -1,6 +1,6 @@
 ---
 title: MySQL索引类型
-date: 2017-09-20 22:14:48
+date: 2016-09-20 22:14:48
 tags: mysql
 categories: mysql
 ---

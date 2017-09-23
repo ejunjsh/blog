@@ -1,6 +1,6 @@
 ---
 title: MySQL索引方法
-date: 2017-09-20 21:58:53
+date: 2016-09-20 21:58:53
 tags: mysql
 categories: mysql
 ---

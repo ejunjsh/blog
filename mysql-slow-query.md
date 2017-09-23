@@ -1,6 +1,6 @@
 ---
 title: 开启mysql慢查询
-date: 2017-09-20 21:47:38
+date: 2016-09-20 21:47:38
 tags: mysql
 categories: mysql
 ---
