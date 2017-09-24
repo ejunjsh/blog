@@ -144,4 +144,4 @@ java.lang.NullPointerException
 # 结论
 很明显tree结构的都不接受key为null,hashtable和concurrenthashmap是key和value都不支持null的，其他都就随便吧。🙂
 
-所有代码在 https://github.com/ejunjsh/java-code/tree/master/com/sky/code/collection
+所有代码在 https://github.com/ejunjsh/java-code/tree/master/src/main/java/com/sky/code/collection

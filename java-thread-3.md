@@ -386,7 +386,7 @@ public class ScheduledTask {
 至于scheduleWithFixedDelay方法，大家就把代码稍微修改一下执行试试就行，这里就不重复了。而SingleThreadScheduledExecutor的使用的方法基本是类似，只不过是单线程罢了，这里也不再描述了。好了，今天就到这吧。
 
 参考 http://blog.csdn.net/javazejian/article/details/50890554
-代码 https://github.com/ejunjsh/java-code/tree/master/com/sky/code/thread
+代码 https://github.com/ejunjsh/java-code/tree/master/src/main/java/com/sky/code/thread
 
 
 

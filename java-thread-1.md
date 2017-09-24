@@ -234,4 +234,4 @@ Thread.Join()：把指定的线程加入到当前线程，可以将两个交替�
 好了。本篇线程基础知识介绍到此结束。
 
 参考 http://blog.csdn.net/javazejian/article/details/50878598
-所有代码在 https://github.com/ejunjsh/java-code/tree/master/com/sky/code/thread
+所有代码在 https://github.com/ejunjsh/java-code/tree/master/src/main/java/com/sky/code/thread

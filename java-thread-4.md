@@ -249,4 +249,4 @@ future task result : 100000
 ````
 
 参考 http://blog.csdn.net/javazejian/article/details/50896505
-代码 https://github.com/ejunjsh/java-code/tree/master/com/sky/code/thread
+代码 https://github.com/ejunjsh/java-code/tree/master/src/main/java/com/sky/code/thread
