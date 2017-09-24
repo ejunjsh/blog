@@ -10,7 +10,7 @@ categories: java
 首先我们得明白一个 问题，为什么需要线程池？在java中，使用线程来执行异步任务时，线程的创建和销毁需要一定的开销，如果我们为每一个任务创建一个新的线程来执行的话，那么这些线程的创建与销毁将消耗大量的计算资源。同时为每一个任务创建一个新线程来执行，这样的方式可能会使处于高负荷状态的应用最终崩溃。所以线程池的出现为解决这个问题带来曙光。我们将在线程池中创建若干条线程，当有任务需要执行时就从该线程池中获取一条线程来执行任务，如果一时间任务过多，超出线程池的线程数量，那么后面的线程任务就进入一个等待队列进行等待，直到线程池有线程处于空闲时才从等待队列获取要执行的任务进行处理，以此循环.....这样就大大减少了线程创建和销毁的开销，也会缓解我们的应用处于超负荷时的情况。
 ## Executor框架的两级调度模型
 在java线程启动时会创建一个本地操作系统线程，当该java线程终止时，这个操作系统线程也会被回收。而每一个java线程都会被一对一映射为本地操作系统的线程，操作系统会调度所有的线程并将它们分别给可用的CPU。而所谓的映射方式是这样实现的，在上层，java多线程程序通过把应用分为若干个任务，然后使用用户级的调度器（Executor框架）将这些任务映射为固定数量的线程；在底层，操作系统内核将这些线程映射到硬件处理器上。这样种两级调度模型如下图所示：
-[![](http://img.blog.csdn.net/20160314222941341?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20160314222941341?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![](http://idiotsky.me/images/java-thread-3-1.png)](http://idiotsky.me/images/java-thread-3-1.png)
 从图中我们可以看出，应用程序通过Executor框架控制上层的调度，而下层的调度由操作系统内核控制，下层的调度不受应用程序的控制。
 ## Executor框架的结构
 Executor框架的结构主要包括3个部分
@@ -18,7 +18,7 @@ Executor框架的结构主要包括3个部分
 2. 任务的执行：包括任务执行机制的核心接口Executor，以及继承自Executor的EexcutorService接口。Exrcutor有两个关键类实现了ExecutorService接口（ThreadPoolExecutor和ScheduledThreadPoolExecutor）。
 3. 异步计算的结果：包括接口Future和实现Future接口的FutureTask类
 下面我们通过一个UML图来认识一下这些类间的关系：
-[![](http://img.blog.csdn.net/20160314223014236?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20160314223014236?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![](http://idiotsky.me/images/java-thread-3-2.png)](http://idiotsky.me/images/java-thread-3-2.png)
 <!-- more -->
 Extecutor是一个接口，它是Executor框架的基础，它将任务的提交与任务的执行分离开来。
 ThreadPoolExecutor是线程池的核心实现类，用来执行被提交的任务。
@@ -26,7 +26,7 @@ ScheduledThreadPoolExecutor是一个实现类，可以在给定的延迟后运�
 Future接口和实现Future接口的FutureTask类，代表异步计算的结果。
 Runnable接口和Callable接口的实现类，都可以被ThreadPoolExecutor或者ScheduledThreadPoolExecutor执行。区别就是Runnable无法返回执行结果，而Callable可以返回执行结果。
 下面我们通过一张图来理解它们间的执行关系：
-[![](http://img.blog.csdn.net/20160314223043311?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20160314223043311?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![](http://idiotsky.me/images/java-thread-3-3.png)](http://idiotsky.me/images/java-thread-3-3.png)
 **分析说明：**
 主线程首先创建实现Runnable或Callable接口的任务对象，工具类Executors可以把一个Runnable对象封装为一个Callable对象,使用如下两种方式：
 Executors.callable(Runnable task)或者Executors.callable(Runnable task,Object resule)。
@@ -73,7 +73,7 @@ public static ExecutorService newFixedThreadPool(int nThreads) {
     }  
 ````
 FixedThreadPool的corePoolSize和maximumPoolSize参数都被设置为nThreads。当线程池中的线程数量大于corePoolSize时，keepAliveTime为非核心空闲线程等待新任务的最长时间，超过这个时间后非核心线程将被终止，这里keepAliveTime设置为0L，就说明非核心线程会立即被终止。事实上这里也没有非核心线程创建，因为核心线程数和最大线程数都一样的。下面我们来看看FixedThreadPool的execute()方法的运行流程：
-[![](http://img.blog.csdn.net/20160314223220078?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20160314223220078?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![](http://idiotsky.me/images/java-thread-3-4.png)](http://idiotsky.me/images/java-thread-3-4.png)
 分析：
 1. 如果当前运行线程数少corePoolSize，则创建一个新的线程来执行任务。
 2. 如果当前线程池的运行线程数等于corePoolSize，那么后面提交的任务将加入LinkedBlockingQueue。
@@ -135,7 +135,7 @@ public static ExecutorService newCachedThreadPool() {
     } 
 ````
 从该静态方法，我们可以看到CachedThreadPool的corePoolSize被设置为0，而maximumPoolSize被设置Integer.MAX_VALUE，即maximumPoolSize是无界的，而keepAliveTime被设置为60L，单位为妙。也就是空闲线程等待时间最长为60秒，超过该时间将会被终止。而且在这里CachedThreadPool使用的是没有容量的SynchronousQueue作为线程池的工作队列，但其maximumPoolSize是无界的，也就是意味着如果主线程提交任务的速度高于maximumPoolSize中线程处理任务的速度时CachedThreadPool将会不断的创建新的线程，在极端情况下，CachedThreadPool会因为创建过多线程而耗尽CPU和内存资源。CachedThreadPool的execute()方法的运行流程：
-[![](http://img.blog.csdn.net/20160314223430065?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20160314223430065?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![](http://idiotsky.me/images/java-thread-3-5.png)](http://idiotsky.me/images/java-thread-3-5.png)
 分析：
 1. 首先执行SynchronousQueue.offer(Runnable task)，添加一个任务。如果当前CachedThreadPool中有空闲线程正在执行SynchronousQueue.poll(keepAliveTime,TimeUnit.NANOSECONDS),其中NANOSECONDS是毫微秒即十亿分之一秒（就是微秒/1000），那么主线程执行offer操作与空闲线程执行poll操作配对成功，主线程把任务交给空闲线程执行，execute()方法执行完成，否则进入第（2）步。
 2. 当CachedThreadPool初始线程数为空时，或者当前没有空闲线程，将没有线程去执行SynchronousQueue.poll(keepAliveTime,TimeUnit.NANOSECONDS)。这样的情况下，步骤（1）将会失败，此时CachedThreadPool会创建一个新的线程来执行任务，execute()方法执行完成。
@@ -144,7 +144,7 @@ public static ExecutorService newCachedThreadPool() {
 根据前面的分析我们知道SynchronousQueue是一个没有容量的阻塞队列（其实个人认为是相对应时间而已的没有容量，因为时间到空闲线程就会被移除）。
 每个插入操作必须等到一个线程与之对应。CachedThreadPool使用SynchronousQueue，把主线程的任务传递给空闲线程执行。
 流程如下：
-[![](http://img.blog.csdn.net/20160314223455644?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20160314223455644?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![](http://idiotsky.me/images/java-thread-3-6.png)](http://idiotsky.me/images/java-thread-3-6.png)
 CachedThreadPool使用的案例代码如下：
 ````java
 public class CachedThreadPool {     
@@ -173,7 +173,7 @@ public static ExecutorService newSingleThreadExecutor() {
     }  
 ````
 从静态方法可以看出SingleThreadExecutor的corePoolSize和maximumPoolSize被设置为1，其他参数则与FixedThreadPool相同。SingleThreadExecutor使用的工作队列也是无界队列LinkedBlockingQueue。由于SingleThreadExecutor采用无界队列的对线程池的影响与FixedThreadPool一样，这里就不过多描述了。同样的我们先来看看其运行流程：
-[![](http://img.blog.csdn.net/20160314223607973?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20160314223607973?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![](http://idiotsky.me/images/java-thread-3-7.png)](http://idiotsky.me/images/java-thread-3-7.png)
 分析：
 1. 如果当前线程数少于corePoolSize即线程池中没有线程运行，则创建一个新的线程来执行任务。
 2. 在线程池的线程数量等于corePoolSize时，将任务加入到LinkedBlockingQueue。
@@ -198,7 +198,7 @@ public class SingleThreadExecutor {
 # ScheduledThreadPoolExecutor浅析 
 ## ScheduledThreadPoolExecutor执行机制分析
 ScheduledThreadPoolExecutor继承自ThreadPoolExecutor。它主要用来在给定的延迟之后执行任务，或者定期执行任务。ScheduledThreadPoolExecutor的功能与Timer类似，但比Timer更强大，更灵活，Timer对应的是单个后台线程，而ScheduledThreadPoolExecutor可以在构造函数中指定多个对应的后台线程数。接下来我们先来了解一下ScheduledThreadPoolExecutor的运行机制：
-[![](http://img.blog.csdn.net/20160314223650662?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20160314223650662?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![](http://idiotsky.me/images/java-thread-3-8.png)](http://idiotsky.me/images/java-thread-3-8.png)
 分析：
 DelayQueue是一个无界队列，所以ThreadPoolExecutor的maximumPoolSize在ScheduledThreadPoolExecutor中无意义。ScheduledThreadPoolExecutor的执行主要分为以下两个部分
 1. 当调用ScheduledThreadPoolExecutor的scheduleAtFixedRate()方法或者scheduleWithFixedDelay()方法时，会向ScheduledThreadPoolExecutor的DelayQueue添加一个实现了RunnableScheduledFuture接口的ScheduleFutureTask。
@@ -326,7 +326,7 @@ public class ScheduledThreadPoolTest {
 }
 ````
 运行输入执行结果：
-[![](http://img.blog.csdn.net/20160314223921260?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20160314223921260?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![](http://idiotsky.me/images/java-thread-3-9.png)](http://idiotsky.me/images/java-thread-3-9.png)
 线程任务确实在10秒延迟后才开始执行。这就是schedule()方法的使用。下面我们再介绍2个可用于周期性执行任务的方法。
 ````java
 public ScheduledFuture<?> scheduleAtFixedRate(Runnable command,long initialDelay,long period,TimeUnit unit)
@@ -365,7 +365,7 @@ public class ScheduledTask {
     }
 }
 ````
-运行结果(后来补贴的结果，所以时间是2017)
+运行结果
 ````
 当前线程：pool-1-thread-5  当前时间：Tue Aug 08 09:43:18 CST 2017  
 当前线程：pool-1-thread-4  当前时间：Tue Aug 08 09:43:18 CST 2017  
