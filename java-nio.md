@@ -67,7 +67,7 @@ class ConnectIOnHandler extends Thread{
 需要说明的是等待就绪的阻塞是不使用CPU的，是在“空等”；而真正的读写操作的阻塞是使用CPU的，真正在"干活"，而且这个过程非常快，属于memory copy，带宽通常在1GB/s级别以上，可以理解为基本不耗时。
 
 下图是几种常见I/O模型的对比：
-[![](http://idiotsky.me/images/java-nio-1.jpg)](http://idiotsky.me/images/java-nio-1.jpg)
+[![](http://idiotsky.me/images1/java-nio-1.jpg)](http://idiotsky.me/images1/java-nio-1.jpg)
 
 以socket.read()为例子：
 
