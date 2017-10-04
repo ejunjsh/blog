@@ -27,8 +27,30 @@ list.remove(0);
 [![](http://idiotsky.me/images1/java-arraylist-3.png)](http://idiotsky.me/images1/java-arraylist-3.png)
 接下来看看几个常用的方法的源码分析。
 <!-- more -->
+# ArrayList属性
+ArrayList属性主要就是当前数组长度size，以及存放数组的对象elementData数组，除此之外还有一个经常用到的属性就是从AbstractList继承过来的modCount属性，代表ArrayList集合的修改次数。
+````java
+public class ArrayList<E> extends AbstractList<E> implements List<E>, RandomAccess, Cloneable, Serializable {  
+    // 序列化id  
+    private static final long serialVersionUID = 8683452581122892189L;  
+    // 默认初始的容量  
+    private static final int DEFAULT_CAPACITY = 10;  
+    // 一个空对象  
+    private static final Object[] EMPTY_ELEMENTDATA = new Object[0];  
+    // 一个空对象，如果使用默认构造函数创建，则默认对象内容默认是该值  
+    private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = new Object[0];  
+    // 当前数据对象存放地方，当前对象不参与序列化  
+    transient Object[] elementData;  
+    // 当前数组长度  
+    private int size;  
+    // 数组最大长度  
+    private static final int MAX_ARRAY_SIZE = 2147483639;  
+  
+    // 省略方法。。  
+} 
+````
 
-# 构造方法： 
+# 构造函数： 
 ArrayList提供了三种方式的构造器，可以构造一个空列表、构造一个指定初始容量的空列表以及构造一个包含指定collection的元素的列表，这些元素按照该collection的迭代器返回它们的顺序排列的。
 ````java
     // ArrayList带容量大小的构造函数。    
@@ -137,27 +159,6 @@ private void rangeCheck(int index) {
     }
 ````
 
-# remove方法
-同样要检查索引，然后删除索引的元素，然后索引位置由后面元素前移补上。
-````java
-public E remove(int index) {
-    rangeCheck(index);
- 
-    modCount++;
-    E oldValue = elementData(index);
- 
-    int numMoved = size - index - 1;
-    if (numMoved > 0)
-        // 把后面的往前移
-        System.arraycopy(elementData, index+1, elementData, index,
-                         numMoved);
-    // 把最后的置null，好让gc回收
-    elementData[--size] = null; 
- 
-    return oldValue;
-}
-````
-
 # contains方法
 调用indexOf方法，遍历数组中的每一个元素作对比，如果找到对于的元素，则返回true，没有找到则返回false。
 ````java
@@ -178,6 +179,133 @@ public int indexOf(Object o) {
     }  
     return -1;  
 } 
+````
+
+# remove方法
+## 根据索引remove
+1. 判断索引有没有越界
+2. 自增修改次数
+3. 将指定位置（index）上的元素保存到oldValue
+4. 将指定位置（index）上的元素都往前移动一位
+5. 将最后面的一个元素置空，好让垃圾回收器回收
+6. 将原来的值oldValue返回
+
+````java
+public E remove(int index) {  
+    rangeCheck(index);  
+  
+    modCount++;  
+    E oldValue = elementData(index);  
+  
+    int numMoved = size - index - 1;  
+    if (numMoved > 0)  
+        System.arraycopy(elementData, index+1, elementData, index,  
+                         numMoved);  
+    elementData[--size] = null; // 把最后的置null，好让gc回收
+  
+    return oldValue;  
+}  
+````
+注意：调用这个方法不会缩减数组的长度，只是将最后一个数组元素置空而已。
+
+## 根据对象remove
+循环遍历所有对象，得到对象所在索引位置，然后调用fastRemove方法，执行remove操作
+````java
+public boolean remove(Object o) {  
+    if (o == null) {  
+        for (int index = 0; index < size; index++)  
+            if (elementData[index] == null) {  
+                fastRemove(index);  
+                return true;  
+            }  
+    } else {  
+        for (int index = 0; index < size; index++)  
+            if (o.equals(elementData[index])) {  
+                fastRemove(index);  
+                return true;  
+            }  
+    }  
+    return false;  
+} 
+````
+定位到需要remove的元素索引，先将index后面的元素往前面移动一位（调用System.arraycooy实现），然后将最后一个元素置空。
+````java
+private void fastRemove(int index) {  
+    modCount++;  
+    int numMoved = size - index - 1;  
+    if (numMoved > 0)  
+        System.arraycopy(elementData, index+1, elementData, index,  
+                         numMoved);  
+    elementData[--size] = null; // clear to let GC do its work  
+}
+````
+
+# clear方法
+添加操作次数（modCount），将数组内的元素都置空，等待垃圾收集器收集，不减小数组容量。
+````java
+public void clear() {  
+    modCount++;  
+  
+    // clear to let GC do its work  
+    for (int i = 0; i < size; i++)  
+        elementData[i] = null;  
+  
+    size = 0;  
+}  
+````
+
+# sublist方法
+我们看到代码中是创建了一个ArrayList 类里面的一个内部类SubList对象，传入的值中第一个参数时this参数，其实可以理解为返回当前list的部分视图，真实指向的存放数据内容的地方还是同一个地方，如果修改了sublist返回的内容的话，那么原来的list也会变动。
+````java
+public List<E> subList(int arg0, int arg1) {  
+    subListRangeCheck(arg0, arg1, this.size);  
+    return new ArrayList.SubList(this, 0, arg0, arg1);  
+}  
+````
+
+# trimToSize方法
+1. 修改次数加1
+2. 将elementData中空余的空间（包括null值）去除，例如：数组长度为10，其中只有前三个元素有值，其他为空，那么调用该方法之后，数组的长度变为3.
+
+````java
+public void trimToSize() {  
+    modCount++;  
+    if (size < elementData.length) {  
+        elementData = (size == 0)  
+          ? EMPTY_ELEMENTDATA  
+          : Arrays.copyOf(elementData, size);  
+    }  
+}  
+````
+
+# iterator方法
+interator方法返回的是一个内部类，由于内部类的创建默认含有外部的this指针，所以这个内部类可以调用到外部类的属性。
+````java
+public Iterator<E> iterator() {  
+    return new Itr();  
+}  
+````
+一般的话，调用完iterator之后，我们会使用iterator做遍历，这里使用next做遍历的时候有个需要注意的地方，就是调用next的时候，可能会引发ConcurrentModificationException，当修改次数，与期望的修改次数（调用iterator方法时候的修改次数）不一致的时候，会发生该异常，详细我们看一下代码实现：
+````java
+@SuppressWarnings("unchecked")  
+public E next() {  
+    checkForComodification();  
+    int i = cursor;  
+    if (i >= size)  
+        throw new NoSuchElementException();  
+    Object[] elementData = ArrayList.this.elementData;  
+    if (i >= elementData.length)  
+        throw new ConcurrentModificationException();  
+    cursor = i + 1;  
+    return (E) elementData[lastRet = i];  
+}  
+````
+expectedModCount这个值是在用户调用ArrayList的iterator方法时候确定的，但是在这之后用户add，或者remove了ArrayList的元素，那么modCount就会改变，那么这个值就会不相等，将会引发ConcurrentModificationException异常，这个是在多线程使用情况下，比较常见的一个异常。
+````java
+final void checkForComodification() {  
+    if (modCount != expectedModCount)  
+        throw new ConcurrentModificationException();  
+}  
 ````
 
 # 数组拷贝

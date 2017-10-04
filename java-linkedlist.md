@@ -315,10 +315,20 @@ public Object[] toArray() {
 ````
 
 # listIterator方法
-这个方法返回的是一个内部类ListIterator，用户可以使用这个内部类变量遍历当前的链表元素，但是由于LinkedList也是非线程安全的类，所以和上一篇文章中的ArrayList源码分析(基于JDK8)  Iterator一样，多线程下面使用，也可能会产生多线程修改的异常。
+这个方法返回的是一个内部类ListIterator，用户可以使用这个内部类变量遍历当前的链表元素，但是由于LinkedList也是非线程安全的类，所以和上一篇文章中的[java数据结构-arraylist](http://idiotsky.me/2017/07/16/java-arraylist/)  Iterator一样，多线程下面使用，也可能会产生多线程修改的异常。
 ````java
 public ListIterator<E> listIterator(int index) {  
     checkPositionIndex(index);  
     return new ListItr(index);  
 }  
 ````
+
+# 总结
+用[关于Java集合的小抄](http://calvin1978.blogcn.com/articles/collection.html)里面的关于linkedlist作为总结吧。
+>以双向链表实现。链表无容量限制，但双向链表本身使用了更多空间，每插入一个元素都要构造一个额外的Node对象，也需要额外的链表指针操作。
+
+>按下标访问元素－get（i）、set（i,e） 要悲剧的部分遍历链表将指针移动到位 （如果i>数组大小的一半，会从末尾移起）。
+
+>插入、删除元素时修改前后节点的指针即可，不再需要复制移动。但还是要部分遍历链表的指针才能移动到下标所指的位置。
+
+>只有在链表两头的操作－add（）、addFirst（）、removeLast（）或用iterator（）上的remove（）倒能省掉指针的移动。
