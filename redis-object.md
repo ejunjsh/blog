@@ -309,4 +309,100 @@ redis> OBJECT ENCODING msg
 ````
 
 # 列表对象
-> to be continue...
+列表对象的编码可以是 ziplist 或者 linkedlist 。
+
+ziplist 编码的列表对象使用压缩列表作为底层实现， 每个压缩列表节点（entry）保存了一个列表元素。
+
+举个例子， 如果我们执行以下 RPUSH 命令， 那么服务器将创建一个列表对象作为 numbers 键的值：
+````shell
+redis> RPUSH numbers 1 "three" 5
+(integer) 3
+````
+如果 numbers 键的值对象使用的是 ziplist 编码， 这个这个值对象将会是图 8-5 所展示的样子。
+[![](http://idiotsky.me/images1/redis-object-5.png)](http://idiotsky.me/images1/redis-object-5.png)
+另一方面， linkedlist 编码的列表对象使用双端链表作为底层实现， 每个双端链表节点（node）都保存了一个字符串对象， 而每个字符串对象都保存了一个列表元素。
+
+举个例子， 如果前面所说的 numbers 键创建的列表对象使用的不是 ziplist 编码， 而是 linkedlist 编码， 那么 numbers 键的值对象将是图 8-6 所示的样子。
+[![](http://idiotsky.me/images1/redis-object-6.png)](http://idiotsky.me/images1/redis-object-6.png)
+注意， linkedlist 编码的列表对象在底层的双端链表结构中包含了多个字符串对象， 这种嵌套字符串对象的行为在稍后介绍的哈希对象、集合对象和有序集合对象中都会出现， 字符串对象是 Redis 五种类型的对象中唯一一种会被其他四种类型对象嵌套的对象。
+
+## 编码转换
+当列表对象可以同时满足以下两个条件时， 列表对象使用 ziplist 编码：
+1. 列表对象保存的所有字符串元素的长度都小于 64 字节；
+2. 列表对象保存的元素数量小于 512 个；
+
+不能满足这两个条件的列表对象需要使用 linkedlist 编码。
+
+> 注意
+>以上两个条件的上限值是可以修改的， 具体请看配置文件中关于 list-max-ziplist-value 选项和 list-max-ziplist-entries 选项的说明。
+
+对于使用 ziplist 编码的列表对象来说， 当使用 ziplist 编码所需的两个条件的任意一个不能被满足时， 对象的编码转换操作就会被执行： 原本保存在压缩列表里的所有列表元素都会被转移并保存到双端链表里面， 对象的编码也会从 ziplist 变为 linkedlist 。
+
+以下代码展示了列表对象因为保存了长度太大的元素而进行编码转换的情况：
+````shell
+# 所有元素的长度都小于 64 字节
+redis> RPUSH blah "hello" "world" "again"
+(integer) 3
+
+redis> OBJECT ENCODING blah
+"ziplist"
+
+# 将一个 65 字节长的元素推入列表对象中
+redis> RPUSH blah "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
+(integer) 4
+
+# 编码已改变
+redis> OBJECT ENCODING blah
+"linkedlist"
+````
+除此之外， 以下代码展示了列表对象因为保存的元素数量过多而进行编码转换的情况：
+````shell
+# 列表对象包含 512 个元素
+redis> EVAL "for i=1,512 do redis.call('RPUSH', KEYS[1], i) end" 1 "integers"
+(nil)
+
+redis> LLEN integers
+(integer) 512
+
+redis> OBJECT ENCODING integers
+"ziplist"
+
+# 再向列表对象推入一个新元素，使得对象保存的元素数量达到 513 个
+redis> RPUSH integers 513
+(integer) 513
+
+# 编码已改变
+redis> OBJECT ENCODING integers
+"linkedlist"
+````
+
+# 哈希对象
+哈希对象的编码可以是 ziplist 或者 hashtable 。
+
+ziplist 编码的哈希对象使用压缩列表作为底层实现， 每当有新的键值对要加入到哈希对象时， 程序会先将保存了键的压缩列表节点推入到压缩列表表尾， 然后再将保存了值的压缩列表节点推入到压缩列表表尾， 因此：
+* 保存了同一键值对的两个节点总是紧挨在一起， 保存键的节点在前， 保存值的节点在后；
+* 先添加到哈希对象中的键值对会被放在压缩列表的表头方向， 而后来添加到哈希对象中的键值对会被放在压缩列表的表尾方向。
+
+举个例子， 如果我们执行以下 HSET 命令， 那么服务器将创建一个列表对象作为 profile 键的值：
+````shell
+redis> HSET profile name "Tom"
+(integer) 1
+
+redis> HSET profile age 25
+(integer) 1
+
+redis> HSET profile career "Programmer"
+(integer) 1
+````
+如果 profile 键的值对象使用的是 ziplist 编码， 那么这个值对象将会是图 8-9 所示的样子， 其中对象所使用的压缩列表如图 8-10 所示。
+[![](http://idiotsky.me/images1/redis-object-9.png)](http://idiotsky.me/images1/redis-object-9.png)
+[![](http://idiotsky.me/images1/redis-object-10.png)](http://idiotsky.me/images1/redis-object-10.png)
+
+另一方面， hashtable 编码的哈希对象使用字典作为底层实现， 哈希对象中的每个键值对都使用一个字典键值对来保存：
+* 字典的每个键都是一个字符串对象， 对象中保存了键值对的键；
+* 字典的每个值都是一个字符串对象， 对象中保存了键值对的值。
+
+举个例子， 如果前面 profile 键创建的不是 ziplist 编码的哈希对象， 而是 hashtable 编码的哈希对象， 那么这个哈希对象应该会是图 8-11 所示的样子。
+[![](http://idiotsky.me/images1/redis-object-11.png)](http://idiotsky.me/images1/redis-object-11.png)
+
+## 编码转换
