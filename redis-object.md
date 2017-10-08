@@ -333,7 +333,7 @@ redis> RPUSH numbers 1 "three" 5
 
 不能满足这两个条件的列表对象需要使用 linkedlist 编码。
 
-> 注意
+>__注意__
 >以上两个条件的上限值是可以修改的， 具体请看配置文件中关于 list-max-ziplist-value 选项和 list-max-ziplist-entries 选项的说明。
 
 对于使用 ziplist 编码的列表对象来说， 当使用 ziplist 编码所需的两个条件的任意一个不能被满足时， 对象的编码转换操作就会被执行： 原本保存在压缩列表里的所有列表元素都会被转移并保存到双端链表里面， 对象的编码也会从 ziplist 变为 linkedlist 。
@@ -406,3 +406,248 @@ redis> HSET profile career "Programmer"
 [![](http://idiotsky.me/images1/redis-object-11.png)](http://idiotsky.me/images1/redis-object-11.png)
 
 ## 编码转换
+当哈希对象可以同时满足以下两个条件时， 哈希对象使用 ziplist 编码：
+1. 哈希对象保存的所有键值对的键和值的字符串长度都小于 64 字节；
+2. 哈希对象保存的键值对数量小于 512 个；
+
+不能满足这两个条件的哈希对象需要使用 hashtable 编码。
+
+>__注意__
+>这两个条件的上限值是可以修改的， 具体请看配置文件中关于 hash-max-ziplist-value 选项和 hash-max-ziplist-entries 选项的说明。
+
+对于使用 ziplist 编码的列表对象来说， 当使用 ziplist 编码所需的两个条件的任意一个不能被满足时， 对象的编码转换操作就会被执行： 原本保存在压缩列表里的所有键值对都会被转移并保存到字典里面， 对象的编码也会从 ziplist 变为 hashtable 。
+
+以下代码展示了哈希对象因为键值对的键长度太大而引起编码转换的情况：
+````shell
+# 哈希对象只包含一个键和值都不超过 64 个字节的键值对
+redis> HSET book name "Mastering C++ in 21 days"
+(integer) 1
+
+redis> OBJECT ENCODING book
+"ziplist"
+
+# 向哈希对象添加一个新的键值对，键的长度为 66 字节
+redis> HSET book long_long_long_long_long_long_long_long_long_long_long_description "content"
+(integer) 1
+
+# 编码已改变
+redis> OBJECT ENCODING book
+"hashtable"
+````
+除了键的长度太大会引起编码转换之外， 值的长度太大也会引起编码转换， 以下代码展示了这种情况的一个示例：
+````shell
+# 哈希对象只包含一个键和值都不超过 64 个字节的键值对
+redis> HSET blah greeting "hello world"
+(integer) 1
+
+redis> OBJECT ENCODING blah
+"ziplist"
+
+# 向哈希对象添加一个新的键值对，值的长度为 68 字节
+redis> HSET blah story "many string ... many string ... many string ... many string ... many"
+(integer) 1
+
+# 编码已改变
+redis> OBJECT ENCODING blah
+"hashtable"
+````
+最后， 以下代码展示了哈希对象因为包含的键值对数量过多而引起编码转换的情况：
+````shell
+# 创建一个包含 512 个键值对的哈希对象
+redis> EVAL "for i=1, 512 do redis.call('HSET', KEYS[1], i, i) end" 1 "numbers"
+(nil)
+
+redis> HLEN numbers
+(integer) 512
+
+redis> OBJECT ENCODING numbers
+"ziplist"
+
+# 再向哈希对象添加一个新的键值对，使得键值对的数量变成 513 个
+redis> HMSET numbers "key" "value"
+OK
+
+redis> HLEN numbers
+(integer) 513
+
+# 编码改变
+redis> OBJECT ENCODING numbers
+"hashtable"
+````
+
+# 集合对象
+集合对象的编码可以是 intset 或者 hashtable 。
+
+intset 编码的集合对象使用整数集合作为底层实现， 集合对象包含的所有元素都被保存在整数集合里面。
+
+举个例子， 以下代码将创建一个如图 8-12 所示的 intset 编码集合对象：
+````shell
+redis> SADD numbers 1 3 5
+(integer) 3
+````
+[![](http://idiotsky.me/images1/redis-object-12.png)](http://idiotsky.me/images1/redis-object-12.png)
+另一方面， hashtable 编码的集合对象使用字典作为底层实现， 字典的每个键都是一个字符串对象， 每个字符串对象包含了一个集合元素， 而字典的值则全部被设置为 NULL 。
+
+举个例子， 以下代码将创建一个如图 8-13 所示的 hashtable 编码集合对象：
+````shell
+redis> SADD fruits "apple" "banana" "cherry"
+(integer) 3
+````
+[![](http://idiotsky.me/images1/redis-object-13.png)](http://idiotsky.me/images1/redis-object-13.png)
+
+## 编码的转换
+当集合对象可以同时满足以下两个条件时， 对象使用 intset 编码：
+1. 集合对象保存的所有元素都是整数值；
+2. 集合对象保存的元素数量不超过 512 个；
+
+不能满足这两个条件的集合对象需要使用 hashtable 编码。
+
+>__注意__
+>第二个条件的上限值是可以修改的， 具体请看配置文件中关于 set-max-intset-entries 选项的说明。
+
+对于使用 intset 编码的集合对象来说， 当使用 intset 编码所需的两个条件的任意一个不能被满足时， 对象的编码转换操作就会被执行： 原本保存在整数集合中的所有元素都会被转移并保存到字典里面， 并且对象的编码也会从 intset 变为 hashtable 。
+
+举个例子， 以下代码创建了一个只包含整数元素的集合对象， 该对象的编码为 intset ：
+````shell
+redis> SADD numbers 1 3 5
+(integer) 3
+
+redis> OBJECT ENCODING numbers
+"intset"
+````
+不过， 只要我们向这个只包含整数元素的集合对象添加一个字符串元素， 集合对象的编码转移操作就会被执行：
+````shell
+redis> SADD numbers "seven"
+(integer) 1
+
+redis> OBJECT ENCODING numbers
+"hashtable"
+````
+除此之外， 如果我们创建一个包含 512 个整数元素的集合对象， 那么对象的编码应该会是 intset ：
+````shell
+redis> EVAL "for i=1, 512 do redis.call('SADD', KEYS[1], i) end" 1 integers
+(nil)
+
+redis> SCARD integers
+(integer) 512
+
+redis> OBJECT ENCODING integers
+"intset"
+````
+但是， 只要我们再向集合添加一个新的整数元素， 使得这个集合的元素数量变成 513 ， 那么对象的编码转换操作就会被执行：
+````shell
+redis> SADD integers 10086
+(integer) 1
+
+redis> SCARD integers
+(integer) 513
+
+redis> OBJECT ENCODING integers
+"hashtable"
+````
+
+# 有序集合对象
+有序集合的编码可以是 ziplist 或者 skiplist 。
+
+ziplist 编码的有序集合对象使用压缩列表作为底层实现， 每个集合元素使用两个紧挨在一起的压缩列表节点来保存， 第一个节点保存元素的成员（member）， 而第二个元素则保存元素的分值（score）。
+
+压缩列表内的集合元素按分值从小到大进行排序， 分值较小的元素被放置在靠近表头的方向， 而分值较大的元素则被放置在靠近表尾的方向。
+
+举个例子， 如果我们执行以下 ZADD 命令， 那么服务器将创建一个有序集合对象作为 price 键的值：
+````shell
+redis> ZADD price 8.5 apple 5.0 banana 6.0 cherry
+(integer) 3
+````
+如果 price 键的值对象使用的是 ziplist 编码， 那么这个值对象将会是图 8-14 所示的样子， 而对象所使用的压缩列表则会是 8-15 所示的样子。
+[![](http://idiotsky.me/images1/redis-object-14.png)](http://idiotsky.me/images1/redis-object-14.png)
+[![](http://idiotsky.me/images1/redis-object-15.png)](http://idiotsky.me/images1/redis-object-15.png)
+skiplist 编码的有序集合对象使用 zset 结构作为底层实现， 一个 zset 结构同时包含一个字典和一个跳跃表：
+````c
+typedef struct zset {
+
+    zskiplist *zsl;
+
+    dict *dict;
+
+} zset;
+````
+zset 结构中的 zsl 跳跃表按分值从小到大保存了所有集合元素， 每个跳跃表节点都保存了一个集合元素： 跳跃表节点的 object 属性保存了元素的成员， 而跳跃表节点的 score 属性则保存了元素的分值。 通过这个跳跃表， 程序可以对有序集合进行范围型操作， 比如 ZRANK 、 ZRANGE 等命令就是基于跳跃表 API 来实现的。
+
+除此之外， zset 结构中的 dict 字典为有序集合创建了一个从成员到分值的映射， 字典中的每个键值对都保存了一个集合元素： 字典的键保存了元素的成员， 而字典的值则保存了元素的分值。 通过这个字典， 程序可以用 O(1) 复杂度查找给定成员的分值， ZSCORE 命令就是根据这一特性实现的， 而很多其他有序集合命令都在实现的内部用到了这一特性。
+
+有序集合每个元素的成员都是一个字符串对象， 而每个元素的分值都是一个 double 类型的浮点数。 值得一提的是， 虽然 zset 结构同时使用跳跃表和字典来保存有序集合元素， 但这两种数据结构都会通过指针来共享相同元素的成员和分值， 所以同时使用跳跃表和字典来保存集合元素不会产生任何重复成员或者分值， 也不会因此而浪费额外的内存。
+
+>__为什么有序集合需要同时使用跳跃表和字典来实现？__
+>在理论上来说， 有序集合可以单独使用字典或者跳跃表的其中一种数据结构来实现， 但无论单独使用字典还是跳跃表， 在性能上对比起同时使用字典和跳跃表都会有所降低。
+
+>举个例子， 如果我们只使用字典来实现有序集合， 那么虽然以 O(1) 复杂度查找成员的分值这一特性会被保留， 但是， 因为字典以无序的方式来保存集合元素， 所以每次在执行范围型操作 —— 比如 ZRANK 、 ZRANGE 等命令时， 程序都需要对字典保存的所有元素进行排序， 完成这种排序需要至少 O(N \log N) 时间复杂度， 以及额外的 O(N) 内存空间 （因为要创建一个数组来保存排序后的元素）。
+
+>另一方面， 如果我们只使用跳跃表来实现有序集合， 那么跳跃表执行范围型操作的所有优点都会被保留， 但因为没有了字典， 所以根据成员查找分值这一操作的复杂度将从 O(1) 上升为 O(\log N) 。
+
+>因为以上原因， 为了让有序集合的查找和范围型操作都尽可能快地执行， Redis 选择了同时使用字典和跳跃表两种数据结构来实现有序集合。
+
+举个例子， 如果前面 price 键创建的不是 ziplist 编码的有序集合对象， 而是 skiplist 编码的有序集合对象， 那么这个有序集合对象将会是图 8-16 所示的样子， 而对象所使用的 zset 结构将会是图 8-17 所示的样子。
+[![](http://idiotsky.me/images1/redis-object-16.png)](http://idiotsky.me/images1/redis-object-16.png)
+[![](http://idiotsky.me/images1/redis-object-17.png)](http://idiotsky.me/images1/redis-object-17.png)
+
+>__注意__
+>为了展示方便， 图 8-17 在字典和跳跃表中重复展示了各个元素的成员和分值， 但在实际中， 字典和跳跃表会共享元素的成员和分值， 所以并不会造成任何数据重复， 也不会因此而浪费任何内存。
+
+## 编码的转换
+当有序集合对象可以同时满足以下两个条件时， 对象使用 ziplist 编码：
+1. 有序集合保存的元素数量小于 128 个；
+2. 有序集合保存的所有元素成员的长度都小于 64 字节；
+
+不能满足以上两个条件的有序集合对象将使用 skiplist 编码。
+>__注意__ 
+>以上两个条件的上限值是可以修改的， 具体请看配置文件中关于 zset-max-ziplist-entries 选项和 zset-max-ziplist-value 选项的说明。
+
+对于使用 ziplist 编码的有序集合对象来说， 当使用 ziplist 编码所需的两个条件中的任意一个不能被满足时， 程序就会执行编码转换操作， 将原本储存在压缩列表里面的所有集合元素转移到 zset 结构里面， 并将对象的编码从 ziplist 改为 skiplist 。
+
+以下代码展示了有序集合对象因为包含了过多元素而引发编码转换的情况：
+````shell
+# 对象包含了 128 个元素
+redis> EVAL "for i=1, 128 do redis.call('ZADD', KEYS[1], i, i) end" 1 numbers
+(nil)
+
+redis> ZCARD numbers
+(integer) 128
+
+redis> OBJECT ENCODING numbers
+"ziplist"
+
+# 再添加一个新元素
+redis> ZADD numbers 3.14 pi
+(integer) 1
+
+# 对象包含的元素数量变为 129 个
+redis> ZCARD numbers
+(integer) 129
+
+# 编码已改变
+redis> OBJECT ENCODING numbers
+"skiplist"
+````
+以下代码则展示了有序集合对象因为元素的成员过长而引发编码转换的情况：
+````shell
+# 向有序集合添加一个成员只有三字节长的元素
+redis> ZADD blah 1.0 www
+(integer) 1
+
+redis> OBJECT ENCODING blah
+"ziplist"
+
+# 向有序集合添加一个成员为 66 字节长的元素
+redis> ZADD blah 2.0 oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+(integer) 1
+
+# 编码已改变
+redis> OBJECT ENCODING blah
+"skiplist"
+````
+
+# 重点回顾
+* Redis 数据库中的每个键值对的键和值都是一个对象。
+* Redis 共有字符串、列表、哈希、集合、有序集合五种类型的对象， 每种类型的对象至少都有两种或以上的编码方式， 不同的编码可以在不同的使用场景上优化对象的使用效率。
+
+参考 http://redisbook.com
