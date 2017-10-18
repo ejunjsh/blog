@@ -46,7 +46,7 @@ L小端（Little-endian）：我们可以假设内存是一个大的数组，它
 
 # 段
 正如我上面提到的，每个汇编程序都是由段来组成的，它包含数据段、代码段、bss 段。我们先来看看数据段，这是主要用来定义初始化的常量。例如：
-````shell
+````s
 section .data
     num1:   equ 100
     num2:   equ 50
@@ -54,7 +54,7 @@ section .data
 ````
 好了，这儿差不多清楚了，三个常量名字分别为 num1、num2 和 msg，值分别是 100、50 和 “Sum is correct”,10 。但是 db 、equ 又是什么呢？实际上，NASM 支持大量伪指令：
 * DB、DW、DD、DQ、DT、DO、DY 和 DZ —— 用来定义初始化数据的。例如：
-````
+````s
 ;; Initialize 4 bytes 1h, 2h, 3h, 4h
 db 0x01,0x02,0x03,0x04
  
@@ -64,7 +64,7 @@ dw    0x1234
 * RESB、RESW、RESD、RESQ、REST、RESO、RESY、RESZ —— 用来定义非初始化变量
 * INCBIN —— 包含外部二进制文件
 * EQU —— 定义常量，例如：
-````
+````s
 ;; now one is 1
 one equ 1
 ````
@@ -109,7 +109,7 @@ if (rax != 50) {
 }
 ````
 在汇编中是这样的：
-````
+````s
 ;; compare rax with 50
 cmp rax, 50
 ;; perform .exit if rax is not equal 50
@@ -117,11 +117,11 @@ jne .exit
 jmp .right
 ````
 也有一种无条件跳转的指令语法：
-````
+````s
 JMP LABEL
 ````
 例如：
-````
+````s
 _start:
     ;; ....
     ;; do something and jump to .exit label
@@ -139,7 +139,7 @@ _start:
 
 # 示例
 我们看个简单的例子：两个数相加，得到它们的和，然后与预定义的一个数进行比较，如果相等输出一些东西到屏幕上；如果不等退出。下面是例子的源代码：
-````shell
+````s
 ;initialised data section
 section .data
     ; Define constants

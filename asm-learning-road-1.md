@@ -31,26 +31,26 @@ sudo apt-get install nasm
 * 代码段（text section）
 
 数据段用来定义常量（constant），常量是在运行时不会改变的数据。你可以定义数字或其他常量等等，声明一个数据段的语法如下：
-````shell
+````s
 section .data
 ````
 代码段是存放代码（code）的，该段必须以 global _start 开始，告诉内核这里是程序开始执行的地方。
-````shell
+````s
 section .text
 global _start
 _start:
 ````
 注释是以 ; 开始。每个 NASM 代码行包含下面四个字段的组合：
-````shell
+````s
 [label:] instruction [operands] [; comment]
 ````
 中括号括起来的字段表示是可选的。基本 NASM 指令由两部分组成，第一部分是需要执行指令的名字，第二部分是该指令的操作数。例如：
-````shell
+````s
 MOV COUNT, 48  ;将数值 48 存放到 COUNT 变量中
 ````
 # Hello world
 让我们用 NASM 汇编来写第一个程序吧，当然是传统的打印 “Hello world” 的程序。这是代码：
-````shell
+````s
 section .data
     msg db      "hello, world!"
  
