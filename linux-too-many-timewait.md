@@ -35,6 +35,7 @@ LISTEN 7
 * LAST_ACK：远端已经结束，并且socket也已关闭，等待acknowledgement。
 
 # linux优化
+Linux有很多关于tcp的系统参数，可以有效的优化tcp。
 ````shell
 net.ipv4.tcp_syncookies = 1 #表示开启SYN Cookies。当出现SYN等待队列溢出时，启用cookies来处理，可防范少量SYN攻击(sync flood 攻击)，默认为0，表示关闭；
 net.ipv4.tcp_tw_reuse = 1 #表示开启重用。允许将TIME-WAIT sockets重新用于新的TCP连接，默认为0，表示关闭；
@@ -47,9 +48,24 @@ net.ipv4.tcp_max_tw_buckets = 5000 #表示系统同时保持TIME_WAIT套接字�
 ````
 
 # 问题
-上面的优化，改了些参数，确实能够明显看到time_wait减少，甚至基本看不到了。其实这个看上去解决了问题，但是其实还会引发其他的问题。
+上面的优化，改了些参数,特别是`tcp_tw_reuse`和`tcp_tw_recycle`这两个参数，确实能够明显看到time_wait减少，甚至基本看不到了。其实这个看上去解决了问题，但是其实还会引发其他的问题。
+TCP有一种行为，可以缓存每个主机最新的时间戳，后续请求中如果时间戳小于缓存的时间戳，即视为无效，相应的数据包会被丢弃。
+Linux是否启用这种行为取决于`tcp_timestamps`和`tcp_tw_recycle`，因为`tcp_timestamps`缺省就是开启的，所以当`tcp_tw_recycle`被开启后，实际上这种行为就被激活了，当客户端或服务端以NAT方式构建的时候就可能出现问题，下面以客户端NAT为例来说明：
+当多个客户端通过NAT方式联网并与服务端交互时，服务端看到的是同一个IP，也就是说对服务端而言这些客户端实际上等同于一个，可惜由于这些客户端的时间戳可能存在差异，于是乎从服务端的视角看，便可能出现时间戳错乱的现象，进而直接导致时间戳小的数据包被丢弃。如果发生了此类问题，具体的表现通常是是客户端明明发送的SYN，但服务端就是不响应ACK，我们可以通过下面命令来确认数据包不断被丢弃的现象：
+````shell
+$ netstat -s | grep timestamp
+... packets rejects in established connections because of timestamp
+````
+安全起见，通常要禁止`tcp_tw_recycle`。到这里，大家可能会想到另一种解决方案：把`tcp_timestamps`设置为0，`tcp_tw_recycle`设置为1，这样不就可以鱼与熊掌兼得了么？可惜一旦关闭了`tcp_timestamps`，那么即便打开了`tcp_tw_recycle`，也没有效果。
 
+好在我们还有另一个内核参数`tcp_max_tw_buckets`（一般缺省是180000）可用：
+````shell
+$ sysctl net.ipv4.tcp_max_tw_buckets=100000
+````
+通过设置它，系统会将多余的TIME_WAIT删除掉，此时系统日志里可能会显示：「TCP: time wait bucket table overflow」，不过除非不得已，否则不要轻易使用。
 
+# 总结
+通过上面的问题，解决time_wait过多，好像没有什么完美的方案，所以，还是看情况使用Linux参数。
 
 
 参考
