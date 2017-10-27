@@ -58,19 +58,35 @@ hash_method crc32;
 } 
 ````
 
-# 其他
-在需要使用负载均衡的server中增加 
+# least_conn
+这个功能可以让在有需要长时间才能完成的请求时让请求的分配更公平。简言之就是它可以控制不让单独的一台服务器负载太高，而是会根据其负载动态的分配请求。
 ````
-proxy_pass http://backserver/; 
-upstream backserver{ 
-ip_hash; 
-server 127.0.0.1:9090 down; (down 表示单前的server暂时不参与负载) 
-server 127.0.0.1:8080 weight=2; (weight 默认为1.weight越大，负载的权重就越大) 
-server 127.0.0.1:6060; 
-server 127.0.0.1:7070 backup; (其它所有的非backup机器down或者忙的时候，请求backup机器) 
+upstream backserver { 
+least_conn
+server server1; 
+server server2; 
 } 
-
-max_fails ：允许请求失败的次数默认为1.当超过最大次数时，返回proxy_next_upstream 模块定义的错误 
-
-fail_timeout:max_fails次失败后，暂停的时间
 ````
+
+# down
+标记某台应用服务器暂时不参与负载均衡。
+````
+upstream backserver { 
+server server1 down;
+server server2; 
+} 
+````
+
+# backup
+这个标记和`down`正好相反，它是在其他所有应用服务器全部繁忙或者处于`down`状态时才会被启用，所以这台机器的压力会最轻。
+````
+upstream backserver { 
+server server1 backup;
+server server2; 
+} 
+````
+
+# 健康状态检查
+Nginx会自动把返回报错信息的应用服务器标记为『故障』，然后就不再把新的请求分配给它了，这个相关的配置有:
+1. `max_fails` 报错多少次会被标记为failed
+2. `fail_timeout` 超时多少次会被标记成failed
