@@ -1,7 +1,7 @@
 ---
 title: openstack安装-keystone
 date: 2017-09-09 15:46:36
-tags: [openstack,ubuntu,kvm]
+tags: [openstack,ubuntu,kvm,keystone]
 categories: openstack
 ---
 > keystone 是openstack中所有service的权限管理和接口入口，所以先安装它
