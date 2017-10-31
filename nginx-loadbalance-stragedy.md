@@ -2,7 +2,7 @@
 title: nginx负载均衡的5种策略
 date: 2014-10-17 23:41:29
 tags: nginx
-categories: ngnix
+categories: nginx
 ---
 nginx可以根据客户端IP进行负载均衡，在upstream里设置ip_hash，就可以针对同一个C类地址段中的客户端选择同一个后端服务器，除非那个后端服务器宕了才会换一个。
 

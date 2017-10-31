@@ -2,7 +2,7 @@
 title: 启用Nginx状态监控
 date: 2014-10-12 20:48:39
 tags: nginx
-categories: ngnix
+categories: nginx
 ---
 # 编译Nginx添加http_stub_status_module
 编译Nginx的时候添加参数：--with-http_stub_status_module

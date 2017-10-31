@@ -1,7 +1,7 @@
 ---
 title: Linux中Kill进程的N种方法
 date: 2014-02-20 17:23:33
-tags: [kill,ps,grep,awk,killall,pkill,pgrep,xargs,pidof]
+tags: [linux,kill,ps,grep,awk,killall,pkill,pgrep,xargs,pidof]
 categories: linux命令
 ---
 # 常规篇 

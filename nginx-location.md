@@ -2,7 +2,7 @@
 title: nginx location 语法和优先级
 date: 2014-10-07 20:53:44
 tags: nginx
-categories: ngix
+categories: nginx
 ---
 > 验证下，记录下，以后不用到处找
 

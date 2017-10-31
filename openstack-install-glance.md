@@ -9,7 +9,7 @@ categories: openstack
 > 这一章还是在`controller`节点操作。。。
 
 # 准备
-1. 创建数据库
+## 创建数据库
 * 用`root`用户权限执行`mysql`
 ````shell
 $ mysql
@@ -27,13 +27,13 @@ MariaDB [(none)]> GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' \
 ````
 替换一下`GLANCE_DBPASS`为一个合适的密码，后面会用到
 * 退出mysql
-
-2. 执行以下命令，进入admin身份
+<!-- more -->
+## 执行以下命令，进入admin身份
 ````shell
 $ . admin-openrc
 ````
 
-3. 创建服务
+## 创建服务
 * 创建`glance`用户
 ````shell
 $ openstack user create --domain default --password-prompt glance
@@ -72,7 +72,7 @@ $ openstack service create --name glance \
 +-------------+----------------------------------+
 ````
 
-4. 创建镜像服务API endpoints
+## 创建镜像服务API endpoints
 ````shell
 $ openstack endpoint create --region RegionOne \
   image public http://controller:9292
@@ -127,11 +127,11 @@ $ openstack endpoint create --region RegionOne \
 ````
 
 # 安装和配置组件
-1. 安装包
+## 安装包
 ````shell
 $ apt install glance
 ````
-2. 修改`/etc/glance/glance-api.conf`
+## 修改`/etc/glance/glance-api.conf`
 * 在`[database]`区域，添加数据访问配置
 ````ini
 [database]
@@ -166,7 +166,7 @@ stores = file,http
 default_store = file
 filesystem_store_datadir = /var/lib/glance/images/
 ````
-3. 修改`/etc/glance/glance-registry.conf`
+## 修改`/etc/glance/glance-registry.conf`
 * 在`[database]`区域，添加数据访问配置
 ````ini
 [database]
@@ -193,7 +193,7 @@ password = GLANCE_PASS
 flavor = keystone
 ````
 替换`GLANCE_PASS `为之前你创建glance用户时的密码。
-4. 初始化镜像服务数据库：
+## 初始化镜像服务数据库：
 ````
 $ su -s /bin/sh -c "glance-manage db_sync" glance
 ````
@@ -205,15 +205,15 @@ $ service glance-api restart
 ````
 
 # 验证
-1. 进入`admin`身份
+## 进入`admin`身份
 ````shell
 $ . admin-openrc
 ````
-2. 下载测试镜像
+## 下载测试镜像
 ````shell
 $ wget http://download.cirros-cloud.net/0.3.5/cirros-0.3.5-x86_64-disk.img
 ````
-3. 上传测试镜像到镜像服务
+## 上传测试镜像到镜像服务
 ````shell
 $ openstack image create "cirros" \
   --file cirros-0.3.5-x86_64-disk.img \
@@ -243,7 +243,7 @@ $ openstack image create "cirros" \
 | visibility       | public                                               |
 +------------------+------------------------------------------------------+
 ````
-4. 确认是否上传成功
+## 确认是否上传成功
 ````shell
 $ openstack image list
 
