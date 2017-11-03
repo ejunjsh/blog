@@ -1,6 +1,6 @@
 ---
 title: Linux硬盘分区相关命令
-date: 2014-02-30 17:23:33
+date: 2014-03-01 17:23:33
 tags: [fdisk,e2label,mkfs,mount,umount,df,du,linux]
 categories: linux命令
 ---
