@@ -226,4 +226,5 @@ $ openstack endpoint create --region RegionOne placement admin http://controller
 $ apt install nova-api nova-conductor nova-consoleauth \
   nova-novncproxy nova-scheduler nova-placement-api
 ````
-> to be continue...
+## 修改`/etc/nova/nova.conf`
+* 修改`[api_database]`和`[database]`区域
