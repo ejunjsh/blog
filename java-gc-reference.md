@@ -6,7 +6,6 @@ categories: java
 ---
 >Java中一共有4种类型的引用:StrongReference、SoftReference、WeakReference以及PhantomReference (幽灵引用), 这 4 种类型的引用与Java GC有着密切的关系, 让我们逐一来看它们的定义和使用场景。
 
-<!-- more -->
 # Strong Reference
 StrongReference 是 Java 的默认引用实现,它会尽可能长时间的存活于 JVM 内， 当没有任何对象指向它时Java GC 执行后将会被回收
 ````java
@@ -49,6 +48,7 @@ System.gc();
 assertNull(weakRerference.get());   
 }   
 ````
+<!-- more -->
 WeakHashMap 使用 WeakReference 作为 key， 一旦没有指向 key 的强引用, WeakHashMap 在Java GC 后将自动删除相关的 entry
 ````java
 @Test  
