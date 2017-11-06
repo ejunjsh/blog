@@ -47,7 +47,8 @@ categories: java
 
 再总结下:
 1. Serial Old 做full gc 时候不会执行young gc，而 ParallelOld 会根据 __ScavengeBeforeFullGC__ 来决定是否在full gc前执行一次young gc
-2. CMS 有自己的major gc，单独执行old区的gc，__CMSScavengeBeforeRemark__ 可以在remark阶段之前执行一次young gc（网上说这个标记还能解决跨代引用问题），还有如果 __Concurrent Mode Failure__ 的话，就还是老老实实做Serial Old的full gc吧。
+2. CMS 有自己的major gc，单独执行old区的gc，但是如果 __Concurrent Mode Failure__ 的话，就还是老老实实做Serial Old的full gc吧。
+3. CMS 的 __CMSScavengeBeforeRemark__ 标记决定了是否在remark阶段之前执行一次young gc（网上说这个标记还能解决跨代引用问题），
 
 参考 https://www.zhihu.com/question/62604570
 参考 https://www.zhihu.com/question/41922036
