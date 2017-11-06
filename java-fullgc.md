@@ -1,7 +1,7 @@
 ---
 title: jvm full gc 解惑
 date: 2017-11-06 18:03:15
-tags: [jvm,java]
+tags: [jvm,java,gc]
 categories: java
 ---
 > 一直以来，都觉得full gc就是对old区的gc，然后就打脸了。。。。
