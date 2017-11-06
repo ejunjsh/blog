@@ -42,12 +42,12 @@ categories: java
 
 >可见，一般情况下，年轻代的存活对象都被Compact到了年老代，所以，你看到年轻代都被清空了；只有当年老代满了的时候，才会Compact到Eden区域。
 
->对于Concurrent Collector，CMS在Remark Phase，可以通过设置__CMSScavengeBeforeRemark__在remark之前先行YGC，这给了CMS在Major GC时触发Minor GC的机会，但这个Flag默认是false；当CMS发生__Concurrent Mode Failure__时，CMS会退化为Serial Old GC，从而采用与Serial Collector相同的算法进行Full GC。CMS发生__Concurrent Mode Failure__的原因：1. 因为是并发收集，所以Mutator仍可能在不断占用年老代的空间，当然还包括这一趟无法收集的Float Garbage会占用内存空间，如果年老代空间被占满但并发收集还未结束，就会发生并发模式失败；2. 因为CMS采用的是Mark Sweep算法，本身内存碎片化无法解决，很可能发生大对象分配时没有连续空间，或者本身剩余空间不够大对象分配时，也会发生并发模式失败。
+>对于Concurrent Collector，CMS在Remark Phase，可以通过设置 __CMSScavengeBeforeRemark__ 在remark之前先行YGC，这给了CMS在Major GC时触发Minor GC的机会，但这个Flag默认是false；当CMS发生 __Concurrent Mode Failure__ 时，CMS会退化为Serial Old GC，从而采用与Serial Collector相同的算法进行Full GC。CMS发生 __Concurrent Mode Failure__ 的原因：1. 因为是并发收集，所以Mutator仍可能在不断占用年老代的空间，当然还包括这一趟无法收集的Float Garbage会占用内存空间，如果年老代空间被占满但并发收集还未结束，就会发生并发模式失败；2. 因为CMS采用的是Mark Sweep算法，本身内存碎片化无法解决，很可能发生大对象分配时没有连续空间，或者本身剩余空间不够大对象分配时，也会发生并发模式失败。
 
 
 再总结下:
-1. Serial Old 做full gc 时候不会执行young gc，而 ParallelOld 会根据__ScavengeBeforeFullGC__来决定是否在full gc前执行一次young gc
-2. CMS 有自己的major gc，单独执行old区的gc，__CMSScavengeBeforeRemark__ 可以在remark阶段之前执行一次young gc（网上说这个标记还能解决跨代引用问题），还有如果__Concurrent Mode Failure__的话，就还是老老实实做Serial Old的full gc吧。
+1. Serial Old 做full gc 时候不会执行young gc，而 ParallelOld 会根据 __ScavengeBeforeFullGC__ 来决定是否在full gc前执行一次young gc
+2. CMS 有自己的major gc，单独执行old区的gc，__CMSScavengeBeforeRemark__ 可以在remark阶段之前执行一次young gc（网上说这个标记还能解决跨代引用问题），还有如果 __Concurrent Mode Failure__ 的话，就还是老老实实做Serial Old的full gc吧。
 
 参考 https://www.zhihu.com/question/62604570
 参考 https://www.zhihu.com/question/41922036
