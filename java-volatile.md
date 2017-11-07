@@ -257,7 +257,7 @@ class CountingThread extends Thread {
 ````
 这种优化可以通过查看C2编译器所产生的汇编代码来确认，如图1所示。不幸的是，这种优化导致了死循环！
 图1 C2编译器循环不变量外提优化所产生的汇编代码
-[![](https://pic3.zhimg.com/50/v2-89207cb27a36d120a1e6f1f46d69f49e_hd.jpg)](https://pic3.zhimg.com/50/v2-89207cb27a36d120a1e6f1f46d69f49e_hd.jpg)
+[![](http://idiotsky.me/images1/java-volatile-1.jpg)](http://idiotsky.me/images1/java-volatile-1.jpg)
 
 如果我们采用volatile修饰上述Demo中的ready变量，那么C2编译器便会“意识”到ready是一个共享变量，因此就不会对CountingThread.run()中的while循环语句执行循环不变量外提优化从而避免了死循环。
 
@@ -427,14 +427,14 @@ helper = objRef；//子操作③：将Helper实例引用objRef赋值给实例变
 
 查看上述程序运行过程中JIT编译器动态生成的汇编代码（相当于机器码），如图2所示，我们可以发现JIT编译器编译字节码的时候并不是每次都按照上述源代码顺序（这里同时也是程序顺序）生成相应的机器码（汇编代码）：JIT编译器将子操作③相应的指令重排到子操作②相应的指令之前，即JIT编译器在初始化Helper实例之前可能已经将对该实例的引用写入helper实例变量。这就导致了其他线程（consume方法的执行线程）看到helper实例变量（不为null）的时候，该实例变量所引用的对象可能还没有被初始化或者未初始化完毕（即相应构造器中的代码未执行结束）。这就解释了为什么我们在运行上述程序的时候，consume方法的返回值有时候并不是4。
 图2 JIT编译器重排序Demo中的汇编代码片段
-[![](https://pic4.zhimg.com/50/v2-9ea7987364554bc56b189ca31a8df737_hd.jpg)](https://pic4.zhimg.com/50/v2-9ea7987364554bc56b189ca31a8df737_hd.jpg)
+[![](http://idiotsky.me/images1/java-volatile-2.jpg)](http://idiotsky.me/images1/java-volatile-2.jpg)
 
 虽然乱序有利于充分发挥处理器的指令执行效率，但是正如上述实验所展示的，它也可能导致程序正确性的问题。所以，为了保障程序的正确性，有时候我们需要确保线程对一组操作的感知顺序与这组操作的程序顺序保持一致，即保障这组操作的有序性。上述实验中，为了确保consume方法的执行线程看到的Helper实例总是初始化完毕的，我们需要确保createHelper方法所执行的操作的有序性。为此，我们只需要用volatile关键字来修饰实例变量helper即可，而无需借助锁。这里，volatile关键字所起的作用是通过禁止子操作②被JIT编译器以及处理器重排序（指令重排序、内存重排序）到子操作③之后，从而保障了有序性。
 
 Java语言规范规定，对于访问（读、写）同一个volatile变量的多个线程而言，一个线程（写线程）在写volatile变量前所执行的内存读、写操作在随后读取该volatile变量的其他线程（读线程）看来是有序的。设X、Y是普通（非volatile）共享变量，其初始值均为0，V是volatile变量，其初始值为false，r1、r2是局部变量，线程T1和T2先后访问V，如图3所示。那么，T1对V的更新以及更新V前所执行的操作在T2看来是有序的：在T2看来T1对X、Y和V的写操作就像是完全依照程序顺序执行的。换而言之，如果T2读取到V的值为true，那么该线程所读取到的X和Y的值必然为分别为1和2。相反，如果V不是volatile变量，那么上述这种保证就不存在，即T2读取到V的值为true时，T2所读取到X和Y的值可能并非1和2。
 
 图3 volatile关键字的有序性保障示例代码
-[![](https://pic4.zhimg.com/50/v2-acd01d702bcc8bc4570dbd31df36ce8f_hd.jpg)](https://pic4.zhimg.com/50/v2-acd01d702bcc8bc4570dbd31df36ce8f_hd.jpg)
+[![](http://idiotsky.me/images1/java-volatile-3.jpg)](http://idiotsky.me/images1/java-volatile-3.jpg)
 
 上述例子中，我们假设只有一个线程更新V（另外一个线程读取V），如果有更多的线程并发更新V，那么由于volatile并不具有排他性，因此在T2读取V的时候T1之外的其他线程可能已经又更新了共享变量X、Y，这就使得T2在其读取到V的值为true的情况下，其读取到X和Y的值可能不是1和2。不过，这种现象是数据竞争的结果，这与volatile能够保障有序性本身并不矛盾。
 
@@ -487,7 +487,7 @@ wY→rY（hb9）
 本节会涉及较多的术语，如表1所示。
 
 表1 本节术语
-[![](https://pic4.zhimg.com/50/v2-52b4ec3b6b6c5899c96551c8c43852a7_hd.jpg)](https://pic4.zhimg.com/50/v2-52b4ec3b6b6c5899c96551c8c43852a7_hd.jpg)
+[![](http://idiotsky.me/images1/java-volatile-4.jpg)](http://idiotsky.me/images1/java-volatile-4.jpg)
 
 Java虚拟机对long/double型变量访问操作的原子性保障是通过使用原子指令（本身就具有原子性的处理器指令）实现的。下面通过一个实验来进一步介绍这点，该实验所需的Java代码如清单6所示。
 
@@ -547,12 +547,12 @@ public class AtomicJVMImpl {
 ````
 32位Java虚拟机（JIT编译器）执行（动态编译）normalWrite方法中的普通long/double型变量写操作时使用的机器码（x86汇编语言表示）如图4所示。
 图4 32位Java虚拟机x86处理器下对普通long/double型变量写操作的实现
-[![](https://pic4.zhimg.com/50/v2-48be48f864dcdb9dae982d529c225fab_hd.jpg)](https://pic4.zhimg.com/50/v2-48be48f864dcdb9dae982d529c225fab_hd.jpg)
+[![](http://idiotsky.me/images1/java-volatile-5.jpg)](http://idiotsky.me/images1/java-volatile-5.jpg)
 
 可见，32位Java虚拟机在x86处理器平台下对普通long/double型变量（这里是long型变量）的写操作是通过两个子操作——先写低32位再写高32位实现的。32位Java虚拟机在某些处理器平台下可能仍然使用一条指令（比如在ARM处理器平台下使用strd指令）来实现普通long/double型变量的写操作，但是这条指令可能不是原子指令，因此在Java语言这一层次来观察，此时的普通long/double型变量写操作同样也不是原子操作。32位Java虚拟机（JIT编译器）在x86处理器平台下实现volatileWrite方法中的volatile long/double型变量写操作时使用的是一个原子指令（vmovsd），如图5所示。
 
 图5 32位Java虚拟机x86处理器下对volatile long/double型变量写操作的实现
-[![](https://pic4.zhimg.com/50/v2-a3059a9b7bec95d63aec2084a5d78f6f_hd.jpg)](https://pic4.zhimg.com/50/v2-a3059a9b7bec95d63aec2084a5d78f6f_hd.jpg)
+[![](http://idiotsky.me/images1/java-volatile-6.jpg)](http://idiotsky.me/images1/java-volatile-6.jpg)
 
 类似的，Java虚拟机对long/double型变量读操作的原子性保障也是通过使用原子指令实现的。例如，32位Java虚拟机在x86平台下会使用vmovsd这个原子指令来实现volatile修饰的long/double型变量的读操作，而对普通long/double型变量的读操作则是使用2条mov指令实现。
 
@@ -565,18 +565,18 @@ Java虚拟机对可见性和有序性的保障则是通过使用内存屏障实�
 可见，volatile关键字对可见性的保障是通过Java虚拟机（JIT编译器）在写线程和读线程中配对地使用内存屏障实现的，如图6所示。
 
 图6 Java虚拟机（JIT编译器）为实现volatile语义而插入的内存屏障
-[![](https://pic3.zhimg.com/50/v2-647274bdd02686f5a718e155321d618e_hd.jpg)](https://pic3.zhimg.com/50/v2-647274bdd02686f5a718e155321d618e_hd.jpg)
+[![](http://idiotsky.me/images1/java-volatile-7.jpg)](http://idiotsky.me/images1/java-volatile-7.jpg)
 
 volatile关键字对有序性的保障也是通过Java虚拟机（JIT编译器）在写线程和读线程中配对地使用内存屏障实现的。为了使写线程对共享变量所做的更新在读线程看来是有序的（即感知顺序与程序顺序保持一致），Java虚拟机首先必须保证写线程程序顺序上排在写volatile变量之前的对其他共享变量的更新先于对volatile变量的更新反映到该线程所在的处理器的高速缓存上。换而言之，Java虚拟机必须确保程序顺序上排在volatile变量写操作之前的其他写操作不能够被编译器/处理器通过指令重排序和（或）内存重排序被重排序到该volatile变量写操作之后。为此，Java虚拟机（JIT编译器）会在volatile变量写操作之前插入LoadStore+StoreStore内存屏障，这个组合内存屏障禁止了volatile变量写操作与该操作之前的任何读、写操作之间的重排序（包括指令重排序和内存重排序）。其次，Java虚拟机（JIT编译器）必须确保读线程在读取完写线程对volatile变量所做的更新之后才开始读取写线程在更新该volatile变量前对其他共享变量所做的更新。换而言之，Java虚拟机必须确保程序顺序上排在volatile变量读操作之后的其他共享变量的读、写操作不能够被编译器/处理器通过指令重排序和（或）内存重排序被重排序到该volatile变量读操作之前。为此，Java虚拟机（JIT编译器）会在volatile变量读操作之后插入一个LoadLoad+LoadStore内存屏障，这个组合内存屏障禁止了volatile变量读操作与该操作之后的任何读、写操作之间的重排序（包括指令重排序和内存重排序）。可见，Java虚拟机是通过使写线程和读线程配对地使用内存屏障来实现volatile对有序性的保障的，如图6所示。
 
 图7和图8展示了Java虚拟机（32位）在ARM处理器平台下对清单1中的volatileWrite、volatileRead方法进行JIT编译时插入的内存屏障情况。
 
 图7 Java虚拟机在ARM处理器平台下在volatile变量写操作前后插入的内存屏障
-[![](https://pic4.zhimg.com/50/v2-22711526bd94ce88bb4171e7fa5ddbfb_hd.jpg)](https://pic4.zhimg.com/50/v2-22711526bd94ce88bb4171e7fa5ddbfb_hd.jpg)
+[![](http://idiotsky.me/images1/java-volatile-8.jpg)](http://idiotsky.me/images1/java-volatile-8.jpg)
 图7中，JIT编译器在volatile写操作（“vstr d7, [r5, #96]”指令）前插入的“dmb sy”指令相当于LoadStore+StoreStore内存屏障。JIT编译器在volatile写操作后插入的“dsb sy”指令相当于StoreLoad内存屏障。
 
 图8 Java虚拟机在ARM处理器平台下在volatile变量读操作后插入的内存屏障
-[![](https://pic4.zhimg.com/50/v2-b789c4436333168b106c9f8598e74f5b_hd.jpg)](https://pic4.zhimg.com/50/v2-b789c4436333168b106c9f8598e74f5b_hd.jpg)
+[![](http://idiotsky.me/images1/java-volatile-9.jpg)](http://idiotsky.me/images1/java-volatile-9.jpg)
 
 图8中，JIT编译器在volatile读操作（“vldr d7, [r5, #96]”指令）后插入的“dmb sy”指令相当于LoadStore+LoadLoad内存屏障。由于ARM处理器并没有使用无效化队列，因此JIT编译器在volatile读操作前并不需要插入LoadLoad内存屏障。
 

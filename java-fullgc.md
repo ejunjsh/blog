@@ -31,14 +31,14 @@ categories: java
 
 再引用下别的大牛的话：
 >先看一下HotSpot VM的GC家族的组合示意图：
->[![](https://pic4.zhimg.com/50/v2-52f461fc5f5b2a8d3c35efe488cd6d9f_hd.jpg)](https://pic4.zhimg.com/50/v2-52f461fc5f5b2a8d3c35efe488cd6d9f_hd.jpg)
+>[![](http://idiotsky.me/images1/java-fullgc-1.jpg)](http://idiotsky.me/images1/java-fullgc-1.jpg)
 >不同的GC组合套装之中，具备Full GC能力的大概有三种：
 >1. ParallelOld(PSMarkSweep)
 >2. Serial Old(MarkSweep)
 >3. "?"所代表的G1
 
 >暂不考虑G1，除了CMS具备在年老代进行Major GC之外，其他情况下年老代的GC都是由Full GC触发的。Full GC的收集范围包含整个Heap区域( Eden + S1 + S2 + Tenured)，它发生时Mutator停止工作——Stop The World。对于Serial Collector，它采用MSC(Mark-Sweep-Compact)的算法对全堆进行Full GC，在HotSpot VM的实现中，主要用MarkSweep这个类来实现；对于Parallel Collector而言，PSMarkSweep是多线程的MarkSweep，名不副实，这玩意儿其实是个实现了Lisp2的Mark-Compact GC算法。PSMarkSweep有个特殊的地方是如果配置了__ScavengeBeforeFullGC__ 这个flag，则会在Full GC之前对年轻代进行一次Minor GC；其他情况根本不需要Full GC之前先执行Minor GC，Full GC会对年轻代发起GC。Full GC前后Heap的对比示意参见：
->[![](https://pic3.zhimg.com/50/v2-4405aecc32023c52295d6b1ef629671a_hd.jpg)](https://pic3.zhimg.com/50/v2-4405aecc32023c52295d6b1ef629671a_hd.jpg)
+>[![](http://idiotsky.me/images1/java-fullgc-2.jpg)](http://idiotsky.me/images1/java-fullgc-2.jpg)
 
 >可见，一般情况下，年轻代的存活对象都被Compact到了年老代，所以，你看到年轻代都被清空了；只有当年老代满了的时候，才会Compact到Eden区域。
 
