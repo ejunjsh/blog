@@ -228,3 +228,92 @@ $ apt install nova-api nova-conductor nova-consoleauth \
 ````
 ## 修改`/etc/nova/nova.conf`
 * 修改`[api_database]`和`[database]`区域
+````ini
+[api_database]
+# ...
+connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova_api
+
+[database]
+# ...
+connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova
+````
+替换`NOVA_DBPASS`为你上面配置数据库的密码
+* 在`[Default]`区域，对`RabbitMQ`配置
+````ini
+[DEFAULT]
+# ...
+transport_url = rabbit://openstack:RABBIT_PASS@controller
+````
+替换`RABBIT_PASS`为当时安装rabbitmq时候设置的密码
+* 在`[api]`和`[keystone——authtoken]`区域，配置keystone相关配置
+````ini
+[api]
+# ...
+auth_strategy = keystone
+
+[keystone_authtoken]
+# ...
+auth_uri = http://controller:5000
+auth_url = http://controller:35357
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = nova
+password = NOVA_PASS
+````
+替换`NOVA_PASS`为你创建nova用户时的密码
+* 在`[DEFAULT]`区域，配置`my_ip`为管理网络ip，此为controller节点的管理ip
+````ini
+[DEFAULT]
+# ...
+my_ip = 192.168.199.10
+````
+* 在`[DEFAUL]`区域，启用neutron作为网络服务的组件
+````ini
+[DEFAULT]
+# ...
+use_neutron = True
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+````
+* 配置vnc
+````ini
+[vnc]
+enabled = true
+# ...
+vncserver_listen = $my_ip
+vncserver_proxyclient_address = $my_ip
+````
+* 在`[glance]`区域，配置glance
+````ini
+[glance]
+# ...
+api_servers = http://controller:9292
+````
+* 在`[oslo_concurrency]`区域，配置锁定路径
+````ini
+[oslo_concurrency]
+# ...
+lock_path = /var/lib/nova/tmp
+````
+* 在`[DEFAULT]`删除`log_dir`选项
+* 在`[placement]`区域配置placement api
+````ini
+[placement]
+# ...
+os_region_name = RegionOne
+project_domain_name = Default
+project_name = service
+auth_type = password
+user_domain_name = Default
+auth_url = http://controller:35357/v3
+username = placement
+password = PLACEMENT_PASS
+````
+使用创建placement用户时的密码替换`PLACEMENT_PASS`
+
+## 初始化`nova-api`数据库
+````shell
+$ su -s /bin/sh -c "nova-manage api_db sync" nova
+````
