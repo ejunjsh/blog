@@ -317,3 +317,39 @@ password = PLACEMENT_PASS
 ````shell
 $ su -s /bin/sh -c "nova-manage api_db sync" nova
 ````
+
+## 注册`cell0`数据库
+````shell
+$ su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova
+````
+
+## 创建`cell`
+````shell
+# su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova
+109e1d4b-536a-40d0-83c6-5f121b82b650
+````
+
+## 初始化`nova`数据库
+````shell
+$ su -s /bin/sh -c "nova-manage db sync" nova
+````
+
+## 验证`nova`的`cell0`和`cell1`
+````shell
+$ nova-manage cell_v2 list_cells
++-------+--------------------------------------+
+| Name  | UUID                                 |
++-------+--------------------------------------+
+| cell1 | 109e1d4b-536a-40d0-83c6-5f121b82b650 |
+| cell0 | 00000000-0000-0000-0000-000000000000 |
++-------+--------------------------------------+
+````
+
+# 重启服务
+````shell
+$ service nova-api restart
+$ service nova-consoleauth restart
+$ service nova-scheduler restart
+$ service nova-conductor restart
+$ service nova-novncproxy restart
+````
