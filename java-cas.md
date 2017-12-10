@@ -7,7 +7,7 @@ categories: java
 # 概况
 CAS:Compare and Swap, 翻译成比较并交换。 CAS有3个操作数，内存值V，旧的预期值A，要修改的新值B。当且仅当预期值A和内存值V相同时，将内存值V修改为B，否则什么都不做。
 
-#分析
+# 分析
 现代的CPU提供了特殊的指令，可以自动更新共享数据，而且能够检测到其他线程的干扰，而 compareAndSet() 就用这些代替了锁定。
 拿AtomicInteger来研究在没有锁的情况下是如何做到数据正确性的。
 ````java
