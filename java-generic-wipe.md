@@ -245,26 +245,339 @@ java/lang/Object;
 是一个Date类型，即做Date类型的强转。
 所以不是在get方法里强转的，是在你调用的地方强转的。
 
-> to be continue...
+# 类型擦除与多态的冲突和解决方法
+现在有这样一个泛型类：
+````java
+class Pair<T> {
+	private T value;
+	public T getValue() {
+		return value;
+	}
+	public void setValue(T value) {
+		this.value = value;
+	}
+}
+````
+然后我们想要一个子类继承它
+````java
+class DateInter extends Pair<Date> {
+	@Override
+	public void setValue(Date value) {
+		super.setValue(value);
+	}
+	@Override
+	public Date getValue() {
+		return super.getValue();
+	}
+}
+````
+在这个子类中，我们设定父类的泛型类型为Pair<Date>，在子类中，我们覆盖了父类的两个方法，我们的原意是这样的：
+将父类的泛型类型限定为Date，那么父类里面的两个方法的参数都为Date类型：
+````java
+public Date getValue() {
+	return value;
+}
+public void setValue(Date value) {
+    this.value = value;
+}
+````
+所以，我们在子类中重写这两个方法一点问题也没有，实际上，从他们的@Override标签中也可以看到，一点问题也没有，实际上是这样的吗？
 
-http://blog.csdn.net/lonelyroamer/article/details/7868820
+分析：
+实际上，类型擦除后，父类的的泛型类型全部变为了原始类型Object，所以父类编译之后会变成下面的样子：
+````java
+class Pair {
+	private Object value;
+	public Object getValue() {
+		return value;
+	}
+	public void setValue(Object  value) {
+		this.value = value;
+	}
+}
+````
+再看子类的两个重写的方法的类型：
+````java
+@Override
+public void setValue(Date value) {
+	super.setValue(value);
+}
+@Override
+public Date getValue() {
+	return super.getValue();
+}
+````
+先来分析setValue方法，父类的类型是Object，而子类的类型是Date，参数类型不一样，这如果实在普通的继承关系中，根本就不会是重写，而是重载。
+我们在一个main方法测试一下：
+````java
+public static void main(String[] args) throws ClassNotFoundException {
+		DateInter dateInter=new DateInter();
+		dateInter.setValue(new Date());                
+        dateInter.setValue(new Object());//编译错误
+ }
+````
+如果是重载，那么子类中两个setValue方法，一个是参数Object类型，一个是Date类型，可是我们发现，根本就没有这样的一个子类继承自父类的Object类型参数的方法。所以说，却是是重写了，而不是重载了。
 
+为什么会这样呢？
+原因是这样的，我们传入父类的泛型类型是Date，Pair<Date>，我们的本意是将泛型类变为如下：
+````java
+class Pair {
+	private Date value;
+	public Date getValue() {
+		return value;
+	}
+	public void setValue(Date value) {
+		this.value = value;
+	}
+}
+````
+然后再子类中重写参数类型为Date的那两个方法，实现继承中的多态。
+可是由于种种原因，虚拟机并不能将泛型类型变为Date，只能将类型擦除掉，变为原始类型Object。这样，我们的本意是进行重写，实现多态。可是类型擦除后，只能变为了重载。这样，类型擦除就和多态有了冲突。JVM知道你的本意吗？知道！！！可是它能直接实现吗，不能！！！如果真的不能的话，那我们怎么去重写我们想要的Date类型参数的方法啊。
+于是JVM采用了一个特殊的方法，来完成这项功能，那就是__桥方法__。
+首先，我们用javap -c className的方式反编译下DateInter子类的字节码，结果如下：
+````java
+class com.tao.test.DateInter extends com.tao.test.Pair<java.util.Date> {
+  com.tao.test.DateInter();
+    Code:
+       0: aload_0
+       1: invokespecial #8                  // Method com/tao/test/Pair."<init>"
+:()V
+       4: return
 
+  public void setValue(java.util.Date);  //我们重写的setValue方法
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #16                 // Method com/tao/test/Pair.setValue
+:(Ljava/lang/Object;)V
+       5: return
 
+  public java.util.Date getValue();    //我们重写的getValue方法
+    Code:
+       0: aload_0
+       1: invokespecial #23                 // Method com/tao/test/Pair.getValue
+:()Ljava/lang/Object;
+       4: checkcast     #26                 // class java/util/Date
+       7: areturn
 
+  public java.lang.Object getValue();     //编译时由编译器生成的桥方法
+    Code:
+       0: aload_0
+       1: invokevirtual #28                 // Method getValue:()Ljava/util/Date 去调用我们重写的getValue方法
+;
+       4: areturn
 
+  public void setValue(java.lang.Object);   //编译时由编译器生成的桥方法
+    Code:
+       0: aload_0
+       1: aload_1
+       2: checkcast     #26                 // class java/util/Date
+       5: invokevirtual #30                 // Method setValue:(Ljava/util/Date;   去调用我们重写的setValue方法
+)V
+       8: return
+}
 
+````
+从编译的结果来看，我们本意重写setValue和getValue方法的子类，竟然有4个方法，其实不用惊奇，最后的两个方法，就是编译器自己生成的桥方法。可以看到桥方法的参数类型都是Object，也就是说，子类中真正覆盖父类两个方法的就是这两个我们看不到的桥方法。而打在我们自己定义的setvalue和getValue方法上面的@Oveerride只不过是假象。而桥方法的内部实现，就只是去调用我们自己重写的那两个方法。
+所以，虚拟机巧妙的使用了桥方法，来解决了类型擦除和多态的冲突。
+不过，要提到一点，这里面的setValue和getValue这两个桥方法的意义又有不同。
+setValue方法是为了解决类型擦除与多态之间的冲突。
+而getValue却有普遍的意义，怎么说呢，如果这是一个普通的继承关系：
+那么父类的setValue方法如下：
+````java
+public Object getValue() {
+		return super.getValue();
+	}
+````
+而子类重写的方法是：
+````java
+public Date getValue() {
+		return super.getValue();
+	}
+````
+其实这在普通的类继承中也是普遍存在的重写，这就是协变。
+关于协变：。。。。。。
+并且，还有一点也许会有疑问，子类中的桥方法  Object   getValue()和Date getValue()是同时存在的，可是如果是常规的两个方法，他们的方法签名是一样的，也就是说虚拟机根本不能分别这两个方法。如果是我们自己编写Java代码，这样的代码是无法通过编译器的检查的，但是虚拟机却是允许这样做的，因为虚拟机通过参数类型和返回类型来确定一个方法，所以编译器为了实现泛型的多态允许自己做这个看起来“不合法”的事情，然后交给虚拟器去区别。
 
+# 泛型类型变量不能是基本数据类型
+不能用类型参数替换基本类型。就比如，没有`ArrayList<double>`，只有`ArrayList<Double>`。因为当类型擦除后，ArrayList的原始类型变为Object，但是Object类型不能存储double值，只能引用Double的值。
 
+# 运行时类型查询
+举个例子:
+````java
+ArrayList<String> arrayList=new ArrayList<String>();  
+````
+因为类型擦除之后，ArrayList<String>只剩下原始类型，泛型信息String不存在了。
+那么，运行时进行类型查询的时候使用下面的方法是错误的
+````java
+if( arrayList instanceof ArrayList<String>)    
+````
+java限定了这种类型查询的方式
+````java
+if( arrayList instanceof ArrayList<?>)  
+````
+？ 是通配符的形式 ，代表任意类型。所以在上面是返回true的。
 
+# 异常中使用泛型的问题
+## 不能抛出也不能捕获泛型类的对象。
+事实上，泛型类扩展Throwable都不合法。例如：下面的定义将不会通过编译：
+````java
+public class Problem<T> extends Exception{......}  
+````
+为什么不能扩展Throwable，因为异常都是在运行时捕获和抛出的，而在编译的时候，泛型信息全都会被擦除掉，那么，假设上面的编译可行，那么，在看下面的定义：
+````java
+try{
+}catch(Problem<Integer> e1){
+。。
+}catch(Problem<Number> e2){
+...
+} 
+````
+类型信息被擦除后，那么两个地方的catch都变为原始类型Object，那么也就是说，这两个地方的catch变的一模一样,就相当于下面的这样
+````java
+try{
+}catch(Problem<Object> e1){
+。。
+}catch(Problem<Object> e2){
+...
+````
+这个当然就是不行的。就好比，catch两个一模一样的普通异常，不能通过编译一样：
+````java
+try{
+}catch(Exception e1){
+。。
+}catch(Exception  e2){//编译错误
+...
+````
+# 能再catch子句中使用泛型变量
+````java
+public static <T extends Throwable> void doWork(Class<T> t){
+        try{
+            ...
+        }catch(T e){ //编译错误
+            ...
+        }
+   }
+````
+因为泛型信息在编译的时候已经变为原始类型，也就是说上面的T会变为原始类型Throwable，那么如果可以再catch子句中使用泛型变量，那么，下面的定义呢：
+````java
+public static <T extends Throwable> void doWork(Class<T> t){
+        try{
+            ...
+        }catch(Throwable e){ 
+            ...
+        }catch(IndexOutOfBounds e){
+        }                         
+ }
+````
+根据异常捕获的原则，一定是子类在前面，父类在后面，那么上面就违背了这个原则。即使你在使用该静态方法的使用T是ArrayIndexOutofBounds(ArrayIndexOutofBounds是IndexOutofBounds的子类)，在编译之后还是会变成Throwable，，违背了异常捕获的原则。所以java为了避免这样的情况，禁止在catch子句中使用泛型变量。
 
+但是在异常声明中可以使用类型变量。下面方法是合法的。
+````java
+   public static<T extends Throwable> void doWork(T t) throws T{
+       try{
+           ...
+       }catch(Throwable realCause){
+           t.initCause(realCause);
+           throw t; 
+       }
+  }
+````
+上面的这样使用是没问题的。
 
+# 数组（这个不属于类型擦除引起的问题）
+不能声明参数化类型的数组。如：
+````java
+Pair<String>[] table = new Pair<String>(10); //ERROR  
+````
+这是因为擦除后，table的类型变为Pair[]，可以转化成一个Object[]。
+````java
+Object[] objarray =table; 
+````
+数组可以记住自己的元素类型，下面的赋值会抛出一个ArrayStoreException异常。
+````java
+objarray ="Hello"; //ERROR 
+````
+对于泛型而言，擦除降低了这个机制的效率。下面的赋值可以通过数组存储的检测，但仍然会导致类型错误。
+````java
+objarray =new Pair<Employee>();
+````  
+提示：如果需要收集参数化类型对象，直接使用ArrayList：ArrayList<Pair<String>>最安全且有效。
 
+# 泛型类型的实例化 
+## 不能实例化泛型类型。如，
+````java
+first = new T(); //ERROR 
+````
+是错误的，类型擦除会使这个操作做成new Object()。
 
+## 不能建立一个泛型数组。
+````java
+  public<T> T[] minMax(T[] a){
+       T[] mm = new T[2]; //ERROR
+       ...
+  }
+````
+类似的，擦除会使这个方法总是构靠一个Object[2]数组。但是，可以用反射构造泛型对象和数组。
+利用反射，调用Array.newInstance:
+````java
+ publicstatic <T extends Comparable> T[] minmax(T[] a)
 
+    {
 
+       T[] mm == (T[])Array.newInstance(a.getClass().getComponentType(),2);
 
+        ...
 
+       // 以替换掉以下代码
 
+       // Obeject[] mm = new Object[2];
 
+       // return (T[]) mm;
 
+    }
+````
+
+# 类型擦除后的冲突
+当泛型类型被擦除后，创建条件不能产生冲突,如果在Pair类中添加下面的equals方法：
+````java
+class Pair<T>   {
+	public boolean equals(T value) {
+		return null;
+	}
+	
+}
+````
+考虑一个Pair<String>。从概念上，它有两个equals方法：
+````java
+boolean equals(String); //在Pair<T>中定义
+boolean equals(Object); //从object中继承
+````
+但是，这只是一种错觉。实际上，擦除后方法
+boolean equals(T)变成了方法 boolean equals(Object)
+这与Object.equals方法是冲突的！当然，补救的办法是重新命名引发错误的方法。
+
+# 泛型在静态方法和静态类中的问题
+泛型类中的静态方法和静态变量不可以使用泛型类所声明的泛型类型参数
+举例说明：
+````java
+    public class Test2<T> {  
+        public static T one;   //编译错误  
+        public static  T show(T one){ //编译错误  
+            return null;  
+        }  
+    }  
+````
+因为泛型类中的泛型参数的实例化是在定义对象的时候指定的，而静态变量和静态方法不需要使用对象来调用。对象都没有创建，如何确定这个泛型参数是何种类型，所以当然是错误的。
+但是要注意区分下面的一种情况：
+````java
+    public class Test2<T> {  
+      
+        public static <T >T show(T one){//这是正确的  
+            return null;  
+        }  
+    }  
+````
+因为这是一个泛型方法，在泛型方法中使用的T是自己在方法中定义的T，而不是泛型类中的T。
+
+参考 http://blog.csdn.net/lonelyroamer/article/details/7868820
