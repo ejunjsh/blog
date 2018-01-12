@@ -27,7 +27,7 @@ POST /my_index/my_type/_search
 <!-- more -->
 
 ## Query 阶段
-[![](http://7sbmb0.com1.z0.glb.clouddn.com/2016_es_query.jpg)](http://7sbmb0.com1.z0.glb.clouddn.com/2016_es_query.jpg)
+[![](http://idiotsky.me/images2/es-scroll-1.jpg)](http://idiotsky.me/images2/es-scroll-1.jpg)
 
 如上图所示，描述了一次搜索请求的 query 阶段。
 1. Client 发送一次搜索请求，node1 接收到请求，然后，node1 创建一个大小为 from + size 的优先级队列用来存结果，我们管 node1 叫 coordinating node。
@@ -40,7 +40,7 @@ coordinating node 计算好自己的优先级队列后，query 阶段结束，�
 
 ## Fetch 阶段
 query 阶段知道了要取哪些数据，但是并没有取具体的数据，这就是 fetch 阶段要做的。
-[![](http://7sbmb0.com1.z0.glb.clouddn.com/2016_es_fetch.jpg)](http://7sbmb0.com1.z0.glb.clouddn.com/2016_es_fetch.jpg)
+[![](http://idiotsky.me/images2/es-scroll-2.jpg)](http://idiotsky.me/images2/es-scroll-2.jpg)
 
 上图展示了 fetch 过程：
 1. coordinating node 发送 GET 请求到相关shards。
@@ -80,7 +80,7 @@ POST ip:port/my_index/my_type/_search?scroll=1m
 ````
 初始化时需要像普通 search 一样，指明 index 和 type (当然，search 是可以不指明 index 和 type 的)，然后，加上参数 scroll，表示暂存搜索结果的时间，其它就像一个普通的search请求一样。
 
-初始化返回一个 _scroll_id，_scroll_id 用来下次取数据用。
+初始化返回一个 \_scroll\_id，\_scroll\_id 用来下次取数据用。
 
 ### 遍历
 ````
@@ -89,7 +89,7 @@ POST /_search?scroll=1m
     "scroll_id":"XXXXXXXXXXXXXXXXXXXXXXX I am scroll id XXXXXXXXXXXXXXX"
 }
 ````
-这里的 scroll_id 即 上一次遍历取回的 _scroll_id 或者是初始化返回的 _scroll_id，同样的，需要带 scroll 参数。 重复这一步骤，直到返回的数据为空，即遍历完成。注意，每次都要传参数 scroll，刷新搜索结果的缓存时间。另外，不需要指定 index 和 type。
+这里的 scroll\_id 即 上一次遍历取回的 \_scroll\_id 或者是初始化返回的 \_scroll\_id，同样的，需要带 scroll 参数。 重复这一步骤，直到返回的数据为空，即遍历完成。注意，每次都要传参数 scroll，刷新搜索结果的缓存时间。另外，不需要指定 index 和 type。
 
 设置scroll的时候，需要使搜索结果缓存到下一次遍历完成，同时，也不能太长，毕竟空间有限。
 
@@ -106,11 +106,11 @@ POST ip:port/my_index/my_type/_search?search_type=scan&scroll=1m&size=50
 需要指明参数：
 * search_type。赋值为scan，表示采用 Scroll-Scan 的方式遍历，同时告诉 Elasticsearch 搜索结果不需要排序。
 * scroll。同上，传时间。
-* size。与普通的 size 不同，这个 size 表示的是每个 shard 返回的 size 数，最终结果最大为 number_of_shards * size。
+* size。与普通的 size 不同，这个 size 表示的是每个 shard 返回的 size 数，最终结果最大为 number\_of\_shards * size。
 
 Scroll-Scan 方式与普通 scroll 有几点不同：
 1. Scroll-Scan 结果没有排序，按 index 顺序返回，没有排序，可以提高取数据性能。
-2. 初始化时只返回 _scroll_id，没有具体的 hits 结果。
+2. 初始化时只返回 \_scroll\_id，没有具体的 hits 结果。
 3. size 控制的是每个分片的返回的数据量而不是整个请求返回的数据量。
 
 ## Java 实现
@@ -131,7 +131,7 @@ try {
 }  
 ````
 
-初始化返回 _scroll_id，然后，用 _scroll_id 去遍历，注意，上面的query是一个JSONObject，不过这里很多种实现方式，我这儿只是个例子。
+初始化返回 \_scroll\_id，然后，用 \_scroll\_id 去遍历，注意，上面的query是一个JSONObject，不过这里很多种实现方式，我这儿只是个例子。
 
 ### 遍历
 ````java
