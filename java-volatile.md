@@ -1,5 +1,5 @@
 ---
-title: java多线程-volatile 解惑
+title: java volatile 解惑
 date: 2016-08-27 20:23:44
 tags: [java,多线程,volatile]
 categories: java
