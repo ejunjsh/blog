@@ -321,8 +321,27 @@ public static int binarySearch(Integer[] srcArray, int des) {
 前面讲解了自平衡查找树中的2-3查找树，这种数据结构在插入之后能够进行自平衡操作，从而保证了树的高度在一定的范围内进而能够保证最坏情况下的时间复杂度。但是2-3查找树实现起来比较困难，红黑树是2-3树的一种简单高效的实现，他巧妙地使用颜色标记来替代2-3树中比较难处理的3-node节点问题。红黑树是一种比较高效的平衡查找树，应用非常广泛，很多编程语言的内部实现都或多或少的采用了红黑树。
 
 # 红黑树在java中的实现
+虽说上面红黑树是2-3树的一种实现，但是在java中红黑树有一个很明显的特点就是，3节点可以出现在右子树上
+[![](http://idiotsky.me/images2/java-treemap-45.png)](http://idiotsky.me/images2/java-treemap-45.png)
+
+上面图片的68节点如果是按前一章的实现的话，在插入68的时候，相当于在2节点的右边插入，是需要左旋的。可上图很明显在java的红黑树是允许的，所以不做任何处理。
+
+由于这样的一个规则，打破了之前红黑树可以通过2-3树来理解的思路，所以java实现这里会通过另外些规则来理解。当然前面所学的是不会白费的👿
+
+## 规则
+以下是Java中实现的一些规则
+1. 每个节点都有颜色（红或黑）；
+2. 根节点必须是黑色的；
+3. 叶子节点（null节点）是黑的，即每个节点都有两个子节点（其中一个或者两个可能是null节点）；
+4. 相连节点不能都是红色（红色节点的父节点和子节点必须为黑色）；（这条在基于2-3树实现的红黑树也有）
+5. 任意节点到它所有的叶子节点的路径都含有相同的黑色节点的数量。
+
+其实在java的实现还有个规则跟前面章节是一致的，就是__插入的节点一开始都是红色的__
+
+还有上图22节点和65节点结合规则4和5，会发现一个有趣的东西：如果一个节点只有一个子节点，那么这个子节点肯定是红色的并且没有子节点。
+
 ## 节点
-下面是代表树的一个节点的代码，很简单，省略了一些不重要的方法。
+下面是代表树的一个节点的代码。
 ````java
 static final class Entry<K,V> implements Map.Entry<K,V> {
     K key;//关键字
@@ -366,11 +385,12 @@ final Entry<K,V> getEntry(Object key) {
 ````
 
 ## 插入
-红黑树相比二叉查找树来说，最主要的优势在于自平衡，所以在插入的时候会做很多的平衡处理
+红黑树相比二叉查找树来说，最主要的优势在于自平衡，所以在插入的时候除了找到合适位置插入外，还会做很多的平衡处理。
+在java的实现中主要有上面几个规则约束，所以插入后有可能会破坏规则。
 ````java
 public V put(K key, V value) {
         Entry<K,V> t = root;
-        if (t == null) {
+        if (t == null) {//如果根节点是null，直接插入
             compare(key, key); // type (and possibly null) check
 
             root = new Entry<>(key, value, null);
@@ -382,7 +402,7 @@ public V put(K key, V value) {
         Entry<K,V> parent;
         // split comparator and comparable paths
         Comparator<? super K> cpr = comparator;
-        if (cpr != null) {
+        if (cpr != null) {//如果实现了comparator就用comparator比较大小，否则用通用的Comparable比较大小
             do {
                 parent = t;
                 cmp = cpr.compare(key, t.key);
@@ -410,41 +430,117 @@ public V put(K key, V value) {
                     return t.setValue(value);
             } while (t != null);
         }
+        //没找到节点，则进行插入，小于就插入左节点，大于就插入右节点
         Entry<K,V> e = new Entry<>(key, value, parent);
         if (cmp < 0)
             parent.left = e;
         else
             parent.right = e;
-        //自平衡函数
+        //插入之后可能违反了红黑树的规则，需要进行调整
         fixAfterInsertion(e);
         size++;
         modCount++;
         return null;
     }
 ````
-自平衡处理在函数`fixAfterInsertion`里面
+函数`fixAfterInsertion`很重要，下面注释先用2-3树的思维来了解的。
 ````java
 private void fixAfterInsertion(Entry<K,V> x) {
         x.color = RED;//一开始插入的节点标记为红色
-        //如果x的父节点为红色而且x不为根结点
+        //如果x的父节点为红色而且x不为根结点,就继续循环下去。
+        //由于父节点是红色，所以操作只处理3节点的插入处理。
         while (x != null && x != root && x.parent.color == RED) {
+            //x在3节点的左边或者中间
             if (parentOf(x) == leftOf(parentOf(parentOf(x)))) {
                 Entry<K,V> y = rightOf(parentOf(parentOf(x)));
+                //这里的y是红色，就意味着产生了一个4节点，所以要进行flip color，把红色往上面提升。
                 if (colorOf(y) == RED) {
                     setColor(parentOf(x), BLACK);
                     setColor(y, BLACK);
                     setColor(parentOf(parentOf(x)), RED);
                     x = parentOf(parentOf(x));
                 } else {
+                    //这里代表了在3节点中间插入的情况，要进行左旋。
                     if (x == rightOf(parentOf(x))) {
                         x = parentOf(x);
                         rotateLeft(x);
                     }
+                    //这里代表了在3节点左边插入的情况，要进行右旋。
                     setColor(parentOf(x), BLACK);
                     setColor(parentOf(parentOf(x)), RED);
                     rotateRight(parentOf(parentOf(x)));
                 }
             } else {
+                //这里的处理跟上面的相反过来了。而且出现了一种新的东西，
+                //一直上面我们说的3节点都在左子树上的，现在由于没有2节点的处理，
+                //所以，3节点出现在右子树上。
+                Entry<K,V> y = leftOf(parentOf(parentOf(x)));
+                //这里的y是红色，就意味着产生了一个4节点，所以要进行flip color，把红色往上面提升。
+                if (colorOf(y) == RED) {
+                    setColor(parentOf(x), BLACK);
+                    setColor(y, BLACK);
+                    setColor(parentOf(parentOf(x)), RED);
+                    x = parentOf(parentOf(x));
+                } else {
+                    //这里代表了在右子树的3节点中间插入的情况，要进行右旋（跟左子树的3节点相反的操作）。
+                    if (x == leftOf(parentOf(x))) {
+                        x = parentOf(x);
+                        rotateRight(x);
+                    }
+                    //这里代表了在右子树3节点左边插入的情况，要进行左旋（跟左子树的3节点相反的操作）。
+                    setColor(parentOf(x), BLACK);
+                    setColor(parentOf(parentOf(x)), RED);
+                    rotateLeft(parentOf(parentOf(x)));
+                }
+            }
+        }
+        //根节点变成黑色
+        root.color = BLACK;
+    }
+````
+从注释上面可以看到，循环只处理3节点的插入操作，而对于2节点操作却产生了一种右子树的3节点的操作，这种操作跟前面提到的3节点进行了相反的处理，左旋时候变右旋，右旋时候左旋。
+
+好了，现在用java的实现来再重新看
+`````java
+private void fixAfterInsertion(Entry<K,V> x) {
+        x.color = RED;  //新插入的节点都是红色的
+
+        while (x != null && x != root && x.parent.color == RED) {   //如果父节点也是红色，违反了规则4，就需要调整。
+            if (parentOf(x) == leftOf(parentOf(parentOf(x)))) { //如果x的父节点是x的祖父节点的左孩子，
+                Entry<K,V> y = rightOf(parentOf(parentOf(x)));  //y表示x的叔父节点（x的父节点的兄弟节点）
+                /**
+                * 情况1：如果x的父节点和叔父节点都是红色的
+                * 则祖父节点肯定是黑色的
+                * 把祖父节点变成红色的，父亲节点和叔父节点变成黑色的
+                * （保证从祖父节点到其所有叶子节点的黑色节点数量保持不变）
+                * 此时祖父节点从黑色变成红色，可能违反了规则4，while循环继续对祖父节点进行调整
+                */
+                if (colorOf(y) == RED) {
+                    setColor(parentOf(x), BLACK);   //父亲节点红变黑
+                    setColor(y, BLACK);             //叔父节点红变黑
+                    setColor(parentOf(parentOf(x)), RED);   //祖父节点黑变红
+                    x = parentOf(parentOf(x));  //while循环继续对祖父进行调整
+                } else {
+                    /**
+                    * 情况2：x的叔父节点是黑色的（我们用p代表x的父节点，pp代表x的祖父节点，pr代表x的叔父节点）
+                    * x和p是红色，pr和pp是黑色，不能直接变色，这种情况下我们把p变黑，pp变红，
+                    * 然后对pp右旋转，左右分支的黑色节点数量不变
+                    * 但是右旋转会使p的右孩子变成pp的左孩子，pp现在是红色，如果x是p的右孩子（红色），旋转过去就会冲突。
+                    
+                    * 所以需要提前判断x如果是p的右孩子，对x的父节点进行左旋转（参照上面的左旋转）
+                    * x变成父节点，p变成左孩子，把红色节点移到左分支，x的右孩子是黑色，保证下面的祖父节点右旋转不会发生冲突
+                    * 右旋转之后新祖父节点到各个子孙节点的黑色节点数量仍然保持不变，并且是黑色的，不会再和它的父节点冲突，调整到此结束。
+                    * 即插入操作最多旋转操作两次就可以解决冲突
+                    */
+                    if (x == rightOf(parentOf(x))) {
+                        x = parentOf(x);    //x指向父亲节点
+                        rotateLeft(x);      //对x进行左旋转，把红色节点移到左边
+                    }
+                    setColor(parentOf(x), BLACK);   //父节点变色
+                    setColor(parentOf(parentOf(x)), RED);   //祖父节点变色
+                    rotateRight(parentOf(parentOf(x)));     //祖父节点右旋转
+                }
+            } else {    //下面这种情况对上面的左右对称，操作原理一样
                 Entry<K,V> y = leftOf(parentOf(parentOf(x)));
                 if (colorOf(y) == RED) {
                     setColor(parentOf(x), BLACK);
@@ -462,11 +558,330 @@ private void fixAfterInsertion(Entry<K,V> x) {
                 }
             }
         }
+        /**
+        * 保证根节点是黑色
+        * 假设x的父节点和叔父节点都是红色，祖父节点是黑色并且是根节点
+        * 符合情况1，那么把父节点叔父节点变黑，祖父节点变红，冲突解决
+        * x = parentOf(parentOf(x));此时x是根节点不会再调整，但是此时x是红色的，不满足规则2，所以把根节点置黑。
+        */
         root.color = BLACK;
     }
+`````
+
+### 示例
+
+再来个实例看看，好理解
+
+以下图红黑树为例
+[![](http://idiotsky.me/images2/java-treemap-46.png)](http://idiotsky.me/images2/java-treemap-46.png)
+
+现在我们要增加一个节点50，放在节点47的右子树上。
+
+[![](http://idiotsky.me/images2/java-treemap-47.png)](http://idiotsky.me/images2/java-treemap-47.png)
+
+新增节点和父节点冲突，叔父节点是红色的，进行变色操作，把父亲节点和叔父节点都变成黑色，祖父节点变成红色，然后再对祖父节点进行调整。
+
+````java
+if (colorOf(y) == RED) {
+                    setColor(parentOf(x), BLACK);
+                    setColor(y, BLACK);
+                    setColor(parentOf(parentOf(x)), RED);
+                    x = parentOf(parentOf(x));
+                }
 ````
 
-> to be continue....
+[![](http://idiotsky.me/images2/java-treemap-48.png)](http://idiotsky.me/images2/java-treemap-48.png)
+
+叔父节点y是黑色的，并且x是右孩子，先进行左旋转，把红色节点转移到左分支。
+
+````java
+if (x == rightOf(parentOf(x))) {
+                        x = parentOf(x);
+                        rotateLeft(x);
+                    }
+
+````
+
+[![](http://idiotsky.me/images2/java-treemap-49.png)](http://idiotsky.me/images2/java-treemap-49.png)
+
+再把x的父节点变黑，祖父节点变红，然后把祖父节点右旋转。
+
+````java
+setColor(parentOf(x), BLACK);
+setColor(parentOf(parentOf(x)), RED);
+rotateRight(parentOf(parentOf(x)));
+````
+
+[![](http://idiotsky.me/images2/java-treemap-50.png)](http://idiotsky.me/images2/java-treemap-50.png)
+
+就这样，又符合上面的规则了。其实用2-3树的思维看上面的过程，是不是跟前一章基于2-3树的红黑树的平衡过程类似呢。
+
+
+## 删除
+前面的章节没关于红黑树的删除，因为本身就是二叉查找树的删除操作，所以红黑树只是比二叉查找树多了一个自平衡的操作。
+
+````java
+private void deleteEntry(Entry<K,V> p) {
+        modCount++;
+        size--;
+
+        //有两个孩子的话，找到它的后继，然后用后继的值更新了要删除的节点
+        //这样基本等于要删除的节点被后继的值覆盖了
+        if (p.left != null && p.right != null) {
+            Entry<K,V> s = successor(p);
+            p.key = s.key;
+            p.value = s.value;
+            //让p指向后继，就是方便后面把后继当成要删除的节点来删掉。
+            p = s;
+        } 
+
+        //找到替换节点
+        Entry<K,V> replacement = (p.left != null ? p.left : p.right);
+
+        //替换节点不为空，代表要删除的节点有孩子
+        if (replacement != null) {
+            // 替换节点的父亲和要删除的节点要一致
+            replacement.parent = p.parent;
+            //如果要删除就是根节点
+            if (p.parent == null)
+                //直接根结点指向替换节点。
+                root = replacement;
+            //p的父亲指向替换节点。
+            else if (p == p.parent.left)
+                p.parent.left  = replacement;
+            else
+                p.parent.right = replacement;
+
+            //删除(unlink)p，方便gc
+            p.left = p.right = p.parent = null;
+
+            if (p.color == BLACK)
+                //上面不是说过，如果一个节点有一个孩子，那么这个孩子就一定是红色的
+                //所以replacement一定是红色的。
+                //所以替换节点用红色替换要删除的黑色节点的话，那样会违法规则5，使得
+                //黑色数量减少，所以下面的函数，其实做的事情相当于setColor(replacement, BLACK);
+                //把replacement变成黑色，没有任何黑色数量减少了。
+                //很明显，下面函数一开始的判断条件就不满足了，直接到把replacement变成黑色
+                fixAfterDeletion(replacement);
+        } else if (p.parent == null) { // 如果树只有一个节点的话，直接root赋值为null
+            root = null;
+        } else { // 替换节点为null，代表要删除的节点没有孩子
+            if (p.color == BLACK)
+                //要删除的节点没有孩子，而且是黑色的话，会违反规则5的，
+                //所以这里要进行调整这个节点，使他在删除之后不会影响黑色的数量。
+                fixAfterDeletion(p);
+            //将p的父亲所有指向p的链接指向null
+            if (p.parent != null) {
+                if (p == p.parent.left)
+                    p.parent.left = null;
+                else if (p == p.parent.right)
+                    p.parent.right = null;
+                //删除(unlink)p，方便gc
+                p.parent = null;
+            }
+        }
+    }
+````
+从上面二叉树查找树删除的章节知道，1.如果要删除节点没孩子，直接删掉即可，2.如果一个孩子的，就直接用孩子替换即可，3.对于两个孩子的节点，上面代码有个巧妙的地方，就是找到后继之后，直接用后继的值覆盖删除节点的值，之后把要删除的节点指向成后继节点，而后继节点是只有一个孩子或没有孩子，这样的后继节点刚好可以复用前面说的两种情况的代码了。
+
+函数`fixAfterDeletion`主要用来解决违反规则5的情况，即删除了一个黑色节点，如果它没有孩子，情况更复杂，调整有3种情景：
+1. 如果兄弟节点是红色的，经过变色旋转，在x节点上面增加一个红色的父亲节点，并且不破坏其他分支的黑色节点数量。
+2. 兄弟节点是黑色的，如果兄弟节点的子节点都是黑色的，直接把黑色节点变红，即减少兄弟分支的黑色节点数量，然后对其父节点进行调整；
+3. 兄弟节点是黑色的，但其有红色的孩子节点，不能直接变红。如果左孩子是红色节点，经过变色和右旋转把红色节点移到右边。此时再经过变色，并对x的父节点进行左旋转，在x节点的上面增加一个黑色节点，并且不破坏其他分支的黑色节点数量，调整结束。
+
+````java
+private void fixAfterDeletion(Entry<K,V> x) {
+        while (x != root && colorOf(x) == BLACK) {  //节点x不是根节点并且是黑色才进行处理
+            if (x == leftOf(parentOf(x))) { //x是其父节点的左孩子
+                Entry<K,V> sib = rightOf(parentOf(x));  //sib表示x的兄弟节点
+                
+                /**
+                * 如果兄弟节点是红色的，那么父节点肯定是黑色的
+                * 把兄弟节点变黑，父节点变红，然后对父节点左旋转
+                * 兄弟节点变成父节点，并且到右子树的黑色节点数量不变（由1黑1红变成1黑）
+                * 
+                * 即情景1，在x节点上增加一个父节点（红色）。
+                */
+                
+                if (colorOf(sib) == RED) {
+                    setColor(sib, BLACK);
+                    setColor(parentOf(x), RED);
+                    rotateLeft(parentOf(x));
+                    sib = rightOf(parentOf(x)); //旋转之后重新赋值兄弟节点sib，原sib变成x的祖父节点（见左旋转动图）
+                }
+                
+                /**
+                * 进行上一步的判断处理后，此时兄弟节点肯定是黑色的。
+                * 如果兄弟节点的孩子节点都是黑色的，我们就可以把兄弟节点变红。
+                * 然后while循环继续调整其父节点，即情景2。
+                */
+
+                if (colorOf(leftOf(sib))  == BLACK &&
+                    colorOf(rightOf(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    x = parentOf(x);
+                } else {    //兄弟节点不能直接变红的情况下，即情景3
+                    /**
+                    * 如果兄弟节点的左孩子是红色，右孩子是黑色
+                    * 兄弟节点的左孩子变黑，兄弟节点变红，对兄弟节点右旋转，把红色节点转移到右分支
+                    */
+                    if (colorOf(rightOf(sib)) == BLACK) {
+                        setColor(leftOf(sib), BLACK);
+                        setColor(sib, RED);
+                        rotateRight(sib);
+                        sib = rightOf(parentOf(x)); //重新赋值兄弟节点
+                    }
+                    /**
+                    * 经过上一步判断处理，兄弟节点是黑色，兄弟节点的左孩子是黑色，兄弟节点的右孩子是红色，
+                    * 把兄弟节点变成父节点的颜色，兄弟节点的右孩子变成黑色（不破坏右分支的规则），父节点变成黑色，对父亲节点左旋转，
+                    * 主要就在x节点的上面增加了一个黑色的父节点，即情景3，调整结束。
+                    */
+                    setColor(sib, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(rightOf(sib), BLACK);
+                    rotateLeft(parentOf(x));
+                    x = root;
+                }
+            } else { // x节点是其父节点的右孩子，调整方法和上面的对称。
+                Entry<K,V> sib = leftOf(parentOf(x));
+
+                if (colorOf(sib) == RED) {
+                    setColor(sib, BLACK);
+                    setColor(parentOf(x), RED);
+                    rotateRight(parentOf(x));
+                    sib = leftOf(parentOf(x));
+                }
+
+                if (colorOf(rightOf(sib)) == BLACK &&
+                    colorOf(leftOf(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    x = parentOf(x);
+                } else {
+                    if (colorOf(leftOf(sib)) == BLACK) {
+                        setColor(rightOf(sib), BLACK);
+                        setColor(sib, RED);
+                        rotateLeft(sib);
+                        sib = leftOf(parentOf(x));
+                    }
+                    setColor(sib, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(leftOf(sib), BLACK);
+                    rotateRight(parentOf(x));
+                    x = root;
+                }
+            }
+        }
+
+        setColor(x, BLACK);
+    }
+````
+### 示例
+#### 删除的节点只有一个子节点（删除390）
+根据上面的引申规则，这个节点肯定是黑色，子节点是红色
+[![](http://idiotsky.me/images2/java-treemap-51.png)](http://idiotsky.me/images2/java-treemap-51.png)
+
+#### 删除红色的节点并且没有子节点（删除833）
+[![](http://idiotsky.me/images2/java-treemap-52.png)](http://idiotsky.me/images2/java-treemap-52.png)
+
+#### 删除黑色的节点并且没有子节点（删除22）
+##### 兄弟节点是红色的情况
+[![](http://idiotsky.me/images2/java-treemap-53.png)](http://idiotsky.me/images2/java-treemap-53.png)
+
+变色+旋转，给x节点增加一个红色的父亲节点
+````java
+if (colorOf(sib) == RED) {
+                    setColor(sib, BLACK);
+                    setColor(parentOf(x), RED);
+                    rotateLeft(parentOf(x));
+                    sib = rightOf(parentOf(x));
+}
+````
+[![](http://idiotsky.me/images2/java-treemap-54.png)](http://idiotsky.me/images2/java-treemap-54.png)
+
+此时x的新兄弟节点是黑色，并且孩子节点全是黑色（叶子节点是黑色的），把兄弟节点变色，然后x指向父节点，while循环继续调整。
+````java
+if (colorOf(leftOf(sib))  == BLACK &&
+                    colorOf(rightOf(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    x = parentOf(x);
+````
+[![](http://idiotsky.me/images2/java-treemap-55.png)](http://idiotsky.me/images2/java-treemap-55.png)
+
+节点是红色，跳出循环。循环外把该节点变黑。
+````java
+while (x != root && colorOf(x) == BLACK) {}
+setColor(x, BLACK);
+````
+
+[![](http://idiotsky.me/images2/java-treemap-56.png)](http://idiotsky.me/images2/java-treemap-56.png)
+
+方法返回后，deleteEntry方法把22节点删除，整个过程结束。
+
+````java
+if (p.parent != null) {
+                if (p == p.parent.left)
+                    p.parent.left = null;
+                else if (p == p.parent.right)
+                    p.parent.right = null;
+                p.parent = null;
+            }
+
+````
+[![](http://idiotsky.me/images2/java-treemap-57.png)](http://idiotsky.me/images2/java-treemap-57.png)
+
+##### 兄弟节点是黑色的情况
+上面是旋转变化过程中其实已经遇见了这种情况，并且兄弟节点的孩子节点全是黑色，可以直接变色处理，下面来看一下，兄弟节点是黑色，并且有孩子节点是红色的情况
+
+继续上面的红黑树，下面删除65节点
+
+[![](http://idiotsky.me/images2/java-treemap-58.png)](http://idiotsky.me/images2/java-treemap-58.png)
+
+兄弟节点是黑色，并且有红色的孩子节点，针对x是左孩子的情况下，如果红色节点是左孩子，需要通过旋转操作移到右边
+
+````java
+if (colorOf(rightOf(sib)) == BLACK) {
+                        setColor(leftOf(sib), BLACK);
+                        setColor(sib, RED);
+                        rotateRight(sib);
+                        sib = rightOf(parentOf(x));
+                    }
+````
+
+[![](http://idiotsky.me/images2/java-treemap-59.png)](http://idiotsky.me/images2/java-treemap-59.png)
+
+然后再进行变色旋转操作，给x节点增加一个黑色的父节点。x = root结束循环。
+````java
+setColor(sib, colorOf(parentOf(x)));
+setColor(parentOf(x), BLACK);
+setColor(rightOf(sib), BLACK);
+rotateLeft(parentOf(x));
+x = root;
+````
+[![](http://idiotsky.me/images2/java-treemap-60.png)](http://idiotsky.me/images2/java-treemap-60.png)
+
+方法返回，deleteEntry方法把65节点删除，整个过程结束。
+
+#### 删除节点有两个孩子节点的情况
+[![](http://idiotsky.me/images2/java-treemap-61.png)](http://idiotsky.me/images2/java-treemap-61.png)
+
+删除节点55，该节点有两个孩子节点，deleteEntry方法中会查找继承者节点，即图中的65节点，把65节点的key和value赋值给55节点，然后转化为删除p指向的65节点。
+````java
+if (p.left != null && p.right != null) {
+            Entry<K,V> s = successor(p);
+            p.key = s.key;
+            p.value = s.value;
+            p = s;
+        }
+````
+[![](http://idiotsky.me/images2/java-treemap-62.jpg)](http://idiotsky.me/images2/java-treemap-62.jpg)
+因为继承者节点没有左孩子节点，所以这个问题又变成了删除有一个孩子节点或者无孩子节点的问题。（参照上面）
+
+# 总结
+很长一篇文章，基本包含了跟树相关的数据结构了，mark下来以后忘了回来看看👿
+
+java除了treemap外，treeset也用了红黑树，而且hashmap和一些依赖链表作为查找的数据结构都会在最后从链表转换成红黑树来提高查找效率。
+
+java在红黑树的实现上有别于基于2-3树实现的红黑树，但是最终产生的红黑树也是类似的。
 
 参考 
 http://www.jianshu.com/p/43b6b90555ca 
@@ -474,3 +889,4 @@ http://www.cnblogs.com/yangecnu/p/Introduce-Binary-Search-Tree.html
 http://www.cnblogs.com/yangecnu/p/Introduce-2-3-Search-Tree.html
 https://algs4.cs.princeton.edu/33balanced/
 http://www.cnblogs.com/yangecnu/p/Introduce-Red-Black-Tree.html
+https://juejin.im/post/5a6bf78a6fb9a01caf37a4bb
