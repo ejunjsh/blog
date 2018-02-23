@@ -400,4 +400,7 @@ func assertE2I(inter *interfacetype, e eface) (r iface)
 func assertE2I2(inter *interfacetype, e eface) (r iface, b bool)
 ````
 
+# 总结
+go的interface是一种类型，从源码来看，其他类型在赋值给一个接口的时候，会创建结构（iface和eface）来包装这个原始数据。还有go的鸭子类型这种特点，方便多态的实现。
+
 参考 https://zhuanlan.zhihu.com/p/27652856
