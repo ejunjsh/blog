@@ -55,6 +55,8 @@ tcp在网络OSI的七层模型中的第四层——Transport(传输)层，IP在�
 [![](http://idiotsky.me/images1/tcp-something-6.jpg)](http://idiotsky.me/images1/tcp-something-6.jpg)
 你可以看到，__SeqNum的增加是和传输的字节数相关的__。上图中，三次握手后，来了两个Len:1440的包，而第二个包的SeqNum就成了1441。然后第一个ACK回的是1441，表示第一个1440收到了。
 
+_SeqNum为当前成功发送的数据字节数，ACK为当前成功接收的数据字节数_
+
 __注意__：如果你用Wireshark抓包程序看3次握手，你会发现SeqNum总是为0，不是这样的，Wireshark为了显示更友好，使用了Relative SeqNum——相对序号，你只要在右键菜单中的protocol preference 中取消掉就可以看到“Absolute SeqNum”了
 
 # TCP重传机制
