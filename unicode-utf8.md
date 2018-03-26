@@ -4,7 +4,7 @@ date: 2018-03-19 23:43:59
 tags: [Unicode,UTF-8]
 categories: 编码
 ---
-> mark 一下 👿
+> 这个很简单的说明了unicode和UTF-8的关系 👿
 
 * Unicode 是「字符集」
 * UTF-8 是「编码规则」
@@ -40,3 +40,6 @@ U+10000 ~ U+1FFFF: 11110XXX 10XXXXXX 10XXXXXX 10XXXXXX
 这就是将 U+77E5 按照 UTF-8 编码为字节序列 E79FA5 的过程。反之亦然。
 
 ref https://www.zhihu.com/question/23374078
+
+百度百科其实也说得不错了 
+https://baike.baidu.com/item/Unicode/750500
