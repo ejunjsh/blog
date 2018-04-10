@@ -13,13 +13,16 @@ Unix的grep家族包括grep、egrep和fgrep。egrep和fgrep的命令只跟grep�
 
 # grep常用用法
 
-grep [-acinv] [--color=auto] '搜寻字符串' filename
+grep [-acinvCBA] [--color=auto] '搜寻字符串' filename
 选项与参数：
 -a ：将 binary 文件以 text 文件的方式搜寻数据
 -c ：计算找到 '搜寻字符串' 的次数
 -i ：忽略大小写的不同，所以大小写视为相同
 -n ：顺便输出行号
 -v ：反向选择，亦即显示出没有 '搜寻字符串' 内容的那一行！
+-C N: 显示匹配行上下N行
+-B N: 显示匹配行的上N行
+-A N: 显示匹配行的下N行
 --color=auto ：可以将找到的关键词部分加上颜色的显示喔！
 
 将/etc/passwd，有出现 root 的行取出来
