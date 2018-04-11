@@ -1,7 +1,7 @@
 ---
 title: 深入浅出MappedByteBuffer
 date: 2016-08-23 00:36:51
-tags: java
+tags: [java,nio,buffer]
 categories: java
 ---
 # 前言
