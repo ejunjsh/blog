@@ -1,6 +1,6 @@
 ---
 title: NIO之Channel、Buffer
-date: 2016-08-21 11:16:51
+date: 2016-08-22 21:16:51
 tags: [nio,channel,buffer,java]
 categories: java
 ---
@@ -273,5 +273,8 @@ while (bytesRead != -1) {
 file.close();
 ````
 注意buffer.flip() 的调用，首先将数据写入到buffer，然后变成读模式，再从buffer中读取数据。
+
+# 总结
+channel里面的那一层缓冲跟传统意义的带缓冲io不同，传统的缓冲io是为了减少io操作，但是channel的缓冲更像是纯粹的把从内核读出来的数据（这数据不在java堆里面）拷贝到java堆中。所以性能不是很好，才会有`MappedByteBuffer`,下一篇会谈谈这个。
 
 参考 https://www.jianshu.com/p/052035037297
