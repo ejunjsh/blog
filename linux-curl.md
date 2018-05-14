@@ -166,6 +166,19 @@ curl不仅仅可以下载文件，还可以上传文件。通过内置option:-T�
 ````
 # curl -f http://www.linux.com/error
 ````
+# 发送json内容
+````
+# curl -i -H "Content-Type: application/json" -X POST -d @test.json http://www.linux.com/json
+````
+其中`-d @test.json`代表body内容从test.json取
+
+也可以从标准输入拿，就要改成`-d @-`
+````
+# cat test.json | curl -i -H "Content-Type: application/json" -X POST -d @- http://www.linux.com/json
+等同于
+# curl -i -H "Content-Type: application/json" -X POST -d @- http://www.linux.com/json < test.json
+````
+
 # 其他参数
 ````
 -a/--append                        上传文件时，附加到目标文件
