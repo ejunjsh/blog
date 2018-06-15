@@ -83,3 +83,5 @@ public static int reverseIntHelper(int i, int init){
          return reverseIntHelper(i/10, init*10+i%10);  
      }
 ````
+
+ref https://my.oschina.net/hosee/blog/616968
