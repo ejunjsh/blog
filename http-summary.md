@@ -1,9 +1,13 @@
-# HTTP 基础概述
+---
+title: HTTP 总结
+date: 2018-05-22 22:51:18
+tags: [http,protocol]
+categories: protocol
+---
 
-<p align='center'>
-<img src='../images/HTTP_logo.png'>
-</p>
+> 👿 mark ，很长 😄
 
+# HTTP 概述
 
 Web 使用一种名为 HTTP (HyperText Transfer Protocol，超文本传输协议) 的协议作为规范的。
 >HTTP 更加严谨的译名应该是 超文本转移协议。
@@ -15,8 +19,10 @@ HTTP 在 1997 年 1 月公布了当前最主流的版本，版本命名为 HTTP/
 HTTP/2 于 2015 年 5 月 14 日发布，引入了服务器推送等多种功能，是目前最新的版本。记载于 RFC7540
 (它不叫 HTTP/2.0，是因为标准委员会不打算再发布子版本了，下一个新版本将是 HTTP/3)
 
+<!-- more -->
 
-## 一. HTTP 支持的方法
+
+# HTTP 支持的方法
 
 HTTP 是一种不保存状态，即 无状态（ stateless ）协议。HTTP 协议自身不对请求和响应之间的通信状态进行保存。也就是说在 HTTP 这个级别，协议对于发送过的请求或响应都不做持久化处理。这也是为了更快的处理大量事务，确保协议的可伸缩性。
 
@@ -47,7 +53,7 @@ HTTP/1.1 虽然是无状态协议，但是为了实现期望的保持状态的�
 
 在HTTP/1.1规范中幂等性的定义是：
 
->Methods can also have the property of "idempotence" in that (aside from error or expiration issues) the side-effects of N > 0 identical requests is the same as for a single request.
+> Methods can also have the property of "idempotence" in that (aside from error or expiration issues) the side-effects of N > 0 identical requests is the same as for a single request.
 
 从定义上看，HTTP 方法的幂等性是指一次和多次请求某一个资源应该具有同样的副作用。幂等性属于语义范畴，正如编译器只能帮助检查语法错误一样，HTTP 规范也没有办法通过消息格式等语法手段来定义它，这可能是它不太受到重视的原因之一。但实际上，幂等性是分布式系统设计中十分重要的概念，而 HTTP 的分布式本质也决定了它在 HTTP 中具有重要地位。
 
@@ -69,7 +75,7 @@ HTTP 方法的安全性指的是不会改变服务器状态，也就是说它只
 对同一URI进行多次PUT的副作用和一次PUT是相同的。  
 
 
-## 二. HTTP 状态码
+# HTTP 状态码
 
 
 服务器返回的  **响应报文**  中第一行为状态行，包含了状态码以及原因短语，用来告知客户端请求的结果。
@@ -85,11 +91,11 @@ HTTP 方法的安全性指的是不会改变服务器状态，也就是说它只
 
 
 
-### 1XX 信息
+## 1XX 信息
 
 -  **100 Continue** ：表明到目前为止都很正常，客户端可以继续发送请求或者忽略这个响应。
 
-### 2XX 成功
+## 2XX 成功
 
 -  **200 OK** 
 
@@ -97,7 +103,7 @@ HTTP 方法的安全性指的是不会改变服务器状态，也就是说它只
 
 -  **206 Partial Content** ：表示客户端进行了范围请求。响应报文包含由 Content-Range 指定范围的实体内容。
 
-### 3XX 重定向
+## 3XX 重定向
 
 -  **301 Moved Permanently** ：永久性重定向
 
@@ -111,7 +117,7 @@ HTTP 方法的安全性指的是不会改变服务器状态，也就是说它只
 
 -  **307 Temporary Redirect** ：临时重定向，与 302 的含义类似，但是 307 要求浏览器不会把重定向请求的 POST 方法改成 GET 方法。
 
-### 4XX 客户端错误
+## 4XX 客户端错误
 
 -  **400 Bad Request** ：请求报文中存在语法错误。
 
@@ -121,7 +127,7 @@ HTTP 方法的安全性指的是不会改变服务器状态，也就是说它只
 
 -  **404 Not Found** 
 
-### 5XX 服务器错误
+## 5XX 服务器错误
 
 -  **500 Internal Server Error** ：服务器正在执行请求时发生错误。
 
@@ -197,7 +203,7 @@ webDAV 新增状态码
 |507|Server Error（服务器错误状态码）| Insufficient Storage（存储空间不足）| 服务器无法存储完成请求所必须的内容。这个状况被认为是临时的。||
 |508|Server Error（服务器错误状态码）| Loop Detected（检测到环）| 服务器在处理请求时陷入死循环。|
 
-## 三. MIME 媒体内容
+# MIME 媒体内容
 
 
 HTTP 仔细地给每种要通过 Web 传输的对象都打上了名为 MIME 类型（MIME type）的数据格式标签。最初设计 MIME（Multipurpose Internet Mail Extension，多用途因特网邮件扩展）是为了解决在不同的电子邮件系统之间搬移报文时存在的问题。MIME 在电子邮件系统中工作得非常好，因此 HTTP 也采纳了它，用它来描述并标记多媒体内容。
@@ -223,107 +229,27 @@ RFC2045，“ MIME: Format of Internet Message Bodies”（“ MIME：因特网�
 
 
 
-## 四. HTTP 报文结构
+# HTTP 报文结构
 
-<p align='center'>
-<img src='../images/HTTP 报文结构.png'>
-</p>
+[![](http://idiotsky.me/images3/http-summary-1.png)](http://idiotsky.me/images3/http-summary-1.png)
 
 
-<p align='center'>
-<img src='../images/请求报文.png'>
-</p>
+[![](http://idiotsky.me/images3/http-summary-2.png)](http://idiotsky.me/images3/http-summary-2.png)
 
 
-<p align='center'>
-<img src='../images/响应报文.png'>
-</p>
+[![](http://idiotsky.me/images3/http-summary-3.png)](http://idiotsky.me/images3/http-summary-3.png)
 
-
-<p align='center'>
-<img src='../images/报文实例.png'>
-</p>
-
-
-举个例子：
-
-
-```http
-
-General:
-
-Request URL: https://github.com/halfrost
-Request Method: GET
-Status Code: 200 OK
-Remote Address: 127.0.0.1:6152
-Referrer Policy: no-referrer-when-downgrade
-
-
-```
+[![](http://idiotsky.me/images3/http-summary-4.png)](http://idiotsky.me/images3/http-summary-4.png)
 
 
 Response Headers:
 
-<p align='center'>
-<img src='../images/HTTP_ResponseMessageExample.png'>
-</p>
-
-
-```http  
-
-HTTP/1.1 200 OK
-Date: Sun, 22 Apr 2018 15:47:27 GMT
-Content-Type: text/html; charset=utf-8
-Transfer-Encoding: chunked
-Server: GitHub.com
-Status: 200 OK
-Cache-Control: no-cache
-Vary: X-Requested-With
-Set-Cookie: user_session=GYkmjrs9T6H9r16Gx85; path=/; expires=Sun, 06 May 2018 15:47:27 -0000; secure; HttpOnly
-Set-Cookie: __Host-user_session_same_site=GYkmjre6H9r16Gx85; path=/; expires=Sun, 06 May 2018 15:47:27 -0000; secure; HttpOnly; SameSite=Strict
-Set-Cookie: _gh_sess=OHppNS84T05ubXZFS2swUm9SUlBqdXNpWlA2bHZZ3alUyUGNLZ0pqMD0tLTNLWDI0K1pTUUFlaWJUVU5XUTJaNFE9PQ%3D%3D--74346822d2bf179f6ff73ce52c8b8606c8f78755; path=/; secure; HttpOnly
-X-Request-Id: 855feee9-5be2-482f-911a-b0eb22d55088
-X-Runtime: 0.170448
-Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
-X-Frame-Options: deny
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 1; mode=block
-Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
-Expect-CT: max-age=2592000, report-uri="https://api.github.com/_private/browser/errors"
-Content-Security-Policy: default-src 'none'; base-uri 'self'; block-all-mixed-content; child-src render.githubusercontent.com; connect-src 'self' uploads.github.com status.github.com collector.githubapp.com api.github.com www.google-analytics.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com wss://live.github.com; font-src assets-cdn.github.com; form-action 'self' github.com gist.github.com; frame-ancestors 'none'; img-src 'self' data: assets-cdn.github.com identicons.github.com collector.githubapp.com github-cloud.s3.amazonaws.com *.githubusercontent.com; manifest-src 'self'; media-src 'none'; script-src assets-cdn.github.com; style-src 'unsafe-inline' assets-cdn.github.com
-X-Runtime-rack: 0.175479
-Content-Encoding: gzip
-Vary: Accept-Encoding
-X-GitHub-Request-Id: B706:3019:355B8D9:52B9B00:5ADCAE85
-
-
-```
+[![](http://idiotsky.me/images3/http-summary-5.png)](http://idiotsky.me/images3/http-summary-5.png)
 
 
 Request Headers:
 
-
-<p align='center'>
-<img src='../images/HTTP_RequestMessageExample.png'>
-</p>
-
-
-```http
-
-GET /halfrost HTTP/1.1
-Host: github.com
-Connection: keep-alive
-Cache-Control: max-age=0
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Mobile Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
-Referer: https://github.com/halfrost/Halfrost-Field/blob/master/contents/Protocol/HTTP.md
-Accept-Encoding: gzip, deflate, br
-Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
-Cookie: _octo=GH1.1.101205900.1486965233; logged_in=yes; dotcom_user=halfrost; _ga=GA1.2.183217117.1486965233; user_session=GYkmjrs9Ts80x85; __Host-user_session_same_site=GYkmjrs9THGx85; tz=Asia%2FShanghai; _gat=1; _gh_sess=S1JyM0tEbTVEcU50OXRERmUwOVlqRVZiQWp5SDlBeWt3RitrbEczRkxjaWVLWWNVc2k4YjhBTDVQT3BZajEwSGRJOEE2bz0tLVNLRHhiTlVDN2xEUXJ1OFM1ME1VeVE9PQ%3D%3D--59dc56a889d38d30125fbee36df9dab97e7a46c0
-
-
-```
+[![](http://idiotsky.me/images3/http-summary-6.png)](http://idiotsky.me/images3/http-summary-6.png)
 
 
 请求报文是由请求方法，请求 URI，协议版本，可选请求首部字段和内容实体构成的。
@@ -331,159 +257,160 @@ Cookie: _octo=GH1.1.101205900.1486965233; logged_in=yes; dotcom_user=halfrost; _
 响应报文基本上由协议版本，状态码（表示请求成功与失败的数字代码），用以解释状态码的原因短语，可选的响应首部字段以及实体主体构成。
 
 
-### 1. 通用首部
+# HTTP 缓存控制
 
-| 首部 | 描述 | 
-| :---: | :---: |
-|Cache-Control|控制缓存的行为，用于随报文传送缓存的指示|
-|Connection| 允许客户端和服务器指定与请求/响应连接有关的选项| 
-|Date| 提供日期和时间标志，说明报文是什么时间创建的 |
-|Pragma|报文指令，另一种随报文传送指示的方式，但并不专用于缓存。Pragma 是 HTTP/1.1 之前版本的历史遗留字段，仅作为与 HTTP/1.0 的向后兼容而定义。如果想要所有的服务器保持相同的行为，可以考虑发送 Pragma 指令。例如：Pragma: no-cache Cache-Control: no-cache|
-|MIME-Version |给出了发送端使用的 MIME 版本 |
-|Trailer| 如果报文采用了分块传输编码（chunked transfer encoding）方式，就可以用这个首部列出位于报文拖挂（trailer）部分的首部集合 |
-|Transfer- Encoding |告知接收端为了保证报文的可靠传输，对报文采用了什么编码方式 |
-|Update| 给出了发送端可能想要 “升级” 使用的新版本或协议|
-|Via |显示了报文经过的中间节点（代理、网关）|
-|Warning| 错误通知|
+## 缓存规则解析
+为方便大家理解，我们认为浏览器存在一个缓存数据库,用于存储缓存信息。
+
+在客户端第一次请求数据时，此时缓存数据库中没有对应的缓存数据，需要请求服务器，服务器返回后，将数据存储至缓存数据库中。
+
+[![](http://idiotsky.me/images3/http-summary-21.png)](http://idiotsky.me/images3/http-summary-21.png)
+
+HTTP缓存有多种规则，根据是否需要重新向服务器发起请求来分类，我将其分为两大类(**强制缓存，对比缓存**)
+
+在详细介绍这两种规则之前，先通过时序图的方式，让大家对这两种规则有个简单了解。
+
+已存在缓存数据时，仅基于强制缓存，请求数据的流程如下
+
+[![](http://idiotsky.me/images3/http-summary-22.png)](http://idiotsky.me/images3/http-summary-22.png)
+
+已存在缓存数据时，仅基于对比缓存，请求数据的流程如下
+
+[![](http://idiotsky.me/images3/http-summary-23.png)](http://idiotsky.me/images3/http-summary-23.png)
+
+对缓存机制不太了解的同学可能会问，基于对比缓存的流程下，不管是否使用缓存，都需要向服务器发送请求，那么还用缓存干什么？
+
+这个问题，我们暂且放下，后文在详细介绍每种缓存规则的时候，会带给大家答案。
+
+我们可以看到两类缓存规则的不同，强制缓存如果生效，不需要再和服务器发生交互，而对比缓存不管是否生效，都需要与服务端发生交互。
+
+两类缓存规则可以同时存在，强制缓存优先级高于对比缓存，也就是说，当执行强制缓存的规则时，如果缓存生效，直接使用缓存，不再执行对比缓存规则。
+
+## 强制缓存
+
+从上文我们得知，强制缓存，在缓存数据未失效的情况下，可以直接使用缓存数据，那么浏览器是如何判断缓存数据是否失效呢？
+
+我们知道，在没有缓存数据的时候，浏览器向服务器请求数据时，服务器会将数据和缓存规则一并返回，缓存规则信息包含在响应header中。
+
+对于强制缓存来说，响应header中会有两个字段来标明失效规则（Expires/Cache-Control）
+
+使用chrome的开发者工具，可以很明显的看到对于强制缓存生效时，网络请求的情况
+
+[![](http://idiotsky.me/images3/http-summary-24.png)](http://idiotsky.me/images3/http-summary-24.png)
+
+### Expires
+Expires的值为服务端返回的到期时间，即下一次请求时，请求时间小于服务端返回的到期时间，直接使用缓存数据。
+
+不过Expires 是HTTP 1.0的东西，现在默认浏览器均默认使用HTTP 1.1，所以它的作用基本忽略。
+
+另一个问题是，到期时间是由服务端生成的，但是客户端时间可能跟服务端时间有误差，这就会导致缓存命中的误差。
+
+所以HTTP 1.1 的版本，使用Cache-Control替代。
+
+### Cache-Control
+Cache-Control 是最重要的规则。常见的取值有private、public、no-cache、max-age，no-store，默认为private。
+* private:客户端可以缓存
+* public:客户端和代理服务器都可缓存（前端的同学，可以认为public和private是一样的）
+* max-age=xxx:缓存的内容将在 xxx 秒后失效
+* no-cache:需要使用对比缓存来验证缓存数据（后面介绍）
+* no-store:所有内容都不会缓存，强制缓存，对比缓存都不会触发（对于前端开发来说，缓存越多越好，so...基本上和它说886）
+
+举个板栗
+
+[![](http://idiotsky.me/images3/http-summary-25.png)](http://idiotsky.me/images3/http-summary-25.png)
+
+图中Cache-Control仅指定了max-age，所以默认为private，缓存时间为31536000秒（365天）
+
+也就是说，在365天内再次请求这条数据，都会直接获取缓存数据库中的数据，直接使用。
+
+## 对比缓存
+
+对比缓存，顾名思义，需要进行比较判断是否可以使用缓存。
+
+浏览器第一次请求数据时，服务器会将缓存标识与数据一起返回给客户端，客户端将二者备份至缓存数据库中。
+
+再次请求数据时，客户端将备份的缓存标识发送给服务器，服务器根据缓存标识进行判断，判断成功后，返回304状态码，通知客户端比较成功，可以使用缓存数据。
+
+第一次访问：
+
+[![](http://idiotsky.me/images3/http-summary-26.png)](http://idiotsky.me/images3/http-summary-26.png)
+
+再次访问：
+
+[![](http://idiotsky.me/images3/http-summary-27.png)](http://idiotsky.me/images3/http-summary-27.png)
+
+通过两图的对比，我们可以很清楚的发现，在对比缓存生效时，状态码为304，并且报文大小和请求时间大大减少。
+
+原因是，服务端在进行标识比较后，只返回header部分，通过状态码通知客户端使用缓存，不再需要将报文主体部分返回给客户端。
+
+对于对比缓存来说，缓存标识的传递是我们着重需要理解的，它在请求header和响应header间进行传递，
+
+一共分为两种标识传递，接下来，我们分开介绍。
+
+### Last-Modified  /  If-Modified-Since
+
+Last-Modified：
+
+服务器在响应请求时，告诉浏览器资源的最后修改时间。
+
+[![](http://idiotsky.me/images3/http-summary-28.png)](http://idiotsky.me/images3/http-summary-28.png)
+
+If-Modified-Since：
+
+再次请求服务器时，通过此字段通知服务器上次请求时，服务器返回的资源最后修改时间。
+
+服务器收到请求后发现有头If-Modified-Since 则与被请求资源的最后修改时间进行比对。
+
+若资源的最后修改时间大于If-Modified-Since，说明资源又被改动过，则响应整片资源内容，返回状态码200；
+
+若资源的最后修改时间小于或等于If-Modified-Since，说明资源无新修改，则响应HTTP 304，告知浏览器继续使用所保存的cache。
+
+[![](http://idiotsky.me/images3/http-summary-29.png)](http://idiotsky.me/images3/http-summary-29.png)
+
+### Etag  /  If-None-Match
+
+（优先级高于Last-Modified  /  If-Modified-Since）
+
+Etag：
+
+服务器响应请求时，告诉浏览器当前资源在服务器的唯一标识（生成规则由服务器决定）。
+
+[![](http://idiotsky.me/images3/http-summary-30.png)](http://idiotsky.me/images3/http-summary-30.png)
+
+If-None-Match：
+
+再次请求服务器时，通过此字段通知服务器客户段缓存数据的唯一标识。
+
+服务器收到请求后发现有头If-None-Match 则与被请求资源的唯一标识进行比对，
+
+不同，说明资源又被改动过，则响应整片资源内容，返回状态码200；
+
+相同，说明资源无新修改，则响应HTTP 304，告知浏览器继续使用所保存的cache。
+
+[![](http://idiotsky.me/images3/http-summary-31.png)](http://idiotsky.me/images3/http-summary-31.png)
+
+## 小结
+
+对于强制缓存，服务器通知浏览器一个缓存时间，在缓存时间内，下次请求，直接用缓存，不在时间内，执行比较缓存策略。
+
+对于比较缓存，将缓存信息中的Etag和Last-Modified通过请求发送给服务器，由服务器校验，返回304状态码时，浏览器直接使用缓存。
+
+浏览器第一次请求：
+
+[![](http://idiotsky.me/images3/http-summary-32.png)](http://idiotsky.me/images3/http-summary-32.png)
+
+浏览器再次请求时：
+
+[![](http://idiotsky.me/images3/http-summary-9.png)](http://idiotsky.me/images3/http-summary-9.png)
+
+还有一张图总结下：
+
+[![](http://idiotsky.me/images3/http-summary-33.jpg)](http://idiotsky.me/images3/http-summary-33.jpg)
 
 
+# 请求首部
 
-Cache-Control 首部功能很强大。服务器和客户端都可以用它来说明新鲜度，并且除了使用期或过期时间之外，还有很多指令可用。 
-
-
-| 指令 | 参数 | 报文类型 | 说明 | 
-| :---: | :---: | :---: | :---: |
-|no-cache ||请求| 在重新向服务器验证之前，不要返回文档的缓存副本 |
-|no-store|| 请求| 不要返回文档的缓存副本。不要保存服务器的响应 |
-|max-age = [秒]|必须| 请求 |缓存中的文档不能超过指定的使用期 |
-|max-stale ( = [秒]) |可省略|请求| 文档允许过期（根据服务器提供的过期信息计算），但不能超过指令中指定的过期值 |
-|min-fresh = [秒]|必须|请求| 文档的使用期不能小于这个指定的时间与它的当前存活时间之和。换句话说，响应必须至少在指定的这段时间之内保持新鲜 |
-|no-transform|| 请求| 文档在发送之前不允许被转换 |
-|only-if-cached ||请求| 只有当文档在缓存中才发送，不要联系原始服务器 |
-|cache-extension||请求|新指令标记（token）|
-|||||
-|public ||响应| 响应可以被任何服务器缓存 |
-|private |可省略|响应 |响应可以被缓存，但只能被单个客户端访问 |
-|no-cache |可省略|响应 |如果该指令伴随一个首部列表的话，那么内容可以被缓存并提供给客户端，但必须先删除所列出的首部。如果没有指定首部，缓存中的副本在没有重新向服务器验证之前不能提供给客户端 |
-|no-store ||响应 |响应不允许被缓存 |
-|no-transform ||响应| 响应在提供给客户端之前不能做任何形式的修改 |
-|must-revalidate ||响应| 响应在提供给客户端之前必须重新向服务器验证 |
-|proxy-revalidate ||响应 |共享的缓存在提供给客户端之前必须重新向原始服务器验证。私有的缓存可以忽略这条指令|
-| max-age = [秒]|必须|响应| 指定文档可以被缓存的时间以及新鲜度的最长时间|
-|s-max-age = [秒] |必须|响应 |指定文档作为共享缓存时的最长使用时间（如果有 max-age 指令的话，以本指令为准）。私有的缓存可以忽略本指令|
-|cache-extension||响应|新指令标记（token）|
-
-
-
-> no-cache 和 no-store 的区别：no-cache 代表不缓存过期的资源，缓存会向源服务器进行有效期确认后再处理资源。no-store 才是真正的不缓存。
-
-
-no-cache 并不代表完全的禁用缓存，而是代表会每次去核对服务端的 Etag，如果相同，那么就不会去服务端下载完整的资源，返回一个 304 Not Modified。（最长缓存 3 年）
-
-no-store 才是真正的禁用缓存，它表示每次服务端都会去下载最新的资源。（当然，通常似乎都用不上）。
-
-public 和 private 的差别主要在于如果是有用户认证环节的页面，设置为private 就只有终端浏览器会缓存，中间 CDN 并不会缓存，而设置为 public，则会在每一个环节缓存。默认不需要设置 public，因为 max-age 已经表明可以由各个环节缓存了（单位为秒）。此刻如果命中缓存，则不会再去请求服务器核对 Etag，而是直接返回 200(from disk)。
-
-当然，由于 public 会在每一个环节缓存，如果对修改更新预览又强需求的网页，那么最好不要使用这一缓存策略，否则还需要刷新 CDN 源，很麻烦。
-
-如果挑选缓存策略，可以见下图：
-
-<p align='center'>
-<img src='../images/cache-control.png'>
-</p>
-
-
-### HTTP 缓存控制
-
-<p align='center'>
-<img src='../images/http_cache.png'>
-</p>
-
-针对“Expires 时间是相对服务器而言，无法保证和客户端时间统一”的问题，http1.1 新增了 Cache-Control 来定义缓存过期时间。注意：若报文中同时出现了 Expires 和 Cache-Control，则以 Cache-Control 为准。
-
-也就是说优先级从高到低分别是 **Pragma -> Cache-Control -> Expires**。
-
-| 头部 | 优势和特点 | 劣势和问题 | 额外说明 | 
-| :---: | :---: | :---: | :---: |
-|Expires|	1、HTTP 1.0 产物，可以在HTTP 1.0和1.1中使用，简单易用。<br>2、以时刻标识失效时间。|1、时间是由服务器发送的(UTC)，如果服务器时间和客户端时间存在不一致，可能会出现问题。<br>2、存在版本问题，到期之前的修改客户端是不可知的。||
-|Cache-Control|1、HTTP 1.1 产物，以时间间隔标识失效时间，解决了Expires服务器和客户端相对时间的问题。<br>2、比Expires多了很多选项设置。|1、HTTP 1.1 才有的内容，不适用于HTTP 1.0 。<br>2、存在版本问题，到期之前的修改客户端是不可知的。||
-|Last-Modified|1、不存在版本问题，每次请求都会去服务器进行校验。服务器对比最后修改时间如果相同则返回304，不同返回200以及资源内容。|1、只要资源修改，无论内容是否发生实质性的变化，都会将该资源返回客户端。例如周期性重写，这种情况下该资源包含的数据实际上一样的。<br>2、以时刻作为标识，无法识别一秒内进行多次修改的情况。<br>3、某些服务器不能精确的得到文件的最后修改时间。||
-|ETag|1、可以更加精确的判断资源是否被修改，可以识别一秒内多次修改的情况。<br>2、不存在版本问题，每次请求都回去服务器进行校验。|1、计算ETag值需要性能损耗。<br>2、分布式服务器存储的情况下，计算ETag的算法如果不一样，会导致浏览器从一台服务器上获得页面内容后到另外一台服务器上进行验证时发现ETag不匹配的情况。||
-
-1、Expires / Cache-Control  
-Expires用时刻来标识失效时间，不免收到时间同步的影响，而Cache-Control使用时间间隔很好的解决了这个问题。 但是 Cache-Control 是 HTTP1.1 才有的，不适用于 HTTP1.0，而 Expires 既适用于 HTTP1.0，也适用于 HTTP1.1，所以说在大多数情况下同时发送这两个头会是一个更好的选择，当客户端两种头都能解析的时候，**会优先使用 Cache-Control**。
-
-2、Last-Modified / ETag  
-二者都是通过某个标识值来请求资源， 如果服务器端的资源没有变化，则自动返回 HTTP 304 （Not Changed）状态码，内容为空，这样就节省了传输数据量。而当资源发生比那话后，返回和第一次请求时类似。从而保证不向客户端重复发出资源，也保证当服务器有变化时，客户端能够得到最新的资源。  
-其中 Last-Modified 使用文件最后修改作为文件标识值，它无法处理文件一秒内多次修改的情况，而且只要文件修改了哪怕文件实质内容没有修改，也会重新返回资源内容；ETag 作为“被请求变量的实体值”，其完全可以解决 Last-Modified 头部的问题，但是其计算过程需要耗费服务器资源。
-
-3、from-cache / 304    
-Expires 和 Cache-Control 都有一个问题就是服务端作为的修改，如果还在缓存时效里，那么客户端是不会去请求服务端资源的（非刷新），这就存在一个资源版本不符的问题，而强制刷新一定会发起 HTTP 请求并返回资源内容，无论该内容在这段时间内是否修改过；**而 Last-Modified 和 Etag 每次请求资源都会发起请求，哪怕是很久都不会有修改的资源，都至少有一次请求响应的消耗**。
-
-对于所有可缓存资源，指定一个 Expires 或 Cache-Control max-age 以及一个 Last-Modified 或 ETag 至关重要。同时使用前者和后者可以很好的相互适应。  
-**前者不需要每次都发起一次请求来校验资源时效性，后者保证当资源未出现修改的时候不需要重新发送该资源**。而在用户的不同刷新页面行为中，二者的结合也能很好的利用 HTTP 缓存控制特性，无论是在地址栏输入 URI 然后输入回车进行访问，还是点击刷新按钮，浏览器都能充分利用缓存内容，避免进行不必要的请求与数据传输。
-
-4、避免 304
-
-做法实际上很简单，**它把服务侧 ETag 的那一套理论搬到了前端来使用**。 页面的静态资源以版本形式发布，常用的方法是在文件名或参数带上一串md5或时间标记符：
-
-```http
-https://hm.baidu.com/hm.js?e23800c454aa573c0ccb16b52665ac26
-http://tb1.bdstatic.com/tb/_/tbean_safe_ajax_94e7ca2.js
-http://img1.gtimg.com/ninja/2/2016/04/ninja145972803357449.jpg
-```
-
-可以看到上面的例子中有不同的做法，有的在URI后面加上了md5参数，有的将md5值作为文件名的一部分，有的将资源放在特性版本的目录中。
-
-那么在文件没有变动的时候，浏览器不用发起请求直接可以使用缓存文件；而在文件有变化的时候，由于文件版本号的变更，导致文件名变化，请求的 url 变了，自然文件就更新了。这样能确保客户端能及时从服务器收取到新修改的文件。通过这样的处理，增长了静态资源，特别是图片资源的缓存时间，避免该资源很快过期，客户端频繁向服务端发起资源请求，服务器再返回 304 响应的情况（有 Last-Modified/Etag）。
-
-
-<p align='center'>
-<img src='../images/HTTP缓存流程.png'>
-</p>
-
-
-| 用户操作 | HTTP 状态码 | 原因 | 额外说明 | 
-| :---: | :---: | :---: | :---: |
-|在URI输入栏中输入然后回车|200(from cache)|由 Expires / Cache-Control 控制，Expires 是绝对时间，Cache-Control 是相对时间，两者都存在的时候，Cache-Control 覆盖 Expires ，只要没有失效，浏览器都只访问自己的缓存||
-|F5/点击工具栏中的刷新按钮/右键菜单重新加载|304|由 Last-Modified/Etag 控制，当用户本地缓存失效，刷新的时候，浏览器会发送请求给服务器，如果服务端没有变化，则返回 304 给浏览器||
-|Ctl+F5|200|当本地浏览器没有缓存或者 304 返回的资源也失效的时候，或者用户强制 Ctl+F5 刷新的时候，浏览器最终才会去下载最新的数据||
-
-总结：
-
-- 需要兼容 HTTP1.0 的时候需要使用 Expires，不然可以考虑直接使用 Cache-Control。
-- 需要处理一秒内多次修改的情况，或者其他 Last-Modified 处理不了的情况，才使用 ETag，否则使用 Last-Modified。
-- 对于所有可缓存资源，需要指定一个 Expires 或 Cache-Control，同时指定 Last-Modified 或者 Etag。
-- 可以通过标识文件版本名、加长缓存时间的方式来减少 304 响应。
-
-------------------------------------------------------------------
-
-
-Warning 首部是从 HTTP/1.0 的响应首部（Retry-After）演变过来的。该首部通常会告知用户一些与缓存相关的问题的警告。
-
-Warning 首部的格式如下：
-
-```http
-Warning: [警告码][警告的主机：端口号]"[警告内容]"([日期内容])
-
-```
-
-HTTP/1.1 中定义了 7 种警告，警告码具备扩展性，今后可以能追加新的警告码。
-
-| 警告码 | 警告内容 | 说明 |
-| :---: | :---: | :---: |
-|110|Response is stale（响应已过期）| 代理返回已过期的资源|
-|111|Revalidation failed（再验证失败）|代理再验证资源有效性时失败（服务器无法到达等原因）|
-|112|Disconnection operation（断开连接操作）| 代理与互联网连接被故意切断|
-|113|Heuristic expiration（试探性过期）|响应的使用期超过 24 小时（有效缓存的设定时间大于 24 小时的情况下）|
-|199|Miscellaneous warning（杂项警告）|任意的警告内容|
-|214|Transformation applied（使用了转换）|代理对内容编码或媒体类型等执行了某些处理时|
-|299|Miscellaneous persistent warning（持久杂项警告）| 任意的警告内容|
-
-
-### 2. 请求首部
-
-### 请求信息性首部
+## 请求信息性首部
 
 | 首部 | 描述 | 
 | :---: | :---: |
@@ -498,7 +425,7 @@ HTTP/1.1 中定义了 7 种警告，警告码具备扩展性，今后可以能�
 |UA-Pixels |提供了客户端显示器的像素信息 |
 |User-Agent |将发起请求的应用程序名称告知服务器|
 
-### Accept 首部
+## Accept 首部
 
 | 首部 | 描述 | 
 | :---: | :---: |
@@ -523,7 +450,7 @@ HTTP/1.1 中定义了 7 种警告，警告码具备扩展性，今后可以能�
   不执行压缩或不会变化的默认编码格式
 
 
-### 条件请求首部
+## 条件请求首部
 
 | 首部 | 描述 | 
 | :---: | :---: |
@@ -535,7 +462,7 @@ HTTP/1.1 中定义了 7 种警告，警告码具备扩展性，今后可以能�
 |If-Unmodified-Since| 除非在某个指定日期之后资源没有被修改过，否则就限制这个请求 |
 |Range |如果服务器支持范围请求，就请求资源的指定范围|
 
-### 安全请求首部
+## 安全请求首部
 
 | 首部 | 描述 | 
 | :---: | :---: |
@@ -544,7 +471,7 @@ HTTP/1.1 中定义了 7 种警告，警告码具备扩展性，今后可以能�
 | Cookie | 用来说明请求端支持的 cookie 版本|
 
  
-### 代理请求首部
+## 代理请求首部
 
 | 首部 | 描述 | 
 | :---: | :---: |
@@ -553,9 +480,9 @@ HTTP/1.1 中定义了 7 种警告，警告码具备扩展性，今后可以能�
 |Proxy-Connection |与 Connection 首部相同， 但这个首部是在与代理建立连接时使用的|
 
 
-### 3. 响应首部
+# 响应首部
 
-### 响应信息性首部
+## 响应信息性首部
 
 | 首部 | 描述 | 
 | :---: | :---: |
@@ -566,14 +493,14 @@ HTTP/1.1 中定义了 7 种警告，警告码具备扩展性，今后可以能�
 |Warning| 比原因短语中更详细一些的警告报文|
 
 
-### 协商首部
+## 协商首部
 
 | 首部 | 描述 | 
 | :---: | :---: |
 |Accept-Ranges |对此资源来说，服务器可接受的范围类型 |
 |Vary |服务器查看的其他首部的列表，可能会使响应发生变化；也就是说，这是一个首部列表，服务器会根据这些首部的内容挑选出最适合的资源版本发送给客户端。首部字段 Vary 可对缓存进行控制。源服务器会向代理服务器传达关于本地缓存使用方法的命令。从代理服务器接收到源服务器返回包含 Vary 指定项的响应之后，若再进行缓存，仅对请求中含有相同 Vary 指定首部字段的请求返回缓存。即使对相同资源发起请求，但由于 Vary 指定的首部字段不相同，因此必须要从源服务器重新获取资源。|
 
-### 安全响应首部
+## 安全响应首部
 
 | 首部 | 描述 | 
 | :---: | :---: |
@@ -585,17 +512,17 @@ HTTP/1.1 中定义了 7 种警告，警告码具备扩展性，今后可以能�
 
 Cookie 的 HttpOnly 属性是 Cookie 的扩展功能，它使 JavaScript 脚本无法获得 Cookie。其主要目的为了防止跨站脚本攻击（Cross-site scripting，XSS）对 Cookie 的信息窃取。
 
-```http
+````http
 Set-Cookie: name-value;HttpOnly
 
-```
+````
 
 顺带一提，该扩展并非是为了防止 XSS 而开发的。
 
-### 4. 实体首部
+# 实体首部
 
 
-### 实体信息性首部
+## 实体信息性首部
 
 | 首部 | 描述 | 
 | :---: | :---: |
@@ -603,7 +530,7 @@ Set-Cookie: name-value;HttpOnly
 |Location |告知客户端实体实际上位于何处；用于将接收端定向到资源的（可能是新的）位置（URL）上去|
 
 
-### 内容首部
+## 内容首部
 
 | 首部 | 描述 | 
 | :---: | :---: |
@@ -619,7 +546,7 @@ Set-Cookie: name-value;HttpOnly
 
 由于 HTTP 首部无法记录二进制值，所以要通过 Base-64 编码处理。采用 Content-MD5 这种方法，对内容上的偶发性改变是无从查证的，也无法检测出恶意篡改。原因在于，内容如果被篡改了，那么同时意味着 Content-MD5 也可以被重新计算后更新，被篡改。所以处在接收阶段的客户端是无法意识到报文主体以及首部字段 Content-MD5 是已经被篡改过的。
 
-### 实体缓存首部
+## 实体缓存首部
 
 | 首部 | 描述 | 
 | :---: | :---: |
@@ -645,39 +572,39 @@ ETag 也分为强 ETag 值和弱 ETag 值：
 
 强 ETag 值，不论实体发生多少细微的变化都会改变其值。
 
-```http  
+````http  
 ETag: "usagi-1234"
 
-```
+````
 
 弱 ETag 值：
 
 弱 ETag 值只用于提示资源是否相同。只有资源发生了根本改变，产生差异时才会改变 ETag 值。这时，会在字段值最开始处附加 W/
 
-```http  
+````http  
 ETag: W/"usagi-1234"
 
-```
+````
 
 
 
 
-### 5. 扩展首部
+# 扩展首部
 
 
-### （1）X-Frame-Options
+## X-Frame-Options
 
 首部字段 X-Frame-Options 属于 HTTP 响应首部，用于控制网站内容在其他 Web 网站的 Frame 标签内的显示问题。其主要目的是为了防止点击劫持（clickjacking）攻击。
 
-### （2）X-XSS-Protection
+## X-XSS-Protection
 
 首部字段 X-XSS-Protection 属于 HTTP 响应首部，它是针对跨站脚本攻击（XSS）的一种对策，用于控制浏览器 XSS 防护机制的开关。0：将 XSS 过滤设置成无效状态，1：将 XSS 过滤设置成有效状态。
 
-### （3）DNT
+## DNT
 
 首部字段 DNT 属于 HTTP 请求首部，其中 DNT 是 Do Not Track 的简称，意为拒绝个人信息被收集，是表示拒绝被精准广告追踪的一种方法。0：同意被追踪，1：拒绝被追踪。
 
-### （4）P3P
+## P3P
 
 首部字段 P3P 属于 HTTP 响应首部，通过利用 P3P（The Platform for Privacy Preferences，在线隐私偏好平台）技术，可以让 Web 网站上的个人隐私变成一种仅供程序可理解的形式，以达到保护用户隐私的目的。
 
@@ -691,20 +618,20 @@ HTTP 首部字段将定义成缓存代理和非缓存代理的行为，分为 �
 - 逐跳首部：分在此类别中的首部只对单次转发有效，会因通过缓存或代理而不再转发。HTTP/1.1 和之后版本中，如果要使用 hop-by-hop 首部，需提供 Connection 首部字段。（Connection、Keep-Alive、Proxy-Authenticate、Proxy-Authorization、Trailer、TE、Transfer-Encoding、Upgrade 这 8 个首部字段属于逐跳首部，除此以外的字段都属于端到端首部）
 
 
-## 五. 提高 HTTP 性能
+# 提高 HTTP 性能
 
-### 1. 并行连接
+## 并行连接
 
 通过多条 TCP 连接发起并发的 HTTP 请求。
 
-### 2. 持久连接 
+## 持久连接 
 
 重用 TCP 连接，以消除连接及关闭的时延。 持久连接（HTTP Persistent Connections），也称为 HTTP keep-alive 或者 HTTP connection reuse 。
 
 在 HTTP/1.1 中，所有的连接默认都是持久连接。但是服务器端不一定都能够支持持久连接，所以除了服务端，客户端也需要支持持久连接。
 
 
-### 3. 管道化连接 
+## 管道化连接 
 
 通过共享的 TCP 连接发起并发的 HTTP 请求。
 
@@ -713,14 +640,12 @@ HTTP 首部字段将定义成缓存代理和非缓存代理的行为，分为 �
 比如当请求一个包含 10 张图片的 HTML Web 页面，与挨个连接相比，用持久连接可以让请求更快结束。而管线化技术则比持久连接还要快。请求数越多，时间差就越明显。
 
 
-### 4. 复用的连接
+## 复用的连接
 
 交替传送请求和响应报文（实验阶段）。
 
 
-
-
-## 六. GET 和 POST 的区别
+# GET 和 POST 的区别
 
 ## 参数
 
@@ -728,15 +653,15 @@ GET 和 POST 的请求都能使用额外的参数，但是 GET 的参数是以�
 
 GET 的传参方式相比于 POST 安全性较差，因为 GET 传的参数在 URL 中是可见的，可能会泄露私密信息。并且 GET 只支持 ASCII 字符，如果参数为中文则可能会出现乱码，而 POST 支持标准字符集。
 
-```http
+````http
 GET /test/demo_form.asp?name1=value1&name2=value2 HTTP/1.1
-```
+````
 
-```http
+````http
 POST /test/demo_form.asp HTTP/1.1
 Host: w3schools.com
 name1=value1&name2=value2
-```
+````
 
 ## 安全
 
@@ -754,28 +679,28 @@ GET 方法是安全的，而 POST 却不是，因为 POST 的目的是传送实�
 
 GET /pageX HTTP/1.1 是幂等的。连续调用多次，客户端接收到的结果都是一样的：
 
-```http
+````http
 GET /pageX HTTP/1.1
 GET /pageX HTTP/1.1
 GET /pageX HTTP/1.1
 GET /pageX HTTP/1.1
-```
+````
 
 POST /add_row HTTP/1.1 不是幂等的。如果调用多次，就会增加多行记录：
 
-```http
+````http
 POST /add_row HTTP/1.1
 POST /add_row HTTP/1.1   -> Adds a 2nd row
 POST /add_row HTTP/1.1   -> Adds a 3rd row
-```
+````
 
 DELETE /idX/delete HTTP/1.1 是幂等的，即便是不同请求之间接收到的状态码不一样：
 
-```http
+````http
 DELETE /idX/delete HTTP/1.1   -> Returns 200 if idX exists
 DELETE /idX/delete HTTP/1.1   -> Returns 404 as it just got deleted
 DELETE /idX/delete HTTP/1.1   -> Returns 404
-```
+````
 
 ## 可缓存
 
@@ -794,7 +719,7 @@ DELETE /idX/delete HTTP/1.1   -> Returns 404
 在使用 XMLHttpRequest 的 POST 方法时，浏览器会先发送 Header 再发送 Data。但并不是所有浏览器会这么做，例如火狐就不会。
 
 
-## 七. HTTP 各版本比较
+# HTTP 各版本比较
 
 ## HTTP/1.0 与 HTTP/1.1 的区别
 
@@ -811,305 +736,586 @@ DELETE /idX/delete HTTP/1.1   -> Returns 404
 
 > [HTTP/2 简介](https://developers.google.com/web/fundamentals/performance/http2/?hl=zh-cn)
 
-### 1. 多路复用
+### 多路复用
 
 HTTP/2.0 使用多路复用技术，同一个 TCP 连接可以处理多个请求。
 
-### 2. 首部压缩
+###  首部压缩
 
 HTTP/1.1 的首部带有大量信息，而且每次都要重复发送。HTTP/2.0 要求通讯双方各自缓存一份首部字段表，从而避免了重复传输。
 
-### 3. 服务端推送
+###  服务端推送
 
 HTTP/2.0 在客户端请求一个资源时，会把相关的资源一起发送给客户端，客户端就不需要再次发起请求了。例如客户端请求 index.html 页面，服务端就把 index.js 一起发给客户端。
 
-### 4. 二进制格式
+###  二进制格式
 
 HTTP/1.1 的解析是基于文本的，而 HTTP/2.0 采用二进制格式。
 
 
-## 八. CORS 跨域
+# 浏览器同源政策及其规避方法
 
-当一个资源从与该资源本身所在的服务器不同的域或端口请求一个资源时，资源会发起一个跨域 HTTP 请求。
- 
-比如，站点 http://domain-a.com 的某 HTML 页面通过 <img> 的 src 请求 http://domain-b.com/image.jpg。网络上的许多页面都会加载来自不同域的CSS样式表，图像和脚本等资源。
- 
-出于安全原因，浏览器限制从脚本内发起的跨源HTTP请求。 例如，XMLHttpRequest和Fetch API遵循同源策略。 这意味着使用这些API的Web应用程序只能从加载应用程序的同一个域请求HTTP资源，除非使用CORS头文件。
+1995年，同源政策由 Netscape 公司引入浏览器。目前，所有浏览器都实行这个政策。
 
-（译者注：跨域并不一定是浏览器限制了发起跨站请求，也可能是跨站请求可以正常发起，但是返回结果被浏览器拦截了。最好的例子是 CSRF 跨站攻击原理，请求是发送到了后端服务器无论是否跨域！注意：有些浏览器不允许从 HTTPS 的域跨域访问 HTTP，比如  Chrome 和 Firefox，这些浏览器在请求还未发出的时候就会拦截请求，这是一个特例。）
-  
-  
-  
-<p align='center'>
-<img src='../images/CORS_principle.png'>
-</p>
+最初，它的含义是指，A网页设置的 Cookie，B网页不能打开，除非这两个网页"同源"。所谓"同源"指的是"三个相同"。
 
-隶属于 W3C 的 Web 应用工作组推荐了一种新的机制，即跨源资源共享（Cross-Origin Resource Sharing ) CORS。这种机制让Web应用服务器能支持跨站访问控制，从而使得安全地进行跨站数据传输成为可能。需要特别注意的是，这个规范是针对API容器的（比如说XMLHttpReques 或者 Fetch），以减轻跨域HTTP请求的风险。**CORS 需要客户端和服务器同时支持。目前，所有浏览器都支持该机制。 **
+* 协议相同
+* 域名相同
+* 端口相同
 
-跨域资源共享标准（ cross-origin sharing standard ）允许在下列场景中使用跨域 HTTP 请求：
+举例来说，http://www.example.com/dir/page.html  这个网址，协议是http://，域名是www.example.com，端口是80（默认端口可以省略）。它的同源情况如下。
 
-- 前文提到的由 XMLHttpRequest 或 Fetch 发起的跨域 HTTP 请求。
-- Web 字体 (CSS 中通过 @font-face 使用跨域字体资源), 因此，网站就可以发布 TrueType 字体资源，并只允许已授权网站进行跨站调用。
-- WebGL 贴图
-- 使用 drawImage 将 Images/video 画面绘制到 canvas
-- 样式表（使用 CSSOM）
-- Scripts (未处理的异常)
+* http://www.example.com/dir2/other.html  同源
+* http://example.com/dir/other.html 不同源（域名不同）
+* http://v2.www.example.com/dir/other.html 不同源（域名不同）
+* http://www.example.com:81/dir/other.html 不同源（端口不同）
 
-把CORS分为：简单请求、预请求和附带凭证信息的请求。
+同源政策的目的，是为了保证用户信息的安全，防止恶意的网站窃取数据。
+设想这样一种情况：A网站是一家银行，用户登录以后，又去浏览其他网站。如果其他网站可以读取A网站的 Cookie，会发生什么？
+很显然，如果 Cookie 包含隐私（比如存款总额），这些信息就会泄漏。更可怕的是，Cookie 往往用来保存用户的登录状态，如果用户没有退出登录，其他网站就可以冒充用户，为所欲为。因为浏览器同时还规定，提交表单不受同源政策的限制。
+由此可见，"同源政策"是必需的，否则 Cookie 可以共享，互联网就毫无安全可言了。
 
+随着互联网的发展，"同源政策"越来越严格。目前，如果非同源，共有三种行为受到限制。
+1. Cookie、LocalStorage 和 IndexDB 无法读取。
+2. DOM 无法获得。
+3. AJAX 请求不能发送。
 
-### 1. 简单请求
+虽然这些限制是必要的，但是有时很不方便，合理的用途也受到影响。下面，我将详细介绍，如何规避上面三种限制。
 
-某些请求不会触发 CORS 预检请求。本文称这样的请求为“简单请求”，请注意，该术语并不属于 Fetch （其中定义了 CORS）规范。若请求满足所有下述条件，则该请求可视为“简单请求”：
+## Cookie
 
+Cookie 是服务器写入浏览器的一小段信息，只有同源的网页才能共享。但是，两个网页一级域名相同，只是二级域名不同，浏览器允许通过设置document.domain共享 Cookie。
+举例来说，A网页是http://w1.example.com/a.html，B网页是http://w2.example.com/b.html，那么只要设置相同的document.domain，两个网页就可以共享Cookie。
 
-(1). 使用下列方法之一：  
+````
+document.domain = 'example.com';
+````
 
-- GET
-- HEAD
-- POST
+现在，A网页通过脚本设置一个 Cookie。
 
-  
-(2). Fetch 规范定义了对 CORS 安全的首部字段集合，不得人为设置该集合之外的其他首部字段。该集合为：
+````
+document.cookie = "test1=hello";
+````
 
-Accept  
-Accept-Language  
-Content-Language  
-Content-Type （需要注意额外的限制）  
-DPR  
-Downlink  
-Save-Data  
-Viewport-Width  
-Width  
+B网页就可以读到这个 Cookie。
 
-(3). Content-Type 的值仅限于下列三者之一：  
+````
+var allCookie = document.cookie;
+````
 
-- text/plain
-- multipart/form-data
-- application/x-www-form-urlencoded
+注意，这种方法只适用于 Cookie 和 iframe 窗口，LocalStorage 和 IndexDB 无法通过这种方法，规避同源政策，而要使用下文介绍的PostMessage API。
+另外，服务器也可以在设置Cookie的时候，指定Cookie的所属域名为一级域名，比如.example.com。
 
-(4). 请求中的任意XMLHttpRequestUpload 对象均没有注册任何事件监听器；XMLHttpRequestUpload 对象可以使用 XMLHttpRequest.upload 属性访问。
+````
+Set-Cookie: key=value; domain=.example.com; path=/
+````
 
-(5). 请求中没有使用 ReadableStream 对象。
+这样的话，二级域名和三级域名不用做任何设置，都可以读取这个Cookie。
 
+## iframe
 
-简单来说，重点需要记住的就是两点：
+如果两个网页不同源，就无法拿到对方的DOM。典型的例子是iframe窗口和window.open方法打开的窗口，它们与父窗口无法通信。
+比如，父窗口运行下面的命令，如果iframe窗口不是同源，就会报错。
 
-**（1）只使用 GET, HEAD 或者 POST 请求方法。如果使用 POST 向服务器端传送数据，则数据类型(Content-Type)只能是 application/x-www-form-urlencoded, multipart/form-data 或 text/plain中的一种。  
-（2）不会使用自定义请求头（类似于 X-Modified 这种）。**
+````
+document.getElementById("myIFrame").contentWindow.document
+// Uncaught DOMException: Blocked a frame from accessing a cross-origin frame.
+````
 
+上面命令中，父窗口想获取子窗口的DOM，因为跨源导致报错。
 
+反之亦然，子窗口获取主窗口的DOM也会报错。
 
-举例：
+````
+window.parent.document.body
+// 报错
+````
 
-```javascript
+如果两个窗口一级域名相同，只是二级域名不同，那么设置上一节介绍的document.domain属性，就可以规避同源政策，拿到DOM。
+对于完全不同源的网站，目前有三种方法，可以解决跨域窗口的通信问题。
 
-//比如说，假如站点 http://foo.example 的网页应用想要访问 http://bar.other 的资源。以下的 JavaScript 代 
-//码应该会在 foo.example 上执行：    
-var invocation = new XMLHttpRequest();
-var url = 'http://bar.other/resources/public-data/';
-function callOtherDomain() {
-  if(invocation) {    
-    invocation.open('GET', url, true);
-    invocation.onreadystatechange = handler;
-    invocation.send(); 
+* 片段识别符（fragment identifier）
+* window.name
+* 跨文档通信API（Cross-document messaging）
+
+### 片段识别符
+片段标识符（fragment identifier）指的是，URL的#号后面的部分，比如http://example.com/x.html#fragment的#fragment。如果只是改变片段标识符，页面不会重新刷新。
+
+父窗口可以把信息，写入子窗口的片段标识符。
+
+````
+var src = originURL + '#' + data;
+document.getElementById('myIFrame').src = src;
+````
+
+子窗口通过监听hashchange事件得到通知。
+
+````
+window.onhashchange = checkMessage;
+
+function checkMessage() {
+  var message = window.location.hash;
+  // ...
+}
+````
+
+同样的，子窗口也可以改变父窗口的片段标识符。
+
+````
+parent.location.href= target + "#" + hash;
+````
+
+### window.name
+
+浏览器窗口有window.name属性。这个属性的最大特点是，无论是否同源，只要在同一个窗口里，前一个网页设置了这个属性，后一个网页可以读取它。
+
+父窗口先打开一个子窗口，载入一个不同源的网页，该网页将信息写入window.name属性。
+
+````
+window.name = data;
+````
+
+接着，子窗口跳回一个与主窗口同域的网址。
+
+````
+location = 'http://parent.url.com/xxx.html';
+````
+
+然后，主窗口就可以读取子窗口的window.name了。
+
+````
+var data = document.getElementById('myFrame').contentWindow.name;
+````
+
+这种方法的优点是，window.name容量很大，可以放置非常长的字符串；缺点是必须监听子窗口window.name属性的变化，影响网页性能。
+
+### window.postMessage
+
+上面两种方法都属于破解，HTML5为了解决这个问题，引入了一个全新的API：跨文档通信 API（Cross-document messaging）。
+这个API为window对象新增了一个window.postMessage方法，允许跨窗口通信，不论这两个窗口是否同源。
+举例来说，父窗口`http://aaa.com`向子窗口`http://bbb.com`发消息，调用postMessage方法就可以了。
+
+````
+var popup = window.open('http://bbb.com', 'title');
+popup.postMessage('Hello World!', 'http://bbb.com');
+````
+
+postMessage方法的第一个参数是具体的信息内容，第二个参数是接收消息的窗口的源（origin），即"协议 + 域名 + 端口"。也可以设为*，表示不限制域名，向所有窗口发送。
+
+子窗口向父窗口发送消息的写法类似。
+
+````
+window.opener.postMessage('Nice to see you', 'http://aaa.com');
+````
+
+父窗口和子窗口都可以通过message事件，监听对方的消息。
+
+````
+window.addEventListener('message', function(e) {
+  console.log(e.data);
+},false);
+````
+
+message事件的事件对象event，提供以下三个属性。
+
+* event.source：发送消息的窗口
+* event.origin: 消息发向的网址
+* event.data: 消息内容
+
+下面的例子是，子窗口通过event.source属性引用父窗口，然后发送消息。
+
+````
+window.addEventListener('message', receiveMessage);
+function receiveMessage(event) {
+  event.source.postMessage('Nice to see you!', '*');
+}
+````
+
+event.origin属性可以过滤不是发给本窗口的消息。
+
+````
+window.addEventListener('message', receiveMessage);
+function receiveMessage(event) {
+  if (event.origin !== 'http://aaa.com') return;
+  if (event.data === 'Hello World') {
+      event.source.postMessage('Hello', event.origin);
+  } else {
+    console.log(event.data);
   }
 }
+````
 
-```
+### LocalStorage
 
-<p align='center'>
-<img src='../images/example_0.png'>
-</p>
+通过window.postMessage，读写其他窗口的 LocalStorage 也成为了可能。
 
+下面是一个例子，主窗口写入iframe子窗口的localStorage。
 
-```http
+````
+window.onmessage = function(e) {
+  if (e.origin !== 'http://bbb.com') {
+    return;
+  }
+  var payload = JSON.parse(e.data);
+  localStorage.setItem(payload.key, JSON.stringify(payload.data));
+};
+````
 
-//让我们看看，在这个场景中，浏览器会发送什么的请求到服务器，而服务器又会返回什么给浏览器：
-GET /resources/public-data/ HTTP/1.1
-Host: bar.other
-User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.1b3pre) Gecko/20081130 
-Minefield/3.1b3pre
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-Accept-Language: en-us,en;q=0.5
-Accept-Encoding: gzip,deflate
-Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+上面代码中，子窗口将父窗口发来的消息，写入自己的LocalStorage。
+
+父窗口发送消息的代码如下。
+
+````
+var win = document.getElementsByTagName('iframe')[0].contentWindow;
+var obj = { name: 'Jack' };
+win.postMessage(JSON.stringify({key: 'storage', data: obj}), 'http://bbb.com');
+````
+
+加强版的子窗口接收消息的代码如下。
+
+````
+window.onmessage = function(e) {
+  if (e.origin !== 'http://bbb.com') return;
+  var payload = JSON.parse(e.data);
+  switch (payload.method) {
+    case 'set':
+      localStorage.setItem(payload.key, JSON.stringify(payload.data));
+      break;
+    case 'get':
+      var parent = window.parent;
+      var data = localStorage.getItem(payload.key);
+      parent.postMessage(data, 'http://aaa.com');
+      break;
+    case 'remove':
+      localStorage.removeItem(payload.key);
+      break;
+  }
+};
+````
+
+加强版的父窗口发送消息代码如下。
+
+````
+var win = document.getElementsByTagName('iframe')[0].contentWindow;
+var obj = { name: 'Jack' };
+// 存入对象
+win.postMessage(JSON.stringify({key: 'storage', method: 'set', data: obj}), 'http://bbb.com');
+// 读取对象
+win.postMessage(JSON.stringify({key: 'storage', method: "get"}), "*");
+window.onmessage = function(e) {
+  if (e.origin != 'http://aaa.com') return;
+  // "Jack"
+  console.log(JSON.parse(e.data).name);
+};
+````
+
+## AJAX
+
+同源政策规定，AJAX请求只能发给同源的网址，否则就报错。
+
+除了架设服务器代理（浏览器请求同源服务器，再由后者请求外部服务），有三种方法规避这个限制。
+
+* JSONP
+* WebSocket
+* CORS
+
+### JSONP
+JSONP是服务器与客户端跨源通信的常用方法。最大特点就是简单适用，老式浏览器全部支持，服务器改造非常小。
+
+它的基本思想是，网页通过添加一个`<script>`元素，向服务器请求JSON数据，这种做法不受同源政策限制；服务器收到请求后，将数据放在一个指定名字的回调函数里传回来。
+
+首先，网页动态插入`<script>`元素，由它向跨源网址发出请求。
+
+````
+function addScriptTag(src) {
+  var script = document.createElement('script');
+  script.setAttribute("type","text/javascript");
+  script.src = src;
+  document.body.appendChild(script);
+}
+
+window.onload = function () {
+  addScriptTag('http://example.com/ip?callback=foo');
+}
+
+function foo(data) {
+  console.log('Your public IP address is: ' + data.ip);
+};
+````
+
+上面代码通过动态添加`<script>`元素，向服务器example.com发出请求。注意，该请求的查询字符串有一个callback参数，用来指定回调函数的名字，这对于JSONP是必需的。
+
+服务器收到这个请求以后，会将数据放在回调函数的参数位置返回。
+
+````
+foo({
+  "ip": "8.8.8.8"
+});
+````
+
+由于`<script>`元素请求的脚本，直接作为代码运行。这时，只要浏览器定义了foo函数，该函数就会立即调用。作为参数的JSON数据被视为JavaScript对象，而不是字符串，因此避免了使用JSON.parse的步骤。
+
+### WebSocket
+
+WebSocket是一种通信协议，使用ws://（非加密）和wss://（加密）作为协议前缀。该协议不实行同源政策，只要服务器支持，就可以通过它进行跨源通信。
+下面是一个例子，浏览器发出的WebSocket请求的头信息.
+
+````
+GET /chat HTTP/1.1
+Host: server.example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Protocol: chat, superchat
+Sec-WebSocket-Version: 13
+Origin: http://example.com
+````
+
+上面代码中，有一个字段是Origin，表示该请求的请求源（origin），即发自哪个域名。
+
+正是因为有了Origin这个字段，所以WebSocket才没有实行同源政策。因为服务器可以根据这个字段，判断是否许可本次通信。如果该域名在白名单内，服务器就会做出如下回应。
+
+````
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: HSmrc0sMlYUkAGmm5OPpG2HaGWk=
+Sec-WebSocket-Protocol: chat
+````
+
+## CORS
+
+CORS是一个W3C标准，全称是"跨域资源共享"（Cross-origin resource sharing）。
+
+它允许浏览器向跨源服务器，发出XMLHttpRequest请求，从而克服了AJAX只能同源使用的限制。
+
+本文详细介绍CORS的内部机制。
+
+### 简介
+
+CORS需要浏览器和服务器同时支持。目前，所有浏览器都支持该功能，IE浏览器不能低于IE10。
+
+整个CORS通信过程，都是浏览器自动完成，不需要用户参与。对于开发者来说，CORS通信与同源的AJAX通信没有差别，代码完全一样。浏览器一旦发现AJAX请求跨源，就会自动添加一些附加的头信息，有时还会多出一次附加的请求，但用户不会有感觉。
+
+因此，实现CORS通信的关键是服务器。只要服务器实现了CORS接口，就可以跨源通信。
+
+### 两种请求
+
+浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。
+
+只要同时满足以下两大条件，就属于简单请求。
+
+1. 请求方法是以下三种方法之一：
+HEAD
+GET
+POST
+
+2. HTTP的头信息不超出以下几种字段：
+Accept
+Accept-Language
+Content-Language
+Last-Event-ID
+Content-Type：只限于三个值application/x-www-form-urlencoded、multipart/form-data、text/plain
+
+凡是不同时满足上面两个条件，就属于非简单请求。
+浏览器对这两种请求的处理，是不一样的。
+
+### 简单请求
+
+#### 基本流程
+
+对于简单请求，浏览器直接发出CORS请求。具体来说，就是在头信息之中，增加一个Origin字段。
+
+下面是一个例子，浏览器发现这次跨源AJAX请求是简单请求，就自动在头信息之中，添加一个Origin字段。
+
+````
+GET /cors HTTP/1.1
+Origin: http://api.bob.com
+Host: api.alice.com
+Accept-Language: en-US
 Connection: keep-alive
-Referer: http://foo.example/examples/access-control/simpleXSInvocation.html
-Origin: http://foo.example //该请求来自于 http://foo.exmaple。
-//以上是浏览器发送请求
+User-Agent: Mozilla/5.0...
+````
 
+上面的头信息中，Origin字段用来说明，本次请求来自哪个源（协议 + 域名 + 端口）。服务器根据这个值，决定是否同意这次请求。
+
+如果Origin指定的源，不在许可范围内，服务器会返回一个正常的HTTP回应。浏览器发现，这个回应的头信息没有包含Access-Control-Allow-Origin字段（详见下文），就知道出错了，从而抛出一个错误，被XMLHttpRequest的onerror回调函数捕获。注意，这种错误无法通过状态码识别，因为HTTP回应的状态码有可能是200。
+
+如果Origin指定的域名在许可范围内，服务器返回的响应，会多出几个头信息字段。
+
+````
+Access-Control-Allow-Origin: http://api.bob.com
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: FooBar
+Content-Type: text/html; charset=utf-8
+````
+
+上面的头信息之中，有三个与CORS请求相关的字段，都以`Access-Control-`开头。
+
+1. Access-Control-Allow-Origin
+该字段是必须的。它的值要么是请求时Origin字段的值，要么是一个*，表示接受任意域名的请求。
+2. Access-Control-Allow-Credentials
+该字段可选。它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。
+3. Access-Control-Expose-Headers
+该字段可选。CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader('FooBar')可以返回FooBar字段的值。
+
+#### withCredentials 属性
+
+上面说到，CORS请求默认不发送Cookie和HTTP认证信息。如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。
+
+````
+Access-Control-Allow-Credentials: true
+````
+
+另一方面，开发者必须在AJAX请求中打开withCredentials属性。
+
+````
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
+````
+
+否则，即使服务器同意发送Cookie，浏览器也不会发送。或者，服务器要求设置Cookie，浏览器也不会处理。
+但是，如果省略withCredentials设置，有的浏览器还是会一起发送Cookie。这时，可以显式关闭withCredentials。
+
+````
+xhr.withCredentials = false;
+````
+需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。
+
+### 非简单请求
+
+#### 预检请求
+
+非简单请求是那种对服务器有特殊要求的请求，比如请求方法是PUT或DELETE，或者Content-Type字段的类型是application/json。
+
+非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为"预检"请求（preflight）。
+
+浏览器先询问服务器，当前网页所在的域名是否在服务器的许可名单之中，以及可以使用哪些HTTP动词和头信息字段。只有得到肯定答复，浏览器才会发出正式的XMLHttpRequest请求，否则就报错。
+
+下面是一段浏览器的JavaScript脚本。
+
+````
+var url = 'http://api.alice.com/cors';
+var xhr = new XMLHttpRequest();
+xhr.open('PUT', url, true);
+xhr.setRequestHeader('X-Custom-Header', 'value');
+xhr.send();
+````
+
+上面代码中，HTTP请求的方法是PUT，并且发送一个自定义头信息X-Custom-Header。
+
+浏览器发现，这是一个非简单请求，就自动发出一个"预检"请求，要求服务器确认可以这样请求。下面是这个"预检"请求的HTTP头信息。
+
+````
+OPTIONS /cors HTTP/1.1
+Origin: http://api.bob.com
+Access-Control-Request-Method: PUT
+Access-Control-Request-Headers: X-Custom-Header
+Host: api.alice.com
+Accept-Language: en-US
+Connection: keep-alive
+User-Agent: Mozilla/5.0...
+````
+
+"预检"请求用的请求方法是OPTIONS，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。
+
+除了Origin字段，"预检"请求的头信息包括两个特殊字段。
+
+1. Access-Control-Request-Method
+该字段是必须的，用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是PUT。
+2. Access-Control-Request-Headers
+该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Custom-Header。
+
+#### 预检请求的回应
+
+服务器收到"预检"请求以后，检查了Origin、Access-Control-Request-Method和Access-Control-Request-Headers字段以后，确认允许跨源请求，就可以做出回应。
+
+````
 HTTP/1.1 200 OK
-Date: Mon, 01 Dec 2008 00:23:53 GMT
-Server: Apache/2.0.61 
-Access-Control-Allow-Origin: * //这表明服务器接受来自任何站点的跨站请求。如果设置为http://foo.example。其它站点就不能跨站访问 http://bar.other 的资源了。
+Date: Mon, 01 Dec 2008 01:15:39 GMT
+Server: Apache/2.0.61 (Unix)
+Access-Control-Allow-Origin: http://api.bob.com
+Access-Control-Allow-Methods: GET, POST, PUT
+Access-Control-Allow-Headers: X-Custom-Header
+Content-Type: text/html; charset=utf-8
+Content-Encoding: gzip
+Content-Length: 0
 Keep-Alive: timeout=2, max=100
 Connection: Keep-Alive
-Transfer-Encoding: chunked
-Content-Type: application/xml
-//以上是服务器返回信息给浏览器
+Content-Type: text/plain
+````
 
-```
+上面的HTTP回应中，关键的是Access-Control-Allow-Origin字段，表示http://api.bob.com可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。
 
-以下情况，请求会返回相关响应信息
+````
+Access-Control-Allow-Origin: *
+````
 
-- 如果资源是允许公开访问的(就像任何允许GET访问的 HTTP资源),返回Access-Control-Allow-Origin:*头信息就足够了,除非是一些需要Cookies和HTTP身份验证信息的请求。  
-- 如果资源访问被限制基于相同的域名,或者如果要访问的资源需要凭证(或设置凭证),那么就有必要对请求头信息中的ORIGIN进行过滤,或者至少响应请求的来源(例如Access\-Control\-Allow\-Origin:http://arunranga.com)。  
-另外,将发送Access\-Control\-Allow\-Credentials:TRUE头信息，这在后续部分将进行讨论。
+如果浏览器否定了"预检"请求，会返回一个正常的HTTP回应，但是没有任何CORS相关的头信息字段。这时，浏览器就会认定，服务器不同意预检请求，因此触发一个错误，被XMLHttpRequest对象的onerror回调函数捕获。控制台会打印出如下的报错信息。
 
-### 2. 预请求
+````
+XMLHttpRequest cannot load http://api.alice.com.
+Origin http://api.bob.com is not allowed by Access-Control-Allow-Origin.
+````
 
-与前述简单请求不同，“需预检的请求”要求必须首先使用 OPTIONS   方法发起一个预检请求到服务器，以获知服务器是否允许该实际请求。"预检请求“的使用，可以避免跨域请求对服务器的用户数据产生未预期的影响。
+服务器回应的其他CORS相关字段如下。
 
-当请求满足下述任一条件时，即应首先发送预检请求：
-
-(1). 使用了下面任一 HTTP 方法：  
-
-PUT  
-DELETE  
-CONNECT  
-OPTIONS  
-TRACE  
-PATCH  
-
-(2). 人为设置了对 CORS 安全的首部字段集合之外的其他首部字段。该集合为：
-
-Accept  
-Accept-Language  
-Content-Language  
-Content-Type (but note the additional requirements below)  
-DPR  
-Downlink  
-Save-Data  
-Viewport-Width  
-Width  
-
-(3). Content-Type 的值不属于下列之一:  
-
-application/x-www-form-urlencoded  
-multipart/form-data  
-text/plain  
-
-(4). 请求中的XMLHttpRequestUpload 对象注册了任意多个事件监听器。  
-(5). 请求中使用了ReadableStream对象。
-
-
-不同于上面讨论的简单请求，“预请求”要求必须先发送一个 OPTIONS 请求给目的站点，来查明这个跨站请求对于目的站点是不是安全可接受的。这样做，是因为跨站请求可能会对目的站点的数据造成破坏。 当请求具备以下条件，就会被当成预请求处理：
-
-**（1）请求以 GET, HEAD 或者 POST 以外的方法发起请求。或者，使用 POST，但请求数据为 application/x-www-form-urlencoded, multipart/form-data 或者 text/plain 以外的数据类型。比如说，用 POST 发送数据类型为 application/xml 或者 text/xml 的 XML 数据的请求。  
-（2）使用自定义请求头（比如添加诸如 X-PINGOTHER）**
-
-
-举个例子：
-
-```javascript
-var invocation = new XMLHttpRequest();
-var url = 'http://bar.other/resources/post-here/';
-var body = '{C}{C}{C}{C}{C}{C}{C}{C}{C}{C}Arun';
-function callOtherDomain(){
-  if(invocation){
-    invocation.open('POST', url, true);
-    invocation.setRequestHeader('X-PINGOTHER', 'pingpong');
-    invocation.setRequestHeader('Content-Type', 'application/xml');
-    invocation.onreadystatechange = handler;
-    invocation.send(body); 
-  }
-}
-
-```
-
-
-
-如上，以 XMLHttpRequest 创建了一个 POST 请求，为该请求添加了一个自定义请求头(X-PINGOTHER: pingpong)，并指定数据类型为 application/xml。所以，该请求是一个“预请求”形式的跨站请求。浏览器使用一个 OPTIONS 发送了一个“预请求”。Firefox 3.1 根据请求参数，决定需要发送一个“预请求”，来探明服务器端是否接受后续真正的请求。 OPTIONS 是 HTTP/1.1 里的方法，用来获取更多服务器端的信息，是一个不应该对服务器数据造成影响的方法。 随同 OPTIONS 请求，以下两个请求头一起被发送：
-
-```http
-Access-Control-Request-Method: POST
-Access-Control-Request-Headers: X-PINGOTHER
-
-```
-
-假设服务器成功响应返回部分信息如下：
-
-
-```http
-Access-Control-Allow-Origin: http://foo.example //表明服务器允许http://foo.example的请求
-Access-Control-Allow-Methods: POST, GET, OPTIONS //表明服务器可以接受POST, GET和 OPTIONS的请求方法
-Access-Control-Allow-Headers: X-PINGOTHER //传递一个可接受的自定义请求头列表。服务器也需要设置一个与浏览器对应。否则会报 Request header field X-Requested-With is not allowed by Access-Control-Allow-Headers in preflight response 的错误
-Access-Control-Max-Age: 1728000 //告诉浏览器，本次“预请求”的响应结果有效时间是多久。在上面的例子里，1728000秒代表着20天内，浏览器在处理针对该服务器的跨站请求，都可以无需再发送“预请求”，只需根据本次结果进行判断处理。
-
-```
-
-
-<p align='center'>
-<img src='../images/prelight.png'>
-</p>
-
-
-
-
-
-### 3. 附带凭证信息的请求
-
-Fetch 与 CORS 的一个有趣的特性是，可以基于  HTTP cookies 和 HTTP 认证信息发送身份凭证。一般而言，对于跨域 XMLHttpRequest 或 Fetch 请求，浏览器不会发送身份凭证信息。如果要发送凭证信息，需要设置 XMLHttpRequest 的某个特殊标志位。
-
-本例中，http://foo.example 的某脚本向 http://bar.other 发起一个GET 请求，并设置 Cookies：
-
-```javascript
-var invocation = new XMLHttpRequest();
-var url = 'http://bar.other/resources/credentialed-content/';
-    
-function callOtherDomain(){
-  if(invocation) {
-    invocation.open('GET', url, true);
-    invocation.withCredentials = true;
-    invocation.onreadystatechange = handler;
-    invocation.send(); 
-  }
-}
-
-```
-
-第 7 行将 XMLHttpRequest 的 withCredentials 标志设置为 true，从而向服务器发送 Cookies。因为这是一个简单 GET 请求，所以浏览器不会对其发起“预检请求”。但是，如果服务器端的响应中未携带 Access-Control-Allow-Credentials: true ，浏览器将不会把响应内容返回给请求的发送者。
-
-
-<p align='center'>
-<img src='../images/cred-req.png'>
-</p>
-
-假设服务器成功响应返回部分信息如下：
-
-```http
-Access-Control-Allow-Origin: http://foo.example
+````
+Access-Control-Allow-Methods: GET, POST, PUT
+Access-Control-Allow-Headers: X-Custom-Header
 Access-Control-Allow-Credentials: true
-Set-Cookie: pageAccess=3; expires=Wed, 31-Dec-2008 01:34:53 GMT
-```
+Access-Control-Max-Age: 1728000
+````
 
-如果bar.other的响应头里没有Access-Control-Allow-Credentials：true，则响应会被忽略.。特别注意: 给一个带有withCredentials的请求发送响应的时候，服务器端必须指定允许请求的域名,不能使用“\*”。上面这个例子中，如果响应头是这样的 Access-Control-Allow-Origin：\* ，则响应会失败。在这个例子里,因为Access-Control-Allow-Origin的值是 http://foo.example 这个指定的请求域名，所以客户端把带有凭证信息的内容被返回给了客户端。另外注意，更多的cookie信息也被创建了。
+1. Access-Control-Allow-Methods
+该字段必需，它的值是逗号分隔的一个字符串，表明服务器支持的所有跨域请求的方法。注意，返回的是所有支持的方法，而不单是浏览器请求的那个方法。这是为了避免多次"预检"请求。
+2. Access-Control-Allow-Headers
+如果浏览器请求包括Access-Control-Request-Headers字段，则Access-Control-Allow-Headers字段是必需的。它也是一个逗号分隔的字符串，表明服务器支持的所有头信息字段，不限于浏览器在"预检"中请求的字段。
+3. Access-Control-Allow-Credentials
+该字段与简单请求时的含义相同。
+4. Access-Control-Max-Age
+该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是20天（1728000秒），即允许缓存该条回应1728000秒（即20天），在此期间，不用发出另一条预检请求。
+
+#### 浏览器的正常请求和回应
+
+一旦服务器通过了"预检"请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。
+
+下面是"预检"请求之后，浏览器的正常CORS请求。
+
+````
+PUT /cors HTTP/1.1
+Origin: http://api.bob.com
+Host: api.alice.com
+X-Custom-Header: value
+Accept-Language: en-US
+Connection: keep-alive
+User-Agent: Mozilla/5.0...
+````
+
+上面头信息的Origin字段是浏览器自动添加的。
+
+下面是服务器正常的回应。
+
+````
+Access-Control-Allow-Origin: http://api.bob.com
+Content-Type: text/html; charset=utf-8
+````
+
+上面头信息中，Access-Control-Allow-Origin字段是每次回应都必定包含的。
+
+### 与JSONP的比较
+
+CORS与JSONP的使用目的相同，但是比JSONP更强大。
+
+JSONP只支持GET请求，CORS支持所有类型的HTTP请求。JSONP的优势在于支持老式浏览器，以及可以向不支持CORS的网站请求数据。
 
 
-## 九. CORS 和 JSONP 对比
 
-- JSONP 只能实现 GET 请求，而 CORS 支持所有类型的 HTTP 请求。
+ref
+http://www.ruanyifeng.com/blog/2016/04/cors.html
 
-- 使用 CORS，开发者可以使用普通的 XMLHttpRequest 发起请求和获得数据，比起 JSONP 有更好的错误处理。
+http://www.ruanyifeng.com/blog/2016/04/same-origin-policy.html
 
-- JSONP 主要被老的浏览器支持，它们往往不支持 CORS，而绝大多数现代浏览器都已经支持了 CORS）。
+https://github.com/halfrost/Halfrost-Field/blob/master/contents/Protocol/HTTP.md
 
-- CORS 与 JSONP 相比，无疑更为先进、方便和可靠。
-
-
-------------------------------------------------------
-
-Reference：  
-《图解 HTTP》    
-《HTTP 权威指南》    
-[RFC2616](https://tools.ietf.org/html/rfc2616)  
-[HTTP访问控制（CORS）](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS)  
-[跨域资源共享 CORS 详解](http://www.ruanyifeng.com/blog/2016/04/cors.html)  
-[HTTP缓存控制小结](http://imweb.io/topic/5795dcb6fb312541492eda8c)
-
-> GitHub Repo：[Halfrost-Field](https://github.com/halfrost/Halfrost-Field)
-> 
-> Follow: [halfrost · GitHub](https://github.com/halfrost)
->
-> Source: []()
+https://www.cnblogs.com/chenqf/p/6386163.html

@@ -1,3 +1,12 @@
+---
+title: java-逃逸分析
+date: 2017-06-02 19:42:47
+tags: [逃逸分析]
+categories: java
+---
+
+# 什么是逃逸分析
+
 逃逸分析(Escape Analysis)是目前Java虚拟机中比较前沿的优化技术。
 
 逃逸分析的基本行为就是分析对象动态作用域：当一个对象在方法中被定义后，它可能被外部方法所引用，例如作为调用参数传递到其他地方中，称为方法逃逸。
@@ -12,7 +21,7 @@ public static StringBuffer craeteStringBuffer(String s1, String s2) {
         return sb;
     }
 ````
-
+<!-- more -->
 StringBuffer sb是一个方法内部变量，上述代码中直接将sb返回，这样这个StringBuffer有可能被其他方法所改变，这样它的作用域就不只是在方法内部，虽然它是一个局部变量，称其逃逸到了方法外部。
 甚至还有可能被外部线程访问到，譬如赋值给类变量或可以在其他线程中访问的实例变量，称为线程逃逸。
 
