@@ -1,7 +1,7 @@
 ---
 title: linux命令-gdb
-date: 2017-12-28 11:31:23
-tags: [linux,gdb]
+date: 2016-12-28 11:31:23
+tags: [linux,gdb,gcc]
 categories: linux命令
 ---
 > 备忘，mark 👿

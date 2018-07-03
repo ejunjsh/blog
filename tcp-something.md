@@ -1,8 +1,8 @@
 ---
 title: TCP 的那些事儿
 date: 2017-11-01 22:56:41
-tags: tcp
-categories: tcp
+tags: [tcp,protocols]
+categories: protocols
 ---
 > tcp看了很多的文章，这篇总结的很好。此文有点长👿
 
