@@ -207,6 +207,32 @@ Directive2=value
 * Condition...：当前 Unit 运行必须满足的条件，否则不会运行
 * Assert...：当前 Unit 运行必须满足的条件，否则会报启动失败
 
+这里要说说启动顺序和依赖关系
+
+以`sshd.service`为例子
+
+````
+[Unit]
+Description=OpenSSH server daemon
+Documentation=man:sshd(8) man:sshd_config(5)
+After=network.target sshd-keygen.service
+Wants=sshd-keygen.service
+````
+
+`After`字段：表示如果`network.target`或`sshd-keygen.service`需要启动，那么`sshd.service`应该在它们之后启动。
+`Before`字段，定义`sshd.service`应该在哪些服务之前启动。
+
+注意，`After`和`Before`字段只涉及启动顺序，不涉及依赖关系。
+
+设置依赖关系，需要使用`Wants`字段和`Requires`字段。
+
+`Wants`字段：表示``sshd.service`与`sshd-keygen.service`之间存在"弱依赖"关系，即如果`sshd-keygen.service`启动失败或停止运行，不影响`sshd.service`继续执行。
+
+`Requires`字段则表示"强依赖"关系，即如果该服务启动失败或异常退出，那么`sshd.service`也必须退出。
+
+注意，`Wants`字段与`Requires`字段只涉及依赖关系，与启动顺序无关，默认情况下是同时启动的。
+
+
 `[Install]`通常是配置文件的最后一个区块，用来定义如何启动，以及是否开机启动。它的主要字段如下。
 
 * WantedBy：它的值是一个或多个 Target，当前 Unit 激活时（enable）符号链接会放入/etc/systemd/system目录下面以 Target 名 + .wants后缀构成的子目录中
@@ -219,10 +245,10 @@ Directive2=value
 * Type：定义启动时的进程行为。它有以下几种值。
 * Type=simple：默认值，执行ExecStart指定的命令，启动主进程
 * Type=forking：以 fork 方式从父进程创建子进程，创建后父进程会立即退出
-* Type=oneshot：一次性进程，Systemd 会等当前服务退出，再继续往下执行
-* Type=dbus：当前服务通过D-Bus启动
-* Type=notify：当前服务启动完毕，会通知Systemd，再继续往下执行
-* Type=idle：若有其他任务执行完毕，当前服务才会运行
+* Type=oneshot：类似于simple，但只执行一次，Systemd 会等当前服务退出，再继续往下执行
+* Type=dbus：类似于simple，但会等待 D-Bus 信号后启动
+* Type=notify：类似于simple，启动结束后会发出通知信号，然后 Systemd 再启动其他服务
+* Type=idle：类似于simple，但是要等到其他任务都执行完，才会启动该服务。一种使用场合是为让该服务的输出，不与其他服务的输出相混合
 * ExecStart：启动当前服务的命令
 * ExecStartPre：启动当前服务之前执行的命令
 * ExecStartPost：启动当前服务之后执行的命令
@@ -233,8 +259,76 @@ Directive2=value
 * Restart：定义何种情况 Systemd 会自动重启当前服务，可能的值包括always（总是重启）、on-success、on-failure、on-abnormal、on-abort、on-watchdog
 * TimeoutSec：定义 Systemd 停止当前服务之前等待的秒数
 * Environment：指定环境变量
+* EnvironmentFile：指定当前服务的环境参数文件。该文件内部的key=value键值对，可以用$key的形式，在当前配置文件中获取。
+* RemainAfterExit: 设为yes，表示进程退出以后，服务仍然保持执行
+* KillMode：定义 Systemd 如何停止服务。
 
 Unit 配置文件的完整字段清单，请参考[官方文档](https://www.freedesktop.org/software/systemd/man/systemd.unit.html)。
+
+还是以`sshd.service`为例子
+
+````
+[Service]
+EnvironmentFile=/etc/sysconfig/sshd
+ExecStart=/usr/sbin/sshd -D $OPTIONS
+ExecReload=/bin/kill -HUP $MAINPID
+Type=simple
+KillMode=process
+Restart=on-failure
+RestartSec=42s
+````
+
+sshd 的环境参数文件是`/etc/sysconfig/sshd`。
+
+配置文件里面最重要的字段是`ExecStart`。
+
+启动sshd，执行的命令是`/usr/sbin/sshd -D $OPTIONS`，其中的变量`$OPTIONS`就来自EnvironmentFile字段指定的环境参数文件。
+
+请看下面的例子。
+
+````
+[Service]
+ExecStart=/bin/echo execstart1
+ExecStart=
+ExecStart=/bin/echo execstart2
+ExecStartPost=/bin/echo post1
+ExecStartPost=/bin/echo post2
+````
+
+上面这个配置文件，第二行ExecStart设为空值，等于取消了第一行的设置，运行结果如下。
+
+````
+execstart2
+post1
+post2
+````
+
+所有的启动设置之前，都可以加上一个连词号（-），表示"抑制错误"，即发生错误的时候，不影响其他命令的执行。比如，`EnvironmentFile=-/etc/sysconfig/sshd`（注意等号后面的那个连词号），就表示即使`/etc/sysconfig/sshd`文件不存在，也不会抛出错误。
+
+上面sshd例子中，将`KillMode`设为`process`，表示只停止主进程，不停止任何sshd 子进程，即子进程打开的 SSH session 仍然保持连接。这个设置不太常见，但对 sshd 很重要，否则你停止服务的时候，会连自己打开的 SSH session 一起杀掉。
+
+KillMode字段可以设置的值如下。
+
+* control-group（默认值）：当前控制组里面的所有子进程，都会被杀掉
+* process：只杀主进程
+* mixed：主进程将收到 SIGTERM 信号，子进程收到 SIGKILL 信号
+* none：没有进程会被杀掉，只是执行服务的 stop 命令。
+
+上面的例子中，`Restart`设为`on-failure`，表示任何意外的失败，就将重启sshd。如果 sshd 正常停止（比如执行systemctl stop命令），它就不会重启。
+
+Restart字段可以设置的值如下。
+
+* no（默认值）：退出后不会重启
+* on-success：只有正常退出时（退出状态码为0），才会重启
+* on-failure：非正常退出时（退出状态码非0），包括被信号终止和超时，才会重启
+* on-abnormal：只有被信号终止和超时，才会重启
+* on-abort：只有在收到没有捕捉到的信号终止时，才会重启
+* on-watchdog：超时退出，才会重启
+* always：不管是什么退出原因，总是重启
+
+对于守护进程，推荐设为`on-failure`。对于那些允许发生错误退出的服务，可以设为`on-abnormal`。
+
+
 
 # Target
 
@@ -280,7 +374,7 @@ Runlevel 6           |    runlevel6.target -> reboot.target
 
 它与`init`进程的主要差别如下。
 
-1. 默认的 RunLevel（在`/etc/inittab`文件设置）现在被默认的 Target 取代，位置是`/etc/systemd/system/default.target`，通常符号链接到g`raphical.target`（图形界面）或者`multi-user.target`（多用户命令行）。
+1. 默认的 RunLevel（在`/etc/inittab`文件设置）现在被默认的 Target 取代，位置是`/etc/systemd/system/default.target`，通常符号链接到`graphical.target`（图形界面）或者`multi-user.target`（多用户命令行）。
 2. 启动脚本的位置，以前是`/etc/init.d`目录，符号链接到不同的 RunLevel 目录 （比如`/etc/rc3.d`、`/etc/rc5.d`等），现在则存放在`/lib/systemd/system`和`/etc/systemd/system`目录。
 3. 配置文件的位置，以前`init`进程的配置文件是`/etc/inittab`，各种服务的配置文件存放在`/etc/sysconfig`目录。现在的配置文件主要存放在`/lib/systemd`目录，在`/etc/systemd`目录里面的修改可以覆盖原始设置。
 
