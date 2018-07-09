@@ -48,6 +48,15 @@ JVM搜索路径的顺序为：
  输出每次GC的相关情况，后面会有更详细的介绍。
 `-verbose:jni`
  输出native方法调用的相关情况，一般用于诊断jni调用错误信息。
+ 
+ 指定JIT编译器的模式：-Xint，-Xcomp，-Xmixed
+我们知道Java是一种解释型语言，但是随着JIT技术的进步，它能在运行时将Java的字节码编译成本地代码。以下是几个相关的选项：
+
+-Xint表示禁用JIT，所有字节码都被解释执行，这个模式的速度最慢的。
+-Xcomp表示所有字节码都首先被编译成本地代码，然后再执行。
+-Xmixed，默认模式，让JIT根据程序运行的情况，有选择地将某些代码编译成本地代码。 
+-Xcomp和-Xmixed到底谁的速度快，针对不同的程序可能有不同的结果，基本还是推荐用默认模式
+ 
 
 ## 非标准参数
 非标准参数，是在标准参数的基础上进行扩展的参数，输入`java -X`命令，能够获得当前JVM支持的所有非标准参数列表（你会发现，其实并不多哦）。
@@ -145,6 +154,8 @@ JVM搜索路径的顺序为：
 -XX:+PrintClassHistogram|	遇到Ctrl-Break后打印类实例的柱状信息，与jmap -histo功能相同
 -XX:+PrintConcurrentLocks	|遇到Ctrl-Break后打印并发锁的相关信息，与jstack -l功能相同
 -XX:+PrintCommandLineFlags|	打印在命令行中出现过的标记
+-XX:+PrintFlagsInitial|打印出所有XX选项的默认值
+-XX:+PrintFlagsFinal|打印出XX选项在运行程序时生效的值
 -XX:+PrintCompilation	|当一个方法被编译时打印相关信息
 -XX:+PrintGC|	每次GC时打印相关信息
 -XX:+PrintGC Details|	每次GC时打印详细信息
