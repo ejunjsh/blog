@@ -95,77 +95,77 @@ tcpdump的表达式由一个或多个"单元"组成，每个单元一般包含ID
 (1) 默认启动
 
 ````shell
-tcpdump
+$ tcpdump
 ````
 
 默认情况下，直接启动tcpdump将监视第一个网络接口(非lo口)上所有流通的数据包。这样抓取的结果会非常多，滚动非常快。
 
 (2) 监视指定网络接口的数据包
 
-````
-tcpdump -i eth1
+````shell
+$ tcpdump -i eth1
 ````
 
 如果不指定网卡，默认tcpdump只会监视第一个网络接口，如eth0。
 
 (3) 监视指定主机的数据包，例如所有进入或离开longshuai的数据包
 
-````
-tcpdump host longshuai
+````shell
+$ tcpdump host longshuai
 ````
 
 (4) 打印helios<-->hot或helios<-->ace之间通信的数据包
 
-````
-tcpdump host helios and \( hot or ace \)
+````shell
+$ tcpdump host helios and \( hot or ace \)
 ````
 
 (5) 打印ace与任何其他主机之间通信的IP数据包,但不包括与helios之间的数据包
 
-````
-tcpdump ip host ace and not helios
+````shell
+$ tcpdump ip host ace and not helios
 ````
 
 (6) 截获主机hostname发送的所有数据
 
-````
-tcpdump src host hostname
+````shell
+$ tcpdump src host hostname
 ````
 
 (7) 监视所有发送到主机hostname的数据包
 
-````
-tcpdump dst host hostname
+````shell
+$ tcpdump dst host hostname
 ````
 
 (8) 监视指定主机和端口的数据包
 
-````
-tcpdump tcp port 22 and host hostname
+````shell
+$ tcpdump tcp port 22 and host hostname
 ````
 
 (9) 对本机的udp 123端口进行监视(123为ntp的服务端口)
 
-````
-tcpdump udp port 123
+````shell
+$ tcpdump udp port 123
 `````
 
 (10) 监视指定网络的数据包，如本机与192.168网段通信的数据包，"-c 10"表示只抓取10个包
 
-````
-tcpdump -c 10 net 192.168
+````shell
+$ tcpdump -c 10 net 192.168
 ````
 
 (11) 打印所有通过网关snup的ftp数据包(注意,表达式被单引号括起来了,这可以防止shell对其中的括号进行错误解析)
 
-````
-tcpdump 'gateway snup and (port ftp or ftp-data)'
+````shell
+$ tcpdump 'gateway snup and (port ftp or ftp-data)'
 ````
 
 (12) 抓取ping包
 
-````
-tcpdump -c 5 -nn -i eth0 icmp 
+````shell
+$ tcpdump -c 5 -nn -i eth0 icmp 
 
 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
 listening on eth0, link-type EN10MB (Ethernet), capture size 65535 bytes
@@ -181,8 +181,8 @@ listening on eth0, link-type EN10MB (Ethernet), capture size 65535 bytes
 
 如果明确要抓取主机为192.168.100.70对本机的ping，则使用and操作符。
 
-````
-tcpdump -c 5 -nn -i eth0 icmp and src 192.168.100.62
+````shell
+$ tcpdump -c 5 -nn -i eth0 icmp and src 192.168.100.62
 
 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
 listening on eth0, link-type EN10MB (Ethernet), capture size 65535 bytes
@@ -200,8 +200,8 @@ listening on eth0, link-type EN10MB (Ethernet), capture size 65535 bytes
 
 (13) 抓取到本机22端口包
 
-````
-tcpdump -c 10 -nn -i eth0 tcp dst port 22  
+````shell
+$ tcpdump -c 10 -nn -i eth0 tcp dst port 22  
 
 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
 listening on eth0, link-type EN10MB (Ethernet), capture size 65535 bytes
@@ -222,8 +222,9 @@ listening on eth0, link-type EN10MB (Ethernet), capture size 65535 bytes
 
 (14) 解析包数据
 
-````
-tcpdump -c 2 -q -XX -vvv -nn -i eth0 tcp dst port 22
+````shell
+$ tcpdump -c 2 -q -XX -vvv -nn -i eth0 tcp dst port 22
+
 tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 65535 bytes
 12:15:54.788812 IP (tos 0x0, ttl 64, id 19303, offset 0, flags [DF], proto TCP (6), length 40)
     192.168.100.1.5788 > 192.168.100.62.22: tcp 0
