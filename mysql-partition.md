@@ -213,7 +213,7 @@ insert into user2(name,sex) values ('李四',2);
 select * from alluser;  
 ````
 发现是刚刚插入的数据如下：
-[![](http://idiotsky.me/images/mysql-partition-1.png)](http://idiotsky.me/images/mysql-partition-1.png)
+[![](http://idiotsky.top/images/mysql-partition-1.png)](http://idiotsky.top/images/mysql-partition-1.png)
 这就出现了一个id重复，这就造成了当删除和修改的时候异常，解决办法是给 alluser的id赋唯一值。
 我们解决方法是，重新建立一张表tb_ids(id int)，用来专门存一个id的，并插入一条初始数据，同时删除掉user1和user2中的数据。
 ````sql
@@ -241,7 +241,7 @@ insert into user1(name,sex) values('王五',1);
 insert into user2(name,sex) values('赵六',2);
 ````
 3. 查询user1和user2中的数据：
-[![](http://idiotsky.me/images/mysql-partition-2.png)](http://idiotsky.me/images/mysql-partition-2.png)
-[![](http://idiotsky.me/images/mysql-partition-3.png)](http://idiotsky.me/images/mysql-partition-3.png)
+[![](http://idiotsky.top/images/mysql-partition-2.png)](http://idiotsky.top/images/mysql-partition-2.png)
+[![](http://idiotsky.top/images/mysql-partition-3.png)](http://idiotsky.top/images/mysql-partition-3.png)
 4. 查询总表alluser中的数据，发现id没有重复的：
-[![](http://idiotsky.me/images/mysql-partition-4.png)](http://idiotsky.me/images/mysql-partition-4.png)
+[![](http://idiotsky.top/images/mysql-partition-4.png)](http://idiotsky.top/images/mysql-partition-4.png)

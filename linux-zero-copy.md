@@ -20,7 +20,7 @@ while((n = read(diskfd, buf, BUF_SIZE)) > 0)
 接下来，write系统调用再把用户缓冲区的内容拷贝到网络堆栈相关的内核缓冲区中，最后socket再把内核缓冲区的内容发送到网卡上。
 说了这么多，不如看图清楚：
 
-[![](http://idiotsky.me/images2/linux-zero-copy-1.png)](http://idiotsky.me/images2/linux-zero-copy-1.png) 
+[![](http://idiotsky.top/images2/linux-zero-copy-1.png)](http://idiotsky.top/images2/linux-zero-copy-1.png) 
 
 从上图中可以看出，共产生了四次数据拷贝，即使使用了DMA来处理了与硬件的通讯，CPU仍然需要处理两次数据拷贝，与此同时，在用户态与内核态也发生了多次上下文切换，无疑也加重了CPU负担。
 在此过程中，我们没有对文件内容做任何修改，那么在内核空间和用户空间来回拷贝数据无疑就是一种浪费，而零拷贝主要就是为了解决这种低效性。
@@ -39,7 +39,7 @@ write(sockfd, buf, len);
 应用程序调用mmap()，磁盘上的数据会通过DMA被拷贝的内核缓冲区，接着操作系统会把这段内核缓冲区与应用程序共享，这样就不需要把内核缓冲区的内容往用户空间拷贝。应用程序再调用write(),操作系统直接将内核缓冲区的内容拷贝到socket缓冲区中，这一切都发生在内核态，最后，socket缓冲区再把数据发到网卡去。
 同样的，看图很简单：
 
-[![](http://idiotsky.me/images2/linux-zero-copy-2.png)](http://idiotsky.me/images2/linux-zero-copy-2.png) 
+[![](http://idiotsky.top/images2/linux-zero-copy-2.png)](http://idiotsky.top/images2/linux-zero-copy-2.png) 
 
 使用mmap替代read很明显减少了一次拷贝，当拷贝数据量很大时，无疑提升了效率。但是使用mmap是有代价的。当你使用mmap时，你可能会遇到一些隐藏的陷阱。例如，当你的程序map了一个文件，但是当这个文件被另一个进程截断(truncate)时, write系统调用会因为访问非法地址而被SIGBUS信号终止。SIGBUS信号默认会杀死你的进程并产生一个coredump,如果你的服务器这样被中止了，那会产生一笔损失。
 
@@ -74,7 +74,7 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 系统调用sendfile()在代表输入文件的描述符in_fd和代表输出文件的描述符out_fd之间传送文件内容（字节）。描述符out_fd必须指向一个套接字，而in_fd指向的文件必须是可以mmap的。这些局限限制了sendfile的使用，使sendfile只能将数据从文件传递到套接字上，反之则不行。
 使用sendfile不仅减少了数据拷贝的次数，还减少了上下文切换，数据传送始终只发生在kernel space。
 
-[![](http://idiotsky.me/images2/linux-zero-copy-3.png)](http://idiotsky.me/images2/linux-zero-copy-3.png) 
+[![](http://idiotsky.top/images2/linux-zero-copy-3.png)](http://idiotsky.top/images2/linux-zero-copy-3.png) 
 
 在我们调用sendfile时，如果有其它进程截断了文件会发生什么呢？假设我们没有设置任何信号处理程序，sendfile调用仅仅返回它在被中断之前已经传输的字节数，errno会被置为success。如果我们在调用sendfile之前给文件加了锁，sendfile的行为仍然和之前相同，我们还会收到RT_SIGNAL_LEASE的信号。
 
@@ -84,7 +84,7 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 
 总结一下，sendfile系统调用利用DMA引擎将文件内容拷贝到内核缓冲区去，然后将带有文件位置和长度信息的缓冲区描述符添加socket缓冲区去，这一步不会将内核中的数据拷贝到socket缓冲区中，DMA引擎会将内核缓冲区的数据拷贝到协议引擎中去，避免了最后一次拷贝。
 
-[![](http://idiotsky.me/images2/linux-zero-copy-4.png)](http://idiotsky.me/images2/linux-zero-copy-4.png) 
+[![](http://idiotsky.top/images2/linux-zero-copy-4.png)](http://idiotsky.top/images2/linux-zero-copy-4.png) 
 
 不过这一种收集拷贝功能是需要硬件以及驱动程序支持的。
 

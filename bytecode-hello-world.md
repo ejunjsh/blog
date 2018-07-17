@@ -30,7 +30,7 @@ public class HelloWorld {
  </plugin>
 ````
 编译以后的字节码文件（使用UltraEdit的16进制模式打开）：
-[![](http://idiotsky.me/images/bytecode-hello-world-1.jpg)](http://idiotsky.me/images/bytecode-hello-world-1.jpg)
+[![](http://idiotsky.top/images/bytecode-hello-world-1.jpg)](http://idiotsky.top/images/bytecode-hello-world-1.jpg)
 红色框内的部分就是HelloWorld.class的内容，其他部分是UltraEdit自动生成的：红色框顶部的0~f代表列号，左边部分代表行号，右侧部分是二进制码对应的字符（utf-8编码）。
 
 # 字节码解析
@@ -137,9 +137,9 @@ CONSTANT_InvokeDynamic_info	|tag	|u1	|18
 |name_and_type_index	| u2 |	对CONSTANT_NameAndType_info的索引
 
 CONSTANT_Methodref_info（u2):00 06，因为tag为A，代表一个方法引用表（CONSTANT_Methodref_info），所以第二项（u2）应该是指向常量池的位置，即常量池的第六项，表示一个CONSTANT_Class_info表的索引，用类似的方法往下分析，可以发现常量池的第六项如下，tag类型为07，查询上表可知道其即为CONSTANT_Class_info。
-[![](http://idiotsky.me/images/bytecode-hello-world-2.jpg)](http://idiotsky.me/images/bytecode-hello-world-2.jpg)
+[![](http://idiotsky.top/images/bytecode-hello-world-2.jpg)](http://idiotsky.top/images/bytecode-hello-world-2.jpg)
  07之后的00 1B表示对常量池地27项（CONSTANT_Utf8_info）的引用，查看第27项如下图，即（java/lang/Object）：
- [![](http://idiotsky.me/images/bytecode-hello-world-3.jpg)](http://idiotsky.me/images/bytecode-hello-world-3.jpg)
+ [![](http://idiotsky.top/images/bytecode-hello-world-3.jpg)](http://idiotsky.top/images/bytecode-hello-world-3.jpg)
  CONSTANT_NameAndType_info（u2）：00 14,方法引用表的第三项（u2），常量池索引，指向第20项。
 
 CONSTANT_Fieldref_info（u1）：tag为09。
@@ -147,7 +147,7 @@ CONSTANT_Fieldref_info（u1）：tag为09。
 .....
 
 常量池的分析都类似，其他的分析由于篇幅问题就不在此一一讲述了。跳过常量池就到了访问标识（u2）：
- [![](http://idiotsky.me/images/bytecode-hello-world-4.jpg)](http://idiotsky.me/images/bytecode-hello-world-4.jpg)
+ [![](http://idiotsky.top/images/bytecode-hello-world-4.jpg)](http://idiotsky.top/images/bytecode-hello-world-4.jpg)
   JVM 对访问标示符的规范如下：
 
   Flag Name|	Value|	Remarks
@@ -164,7 +164,7 @@ ACC_ENUM|	0x4000	|枚举类型
  这个表里面无法直接查询到0021这个值，原因是0021=0020+0001，即public+invokespecial指令，源码中的方法main是public的，而invokespecial是现在的版本都有的，所以值为0021。
 
 接着往下是this_class（u2）：是指向constant pool的索引值，该值必须是CONSTANT_Class_info类型，值为00 05，即指向常量池中的第五项，第五项指向常量池中的第26项，即com/paddx/test/asm/HelloWorld：
- [![](http://idiotsky.me/images/bytecode-hello-world-5.jpg)](http://idiotsky.me/images/bytecode-hello-world-5.jpg)
+ [![](http://idiotsky.top/images/bytecode-hello-world-5.jpg)](http://idiotsky.top/images/bytecode-hello-world-5.jpg)
 
 super_class(u2)）：super_class是指向constant pool的索引值，该值必须是CONSTANT_Class_info类型，指定当前字节码定义的类或接口的直接父类。这里的取值为00 06，根据上面的分析，对应的指向的全限定性类名为java/lang/object，即当前类的父类为Object类。
 
@@ -189,7 +189,7 @@ u2	|attributes_count
 attribute_info|	attribute_info[attributes_count]
 
 HelloWorld.class文件中对应的数据：
- [![](http://idiotsky.me/images/bytecode-hello-world-6.jpg)](http://idiotsky.me/images/bytecode-hello-world-6.jpg)
+ [![](http://idiotsky.top/images/bytecode-hello-world-6.jpg)](http://idiotsky.top/images/bytecode-hello-world-6.jpg)
 
  access_flag（u2）: 00 01
 
@@ -198,7 +198,7 @@ name_index（u2）:00 07
 descriptor_index（u2）:00 08
 
 可以看看 07、08对应的常量池里面的值：
- [![](http://idiotsky.me/images/bytecode-hello-world-7.jpg)](http://idiotsky.me/images/bytecode-hello-world-7.jpg)
+ [![](http://idiotsky.top/images/bytecode-hello-world-7.jpg)](http://idiotsky.top/images/bytecode-hello-world-7.jpg)
 
 即 07 对应的是 &#60;init&#62;，08 对应的是()；
 
@@ -212,7 +212,7 @@ u2|	attribute_name_index
 u4|	attribute_length
 u1|	bytes
 
- [![](http://idiotsky.me/images/bytecode-hello-world-8.jpg)](http://idiotsky.me/images/bytecode-hello-world-8.jpg)
+ [![](http://idiotsky.top/images/bytecode-hello-world-8.jpg)](http://idiotsky.top/images/bytecode-hello-world-8.jpg)
 
 attribute_name_index（u2）: 00 09，指向常量池中的索引。
 
@@ -221,9 +221,9 @@ attribute_length（u4）：00 00 00 2F，属性的长度47。
 attribute_info:具体属性的分析与上面类似，大家可以对着JVM的规范自己尝试分析一下。
 
 第一个方法结束后，接着进入第二个方法：
- [![](http://idiotsky.me/images/bytecode-hello-world-9.jpg)](http://idiotsky.me/images/bytecode-hello-world-9.jpg)
+ [![](http://idiotsky.top/images/bytecode-hello-world-9.jpg)](http://idiotsky.top/images/bytecode-hello-world-9.jpg)
  第二个方法的属性长度为x037，转换为十进制为55个字节。两个方法之后紧跟着的是attribute_count和attributes：
-  [![](http://idiotsky.me/images/bytecode-hello-world-10.jpg)](http://idiotsky.me/images/bytecode-hello-world-10.jpg)
+  [![](http://idiotsky.top/images/bytecode-hello-world-10.jpg)](http://idiotsky.top/images/bytecode-hello-world-10.jpg)
 attribute_count（u2）:值为 00 01，即有一个属性。
 
 attribute_name_index（u2）：指向常量池中的第十二项。
@@ -287,7 +287,7 @@ class CustomVisitor extends ClassVisitor implements Opcodes {
 }
 ````
 运行结果如下：
-  [![](http://idiotsky.me/images/bytecode-hello-world-11.jpg)](http://idiotsky.me/images/bytecode-hello-world-11.jpg)
+  [![](http://idiotsky.top/images/bytecode-hello-world-11.jpg)](http://idiotsky.top/images/bytecode-hello-world-11.jpg)
 
 关于 ASM 4的操作在这就不细说了。有兴趣的朋友可以自己去研究一下，有机会，我也可以再后续的博文中跟大家分享。
 

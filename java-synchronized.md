@@ -259,7 +259,7 @@ public class SynchronizedDemo {
 }
 ````
 反编译结果：
-[![](http://idiotsky.me/images1/java-synchronized-1.jpg)](http://idiotsky.me/images1/java-synchronized-1.jpg)
+[![](http://idiotsky.top/images1/java-synchronized-1.jpg)](http://idiotsky.top/images1/java-synchronized-1.jpg)
 
 关于这两条指令的作用，我们直接参考JVM规范中描述：
 monitorenter ：
@@ -295,7 +295,7 @@ public class SynchronizedMethod {
 }
 ````
 反编译结果：
-[![](http://idiotsky.me/images1/java-synchronized-2.jpg)](http://idiotsky.me/images1/java-synchronized-2.jpg)
+[![](http://idiotsky.top/images1/java-synchronized-2.jpg)](http://idiotsky.top/images1/java-synchronized-2.jpg)
 
 从反编译的结果来看，方法的同步并没有通过指令monitorenter和monitorexit来完成（理论上其实也可以通过这两条指令来实现），不过相对于普通方法，其常量池中多了ACC\_SYNCHRONIZED标示符。JVM就是根据该标示符来实现方法的同步的：当方法调用时，调用指令将会检查方法的 ACC\_SYNCHRONIZED 访问标志是否被设置，如果设置了，执行线程将先获取monitor，获取成功之后才能执行方法体，方法执行完后再释放monitor。在方法执行期间，其他任何线程都无法再获得同一个monitor对象。 其实本质上没有区别，只是方法的同步是一种隐式的方式来实现，无需通过字节码来完成。
 
@@ -318,7 +318,7 @@ Synchronized是通过对象内部的一个叫做监视器锁（monitor）来实�
 
 # 轻量级锁 
 锁的状态总共有四种：无锁状态、偏向锁、轻量级锁和重量级锁。随着锁的竞争，锁可以从偏向锁升级到轻量级锁，再升级的重量级锁（但是锁的升级是单向的，也就是说只能从低到高升级，不会出现锁的降级）。JDK 1.6中默认是开启偏向锁和轻量级锁的，我们也可以通过-XX:-UseBiasedLocking来禁用偏向锁。锁的状态保存在对象的头文件中，以32位的JDK为例：
-[![](http://idiotsky.me/images1/java-synchronized-3.png)](http://idiotsky.me/images1/java-synchronized-3.png)
+[![](http://idiotsky.top/images1/java-synchronized-3.png)](http://idiotsky.top/images1/java-synchronized-3.png)
 
 “轻量级”是相对于使用操作系统互斥量来实现的传统锁而言的。但是，首先需要强调一点的是，轻量级锁并不是用来代替重量级锁的，它的本意是在没有多线程竞争的前提下，减少传统的重量级锁使用产生的性能消耗。在解释轻量级锁的执行过程之前，先明白一点，轻量级锁所适应的场景是线程交替执行同步块的情况，如果存在同一时间访问同一锁的情况，就会导致轻量级锁膨胀为重量级锁。
 
@@ -329,11 +329,11 @@ Synchronized是通过对象内部的一个叫做监视器锁（monitor）来实�
 4. 如果这个更新动作成功了，那么这个线程就拥有了该对象的锁，并且对象Mark Word的锁标志位设置为“00”，即表示此对象处于轻量级锁定状态，这时候线程堆栈与对象头的状态如图2.2所示。
 5. 如果这个更新操作失败了，虚拟机首先会检查对象的Mark Word是否指向当前线程的栈帧，如果是就说明当前线程已经拥有了这个对象的锁，那就可以直接进入同步块继续执行。否则说明多个线程竞争锁，轻量级锁就要膨胀为重量级锁，锁标志的状态值变为“10”，Mark Word中存储的就是指向重量级锁（互斥量）的指针，后面等待锁的线程也要进入阻塞状态。 而当前线程便尝试使用自旋来获取锁，自旋就是为了不让线程阻塞，而采用循环去获取锁的过程。
 
-[![](http://idiotsky.me/images1/java-synchronized-4.jpg)](http://idiotsky.me/images1/java-synchronized-4.jpg)
+[![](http://idiotsky.top/images1/java-synchronized-4.jpg)](http://idiotsky.top/images1/java-synchronized-4.jpg)
 
 图2.1 轻量级锁CAS操作之前堆栈与对象的状态
 
-[![](http://idiotsky.me/images1/java-synchronized-5.jpg)](http://idiotsky.me/images1/java-synchronized-5.jpg)
+[![](http://idiotsky.top/images1/java-synchronized-5.jpg)](http://idiotsky.top/images1/java-synchronized-5.jpg)
 
 图2.2 轻量级锁CAS操作之后堆栈与对象的状态
 
@@ -355,7 +355,7 @@ Synchronized是通过对象内部的一个叫做监视器锁（monitor）来实�
 偏向锁的撤销在上述第四步骤中有提到。偏向锁只有遇到其他线程尝试竞争偏向锁时，持有偏向锁的线程才会释放锁，线程不会主动去释放偏向锁。偏向锁的撤销，需要等待全局安全点（在这个时间点上没有字节码正在执行），它会首先暂停拥有偏向锁的线程，判断锁对象是否处于被锁定状态，撤销偏向锁后恢复到未锁定（标志位为“01”）或轻量级锁（标志位为“00”）的状态。
 
 # 重量级锁、轻量级锁和偏向锁之间转换
-[![](http://idiotsky.me/images1/java-synchronized-6.jpg)](http://idiotsky.me/images1/java-synchronized-6.jpg)
+[![](http://idiotsky.top/images1/java-synchronized-6.jpg)](http://idiotsky.top/images1/java-synchronized-6.jpg)
 
 图 2.3三者的转换图
 该图主要是对上述内容的总结，如果对上述内容有较好的了解的话，该图应该很容易看懂。
@@ -408,7 +408,7 @@ public class SynchronizedTest02 {
 }
 ````
 虽然StringBuffer的append是一个同步方法，但是这段程序中的StringBuffer属于一个局部变量，并且不会从该方法中逃逸出去，所以其实这过程是线程安全的，可以将锁消除。下面是我本地执行的结果：
-[![](http://idiotsky.me/images1/java-synchronized-7.jpg)](http://idiotsky.me/images1/java-synchronized-7.jpg)
+[![](http://idiotsky.top/images1/java-synchronized-7.jpg)](http://idiotsky.top/images1/java-synchronized-7.jpg)
 
 为了尽量减少其他因素的影响，这里禁用了偏向锁（-XX:-UseBiasedLocking）。通过上面程序，可以看出消除锁以后性能还是有比较大提升的。
 注：可能JDK各个版本之间执行的结果不尽相同，我这里采用的JDK版本为1.6。
@@ -424,7 +424,7 @@ public class SynchronizedTest02 {
 
 # 再次总结
 
-[![](http://idiotsky.me/images2/java-synchronized-8.jpg)](http://idiotsky.me/images2/java-synchronized-8.jpg)
+[![](http://idiotsky.top/images2/java-synchronized-8.jpg)](http://idiotsky.top/images2/java-synchronized-8.jpg)
 
 偏向所锁，轻量级锁都是乐观锁，重量级锁是悲观锁。
 一个对象刚开始实例化的时候，没有任何线程来访问它的时候。它是可偏向的，意味着，它现在认为只可能有一个线程来访问它，所以当第一个

@@ -70,7 +70,7 @@ _start:
 > 中央处理单元（CPU）是计算机中的硬件，它读取计算机程序中的指令，完成系统中基本的算术、逻辑、输入/输出操作。
 
 好了，CPU 完成一些操作，例如算术操作等，但是它从哪获得操作的数据呢？第一个答案是内存。然而从内存中读取和存入数据的速度远远低于处理器的速度，它涉及到复杂的通过控制总线来发送数据请求的过程。因此，CPU 有其内部的存储位置，称为寄存器（register）。
-[![](http://idiotsky.me/images1/asm-learning-road-1-1.png)](http://idiotsky.me/images1/asm-learning-road-1-1.png)
+[![](http://idiotsky.top/images1/asm-learning-road-1-1.png)](http://idiotsky.top/images1/asm-learning-road-1-1.png)
 那么我们写 mov rax, 1，意思是将 1 放到 rax 寄存器中。现在我们知道什么是 rax、rdi、rbx 等等了吧，但是还需要知道什么时候使用 rax，什么时候使用 rsi 等等。
 * rax —— 临时寄存器，当我们调用系统调用时，rax 保存系统调用号
 * rdx —— 用来向函数传递第三个参数

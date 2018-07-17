@@ -127,10 +127,10 @@ for range s  // iterates zero times
 s[i]  // panic: index out of range
 ````
 一个为nil的slice，除了不能索引外，其他的操作都是可以的，当你需要填充值的时候可以使用append函数，slice会自动进行扩充。那么为nil的slice的底层结构是怎样的呢？根据官方的文档，slice有三个元素，分别是长度、容量、指向数组的指针：
-[![](http://idiotsky.me/images2/go-nil.png)](http://idiotsky.me/images2/go-nil.png)
+[![](http://idiotsky.top/images2/go-nil.png)](http://idiotsky.top/images2/go-nil.png)
 
 当有元素的时候：
-[![](http://idiotsky.me/images2/go-nil-1.png)](http://idiotsky.me/images2/go-nil-1.png)
+[![](http://idiotsky.top/images2/go-nil-1.png)](http://idiotsky.top/images2/go-nil-1.png)
 
 所以我们并不需要担心slice的大小，使用append的话slice会自动扩容。
 

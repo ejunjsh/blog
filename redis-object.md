@@ -206,7 +206,7 @@ OK
 redis> OBJECT ENCODING number
 "int"
 ````
-[![](http://idiotsky.me/images1/redis-object-1.png)](http://idiotsky.me/images1/redis-object-1.png)
+[![](http://idiotsky.top/images1/redis-object-1.png)](http://idiotsky.top/images1/redis-object-1.png)
 如果字符串对象保存的是一个字符串值， 并且这个字符串值的长度大于 39 字节， 那么字符串对象将使用一个简单动态字符串（SDS）来保存这个字符串值， 并将对象的编码设置为 raw 。
 
 举个例子， 如果我们执行以下命令， 那么服务器将创建一个如图 8-2 所示的 raw 编码的字符串对象作为 story 键的值：
@@ -220,11 +220,11 @@ redis> STRLEN story
 redis> OBJECT ENCODING story
 "raw"
 ````
-[![](http://idiotsky.me/images1/redis-object-2.png)](http://idiotsky.me/images1/redis-object-2.png)
+[![](http://idiotsky.top/images1/redis-object-2.png)](http://idiotsky.top/images1/redis-object-2.png)
 如果字符串对象保存的是一个字符串值， 并且这个字符串值的长度小于等于 39 字节， 那么字符串对象将使用 embstr 编码的方式来保存这个字符串值。
 
 embstr 编码是专门用于保存短字符串的一种优化编码方式， 这种编码和 raw 编码一样， 都使用 redisObject 结构和 sdshdr 结构来表示字符串对象， 但 raw 编码会调用两次内存分配函数来分别创建 redisObject 结构和 sdshdr 结构， 而 embstr 编码则通过调用一次内存分配函数来分配一块连续的空间， 空间中依次包含 redisObject 和 sdshdr 两个结构， 如图 8-3 所示。
-[![](http://idiotsky.me/images1/redis-object-3.png)](http://idiotsky.me/images1/redis-object-3.png)
+[![](http://idiotsky.top/images1/redis-object-3.png)](http://idiotsky.top/images1/redis-object-3.png)
 embstr 编码的字符串对象在执行命令时， 产生的效果和 raw 编码的字符串对象执行命令时产生的效果是相同的， 但使用 embstr 编码的字符串对象来保存短字符串值有以下好处：
 
 embstr 编码将创建字符串对象所需的内存分配次数从 raw 编码的两次降低为一次。
@@ -238,7 +238,7 @@ OK
 redis> OBJECT ENCODING msg
 "embstr"
 ````
-[![](http://idiotsky.me/images1/redis-object-4.png)](http://idiotsky.me/images1/redis-object-4.png)
+[![](http://idiotsky.top/images1/redis-object-4.png)](http://idiotsky.top/images1/redis-object-4.png)
 最后要说的是， 可以用 long double 类型表示的浮点数在 Redis 中也是作为字符串值来保存的： 如果我们要保存一个浮点数到字符串对象里面， 那么程序会先将这个浮点数转换成字符串值， 然后再保存起转换所得的字符串值。
 
 举个例子， 执行以下代码将创建一个包含 3.14 的字符串表示 "3.14" 的字符串对象：
@@ -319,11 +319,11 @@ redis> RPUSH numbers 1 "three" 5
 (integer) 3
 ````
 如果 numbers 键的值对象使用的是 ziplist 编码， 这个这个值对象将会是图 8-5 所展示的样子。
-[![](http://idiotsky.me/images1/redis-object-5.png)](http://idiotsky.me/images1/redis-object-5.png)
+[![](http://idiotsky.top/images1/redis-object-5.png)](http://idiotsky.top/images1/redis-object-5.png)
 另一方面， linkedlist 编码的列表对象使用双端链表作为底层实现， 每个双端链表节点（node）都保存了一个字符串对象， 而每个字符串对象都保存了一个列表元素。
 
 举个例子， 如果前面所说的 numbers 键创建的列表对象使用的不是 ziplist 编码， 而是 linkedlist 编码， 那么 numbers 键的值对象将是图 8-6 所示的样子。
-[![](http://idiotsky.me/images1/redis-object-6.png)](http://idiotsky.me/images1/redis-object-6.png)
+[![](http://idiotsky.top/images1/redis-object-6.png)](http://idiotsky.top/images1/redis-object-6.png)
 注意， linkedlist 编码的列表对象在底层的双端链表结构中包含了多个字符串对象， 这种嵌套字符串对象的行为在稍后介绍的哈希对象、集合对象和有序集合对象中都会出现， 字符串对象是 Redis 五种类型的对象中唯一一种会被其他四种类型对象嵌套的对象。
 
 ## 编码转换
@@ -395,15 +395,15 @@ redis> HSET profile career "Programmer"
 (integer) 1
 ````
 如果 profile 键的值对象使用的是 ziplist 编码， 那么这个值对象将会是图 8-9 所示的样子， 其中对象所使用的压缩列表如图 8-10 所示。
-[![](http://idiotsky.me/images1/redis-object-9.png)](http://idiotsky.me/images1/redis-object-9.png)
-[![](http://idiotsky.me/images1/redis-object-10.png)](http://idiotsky.me/images1/redis-object-10.png)
+[![](http://idiotsky.top/images1/redis-object-9.png)](http://idiotsky.top/images1/redis-object-9.png)
+[![](http://idiotsky.top/images1/redis-object-10.png)](http://idiotsky.top/images1/redis-object-10.png)
 
 另一方面， hashtable 编码的哈希对象使用字典作为底层实现， 哈希对象中的每个键值对都使用一个字典键值对来保存：
 * 字典的每个键都是一个字符串对象， 对象中保存了键值对的键；
 * 字典的每个值都是一个字符串对象， 对象中保存了键值对的值。
 
 举个例子， 如果前面 profile 键创建的不是 ziplist 编码的哈希对象， 而是 hashtable 编码的哈希对象， 那么这个哈希对象应该会是图 8-11 所示的样子。
-[![](http://idiotsky.me/images1/redis-object-11.png)](http://idiotsky.me/images1/redis-object-11.png)
+[![](http://idiotsky.top/images1/redis-object-11.png)](http://idiotsky.top/images1/redis-object-11.png)
 
 ## 编码转换
 当哈希对象可以同时满足以下两个条件时， 哈希对象使用 ziplist 编码：
@@ -485,7 +485,7 @@ intset 编码的集合对象使用整数集合作为底层实现， 集合对象
 redis> SADD numbers 1 3 5
 (integer) 3
 ````
-[![](http://idiotsky.me/images1/redis-object-12.png)](http://idiotsky.me/images1/redis-object-12.png)
+[![](http://idiotsky.top/images1/redis-object-12.png)](http://idiotsky.top/images1/redis-object-12.png)
 另一方面， hashtable 编码的集合对象使用字典作为底层实现， 字典的每个键都是一个字符串对象， 每个字符串对象包含了一个集合元素， 而字典的值则全部被设置为 NULL 。
 
 举个例子， 以下代码将创建一个如图 8-13 所示的 hashtable 编码集合对象：
@@ -493,7 +493,7 @@ redis> SADD numbers 1 3 5
 redis> SADD fruits "apple" "banana" "cherry"
 (integer) 3
 ````
-[![](http://idiotsky.me/images1/redis-object-13.png)](http://idiotsky.me/images1/redis-object-13.png)
+[![](http://idiotsky.top/images1/redis-object-13.png)](http://idiotsky.top/images1/redis-object-13.png)
 
 ## 编码的转换
 当集合对象可以同时满足以下两个条件时， 对象使用 intset 编码：
@@ -559,8 +559,8 @@ redis> ZADD price 8.5 apple 5.0 banana 6.0 cherry
 (integer) 3
 ````
 如果 price 键的值对象使用的是 ziplist 编码， 那么这个值对象将会是图 8-14 所示的样子， 而对象所使用的压缩列表则会是 8-15 所示的样子。
-[![](http://idiotsky.me/images1/redis-object-14.png)](http://idiotsky.me/images1/redis-object-14.png)
-[![](http://idiotsky.me/images1/redis-object-15.png)](http://idiotsky.me/images1/redis-object-15.png)
+[![](http://idiotsky.top/images1/redis-object-14.png)](http://idiotsky.top/images1/redis-object-14.png)
+[![](http://idiotsky.top/images1/redis-object-15.png)](http://idiotsky.top/images1/redis-object-15.png)
 skiplist 编码的有序集合对象使用 zset 结构作为底层实现， 一个 zset 结构同时包含一个字典和一个跳跃表：
 ````c
 typedef struct zset {
@@ -587,8 +587,8 @@ zset 结构中的 zsl 跳跃表按分值从小到大保存了所有集合元素�
 >因为以上原因， 为了让有序集合的查找和范围型操作都尽可能快地执行， Redis 选择了同时使用字典和跳跃表两种数据结构来实现有序集合。
 
 举个例子， 如果前面 price 键创建的不是 ziplist 编码的有序集合对象， 而是 skiplist 编码的有序集合对象， 那么这个有序集合对象将会是图 8-16 所示的样子， 而对象所使用的 zset 结构将会是图 8-17 所示的样子。
-[![](http://idiotsky.me/images1/redis-object-16.png)](http://idiotsky.me/images1/redis-object-16.png)
-[![](http://idiotsky.me/images1/redis-object-17.png)](http://idiotsky.me/images1/redis-object-17.png)
+[![](http://idiotsky.top/images1/redis-object-16.png)](http://idiotsky.top/images1/redis-object-16.png)
+[![](http://idiotsky.top/images1/redis-object-17.png)](http://idiotsky.top/images1/redis-object-17.png)
 
 >__注意__
 >为了展示方便， 图 8-17 在字典和跳跃表中重复展示了各个元素的成员和分值， 但在实际中， 字典和跳跃表会共享元素的成员和分值， 所以并不会造成任何数据重复， 也不会因此而浪费任何内存。

@@ -10,11 +10,11 @@ categories: java
 # Java内存分配机制
 Java内存分配和回收的机制概括的说，就是：分代分配，分代回收。对象将根据存活的时间被分为：年轻代（Young Generation）、年老代（Old Generation）、永久代（Permanent Generation，也就是方法区）。
 如下图
-[![](http://idiotsky.me/images/java-memory-gc.png)](http://idiotsky.me/images/java-memory-gc.png)
+[![](http://idiotsky.top/images/java-memory-gc.png)](http://idiotsky.top/images/java-memory-gc.png)
 ## 年轻代（Young Generation）
 对象被创建时，内存的分配首先发生在年轻代（大对象可以直接 被创建在年老代），大部分的对象在创建后很快就不再使用，因此很快变得不可达，于是被年轻代的GC机制清理掉（IBM的研究表明，98%的对象都是很快消 亡的），这个GC机制被称为Minor GC或叫Young GC。注意，Minor GC并不代表年轻代内存不足，它事实上只表示在Eden区上的GC。
 年轻代上的内存分配是这样的，年轻代可以分为3个区域：Eden区和两个存活区（Survivor 0 、Survivor 1）。内存分配过程如下图
-[![](http://idiotsky.me/images/java-memory-gc-1.png)](http://idiotsky.me/images/java-memory-gc-1.png)
+[![](http://idiotsky.top/images/java-memory-gc-1.png)](http://idiotsky.top/images/java-memory-gc-1.png)
 
 * 绝大多数刚创建的对象会被分配在Eden区，其中的大多数对象很快就会消亡。Eden区是连续的内存空间，因此在其上分配内存极快；
 * 当Eden区满的时候，执行Minor GC，将消亡的对象清理掉，并将剩余的对象复制到一个存活区Survivor0（此时，Survivor1是空白的，两个Survivor总有一个是空白的）；
@@ -57,7 +57,7 @@ GC机制的基本算法是：分代收集，这个不用赘述。下面阐述每
 
 # 垃圾收集器
 在GC机制中，起重要作用的是垃圾收集器，垃圾收集器是GC的具体实现，Java虚拟机规范中对于垃圾收集器没有任何规定，所以不同厂商实现的垃圾 收集器各不相同，HotSpot 1.6版使用的垃圾收集器如下图（图来源于《深入理解Java虚拟机：JVM高级特效与最佳实现》，图中两个收集器之间有连线，说明它们可以配合使用）：
-[![](http://idiotsky.me/images/java-memory-gc-2.jpg)](http://idiotsky.me/images/java-memory-gc-2.jpg)
+[![](http://idiotsky.top/images/java-memory-gc-2.jpg)](http://idiotsky.top/images/java-memory-gc-2.jpg)
 **在介绍垃圾收集器之前，需要明确一点，就是在新生代采用的停止复制算法中，“停 止（Stop-the-world）”的意义是在回收内存时，需要暂停其他所 有线程的执行。这个是很低效的，现在的各种新生代收集器越来越优化这一点，但仍然只是将停止的时间变短，并未彻底取消停止。**
 * Serial收集器：新生代收集器，使用停止复制算法，使用一个线程进行GC，其它工作线程暂停。使用-XX:+UseSerialGC可以使用Serial+Serial Old模式运行进行内存回收（这也是虚拟机在Client模式下运行的默认值）
 * ParNew收集器：新生代收集器，使用停止复制算法，Serial收集器的多线程版，用多个线程进行GC，其它工作线程暂停，关注缩短垃圾收集时间。使用-XX:+UseParNewGC开关来控制使用ParNew+Serial Old收集器组合收集内存；使用-XX:ParallelGCThreads来设置执行内存回收的线程数。

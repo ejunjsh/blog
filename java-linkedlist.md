@@ -315,7 +315,7 @@ public Object[] toArray() {
 ````
 
 # listIterator方法
-这个方法返回的是一个内部类ListIterator，用户可以使用这个内部类变量遍历当前的链表元素，但是由于LinkedList也是非线程安全的类，所以和上一篇文章中的[java数据结构-arraylist](http://idiotsky.me/2017/07/16/java-arraylist/)  Iterator一样，多线程下面使用，也可能会产生多线程修改的异常。
+这个方法返回的是一个内部类ListIterator，用户可以使用这个内部类变量遍历当前的链表元素，但是由于LinkedList也是非线程安全的类，所以和上一篇文章中的[java数据结构-arraylist](http://idiotsky.top/2017/07/16/java-arraylist/)  Iterator一样，多线程下面使用，也可能会产生多线程修改的异常。
 ````java
 public ListIterator<E> listIterator(int index) {  
     checkPositionIndex(index);  

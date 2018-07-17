@@ -231,25 +231,25 @@ RFC2045，“ MIME: Format of Internet Message Bodies”（“ MIME：因特网�
 
 # HTTP 报文结构
 
-[![](http://idiotsky.me/images3/http-summary-1.png)](http://idiotsky.me/images3/http-summary-1.png)
+[![](http://idiotsky.top/images3/http-summary-1.png)](http://idiotsky.top/images3/http-summary-1.png)
 
 
-[![](http://idiotsky.me/images3/http-summary-2.png)](http://idiotsky.me/images3/http-summary-2.png)
+[![](http://idiotsky.top/images3/http-summary-2.png)](http://idiotsky.top/images3/http-summary-2.png)
 
 
-[![](http://idiotsky.me/images3/http-summary-3.png)](http://idiotsky.me/images3/http-summary-3.png)
+[![](http://idiotsky.top/images3/http-summary-3.png)](http://idiotsky.top/images3/http-summary-3.png)
 
-[![](http://idiotsky.me/images3/http-summary-4.png)](http://idiotsky.me/images3/http-summary-4.png)
+[![](http://idiotsky.top/images3/http-summary-4.png)](http://idiotsky.top/images3/http-summary-4.png)
 
 
 Response Headers:
 
-[![](http://idiotsky.me/images3/http-summary-5.png)](http://idiotsky.me/images3/http-summary-5.png)
+[![](http://idiotsky.top/images3/http-summary-5.png)](http://idiotsky.top/images3/http-summary-5.png)
 
 
 Request Headers:
 
-[![](http://idiotsky.me/images3/http-summary-6.png)](http://idiotsky.me/images3/http-summary-6.png)
+[![](http://idiotsky.top/images3/http-summary-6.png)](http://idiotsky.top/images3/http-summary-6.png)
 
 
 请求报文是由请求方法，请求 URI，协议版本，可选请求首部字段和内容实体构成的。
@@ -264,7 +264,7 @@ Request Headers:
 
 在客户端第一次请求数据时，此时缓存数据库中没有对应的缓存数据，需要请求服务器，服务器返回后，将数据存储至缓存数据库中。
 
-[![](http://idiotsky.me/images3/http-summary-21.png)](http://idiotsky.me/images3/http-summary-21.png)
+[![](http://idiotsky.top/images3/http-summary-21.png)](http://idiotsky.top/images3/http-summary-21.png)
 
 HTTP缓存有多种规则，根据是否需要重新向服务器发起请求来分类，我将其分为两大类(**强制缓存，对比缓存**)
 
@@ -272,11 +272,11 @@ HTTP缓存有多种规则，根据是否需要重新向服务器发起请求来�
 
 已存在缓存数据时，仅基于强制缓存，请求数据的流程如下
 
-[![](http://idiotsky.me/images3/http-summary-22.png)](http://idiotsky.me/images3/http-summary-22.png)
+[![](http://idiotsky.top/images3/http-summary-22.png)](http://idiotsky.top/images3/http-summary-22.png)
 
 已存在缓存数据时，仅基于对比缓存，请求数据的流程如下
 
-[![](http://idiotsky.me/images3/http-summary-23.png)](http://idiotsky.me/images3/http-summary-23.png)
+[![](http://idiotsky.top/images3/http-summary-23.png)](http://idiotsky.top/images3/http-summary-23.png)
 
 对缓存机制不太了解的同学可能会问，基于对比缓存的流程下，不管是否使用缓存，都需要向服务器发送请求，那么还用缓存干什么？
 
@@ -296,7 +296,7 @@ HTTP缓存有多种规则，根据是否需要重新向服务器发起请求来�
 
 使用chrome的开发者工具，可以很明显的看到对于强制缓存生效时，网络请求的情况
 
-[![](http://idiotsky.me/images3/http-summary-24.png)](http://idiotsky.me/images3/http-summary-24.png)
+[![](http://idiotsky.top/images3/http-summary-24.png)](http://idiotsky.top/images3/http-summary-24.png)
 
 ### Expires
 Expires的值为服务端返回的到期时间，即下一次请求时，请求时间小于服务端返回的到期时间，直接使用缓存数据。
@@ -317,7 +317,7 @@ Cache-Control 是最重要的规则。常见的取值有private、public、no-ca
 
 举个板栗
 
-[![](http://idiotsky.me/images3/http-summary-25.png)](http://idiotsky.me/images3/http-summary-25.png)
+[![](http://idiotsky.top/images3/http-summary-25.png)](http://idiotsky.top/images3/http-summary-25.png)
 
 图中Cache-Control仅指定了max-age，所以默认为private，缓存时间为31536000秒（365天）
 
@@ -333,11 +333,11 @@ Cache-Control 是最重要的规则。常见的取值有private、public、no-ca
 
 第一次访问：
 
-[![](http://idiotsky.me/images3/http-summary-26.png)](http://idiotsky.me/images3/http-summary-26.png)
+[![](http://idiotsky.top/images3/http-summary-26.png)](http://idiotsky.top/images3/http-summary-26.png)
 
 再次访问：
 
-[![](http://idiotsky.me/images3/http-summary-27.png)](http://idiotsky.me/images3/http-summary-27.png)
+[![](http://idiotsky.top/images3/http-summary-27.png)](http://idiotsky.top/images3/http-summary-27.png)
 
 通过两图的对比，我们可以很清楚的发现，在对比缓存生效时，状态码为304，并且报文大小和请求时间大大减少。
 
@@ -353,7 +353,7 @@ Last-Modified：
 
 服务器在响应请求时，告诉浏览器资源的最后修改时间。
 
-[![](http://idiotsky.me/images3/http-summary-28.png)](http://idiotsky.me/images3/http-summary-28.png)
+[![](http://idiotsky.top/images3/http-summary-28.png)](http://idiotsky.top/images3/http-summary-28.png)
 
 If-Modified-Since：
 
@@ -365,7 +365,7 @@ If-Modified-Since：
 
 若资源的最后修改时间小于或等于If-Modified-Since，说明资源无新修改，则响应HTTP 304，告知浏览器继续使用所保存的cache。
 
-[![](http://idiotsky.me/images3/http-summary-29.png)](http://idiotsky.me/images3/http-summary-29.png)
+[![](http://idiotsky.top/images3/http-summary-29.png)](http://idiotsky.top/images3/http-summary-29.png)
 
 ### Etag  /  If-None-Match
 
@@ -375,7 +375,7 @@ Etag：
 
 服务器响应请求时，告诉浏览器当前资源在服务器的唯一标识（生成规则由服务器决定）。
 
-[![](http://idiotsky.me/images3/http-summary-30.png)](http://idiotsky.me/images3/http-summary-30.png)
+[![](http://idiotsky.top/images3/http-summary-30.png)](http://idiotsky.top/images3/http-summary-30.png)
 
 If-None-Match：
 
@@ -387,7 +387,7 @@ If-None-Match：
 
 相同，说明资源无新修改，则响应HTTP 304，告知浏览器继续使用所保存的cache。
 
-[![](http://idiotsky.me/images3/http-summary-31.png)](http://idiotsky.me/images3/http-summary-31.png)
+[![](http://idiotsky.top/images3/http-summary-31.png)](http://idiotsky.top/images3/http-summary-31.png)
 
 ## 小结
 
@@ -397,15 +397,15 @@ If-None-Match：
 
 浏览器第一次请求：
 
-[![](http://idiotsky.me/images3/http-summary-32.png)](http://idiotsky.me/images3/http-summary-32.png)
+[![](http://idiotsky.top/images3/http-summary-32.png)](http://idiotsky.top/images3/http-summary-32.png)
 
 浏览器再次请求时：
 
-[![](http://idiotsky.me/images3/http-summary-9.png)](http://idiotsky.me/images3/http-summary-9.png)
+[![](http://idiotsky.top/images3/http-summary-9.png)](http://idiotsky.top/images3/http-summary-9.png)
 
 还有一张图总结下：
 
-[![](http://idiotsky.me/images3/http-summary-33.jpg)](http://idiotsky.me/images3/http-summary-33.jpg)
+[![](http://idiotsky.top/images3/http-summary-33.jpg)](http://idiotsky.top/images3/http-summary-33.jpg)
 
 
 # 请求首部
@@ -1331,7 +1331,7 @@ bool withdraw(account_id, amount)
 
 withdraw的语义是从account_id对应的账户中扣除amount数额的钱；如果扣除成功则返回true，账户余额减少amount；如果扣除失败则返回false，账户余额不变。值得注意的是：和本地环境相比，我们不能轻易假设分布式环境的可靠性。一种典型的情况是withdraw请求已经被服务器端正确处理，但服务器端的返回结果由于网络等原因被掉丢了，导致客户端无法得知处理结果。如果是在网页上，一些不恰当的设计可能会使用户认为上一次操作失败了，然后刷新页面，这就导致了withdraw被调用两次，账户也被多扣了一次钱。如下图所示：
 
-[![](http://idiotsky.me/images3/http-summary-50.png)](http://idiotsky.me/images3/http-summary-50.png)
+[![](http://idiotsky.top/images3/http-summary-50.png)](http://idiotsky.top/images3/http-summary-50.png)
 
 这个问题的解决方案一是采用分布式事务，通过引入支持分布式事务的中间件来保证withdraw功能的事务性。分布式事务的优点是对于调用者很简单，复杂性都交给了中间件来管理。缺点则是一方面架构太重量级，容易被绑在特定的中间件上，不利于异构系统的集成；另一方面分布式事务虽然能保证事务的ACID性质，而但却无法提供性能和可用性的保证。
 
@@ -1343,7 +1343,7 @@ create_ticket的语义是获取一个服务器端生成的唯一的处理号tick
 
 基于幂等性的解决方案中一个完整的取钱流程被分解成了两个步骤：1.调用create_ticket()获取ticket_id；2.调用idempotent_withdraw(ticket_id, account_id, amount)。虽然create_ticket不是幂等的，但在这种设计下，它对系统状态的影响可以忽略，加上idempotent_withdraw是幂等的，所以任何一步由于网络等原因失败或超时，客户端都可以重试，直到获得结果。如下图所示：
 
-[![](http://idiotsky.me/images3/http-summary-51.png)](http://idiotsky.me/images3/http-summary-51.png)
+[![](http://idiotsky.top/images3/http-summary-51.png)](http://idiotsky.top/images3/http-summary-51.png)
 
 ## HTTP的幂等性
 

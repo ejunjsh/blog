@@ -31,37 +31,37 @@ public static int binarySearch(Integer[] srcArray, int des) {
     return -1;
 }
 ````
-[![](http://idiotsky.me/images1/java-treemap.jpg)](http://idiotsky.me/images1/java-treemap.jpg)
+[![](http://idiotsky.top/images1/java-treemap.jpg)](http://idiotsky.top/images1/java-treemap.jpg)
 
 # 二叉树
 在计算机科学中，二叉树是每个节点最多有两个子树的树结构。通常子树被称作“左子树”（left subtree）和“右子树”（right subtree）。二叉树常被用于实现二叉查找树，平衡树，红黑树和二叉堆。二叉树的度就是分支的数目。没有分叉的二叉树节点的度就是0度。如果一个节点只有一个分叉就是1度。两个分叉就是2度的子树。
-[![](http://idiotsky.me/images1/java-treemap-1.png)](http://idiotsky.me/images1/java-treemap-1.png)
+[![](http://idiotsky.top/images1/java-treemap-1.png)](http://idiotsky.top/images1/java-treemap-1.png)
 
 ## 斜树
 * 左斜树：所有结点都只有左子树的二叉树；
 * 右斜树：所有结点都只有右子树的二叉树；
 * 其实在业务逻辑中如果真有这样的需求，那直接使用`线性表`就可以了；
-[![](http://idiotsky.me/images1/java-treemap-2.png)](http://idiotsky.me/images1/java-treemap-2.png)
+[![](http://idiotsky.top/images1/java-treemap-2.png)](http://idiotsky.top/images1/java-treemap-2.png)
 
 ## 满二叉树
 * 所有分支结点的度为２；
 * 所有叶子结点只能分布在最下层上；
 * 同样深度的二叉树中，满二叉树的结点数最多，叶子结点数最多；
-[![](http://idiotsky.me/images1/java-treemap-3.png)](http://idiotsky.me/images1/java-treemap-3.png)
+[![](http://idiotsky.top/images1/java-treemap-3.png)](http://idiotsky.top/images1/java-treemap-3.png)
 
 ## 完全二叉树
 * 二叉树从根结点出发，按着层次从左到右遍历，第i个结点的位置与满二叉树中对应结点位置完全相同；
 * 所有叶子结点只能出现在最下两层；
 * 若结点度为1，则该结点只有左子树，不存在只有右子树的情况；
 * 结点分配`先左后右`；
-[![](http://idiotsky.me/images1/java-treemap-4.png)](http://idiotsky.me/images1/java-treemap-4.png)
+[![](http://idiotsky.top/images1/java-treemap-4.png)](http://idiotsky.top/images1/java-treemap-4.png)
 
 ## 二叉树的遍历
 * 前序：先访问根结点 -> 遍历左子树 -> 遍历右子树；先访问根结点
 * 中序：遍历左子树 -> 访问根结点 -> 遍历右子树；中间访问根结点
 * 后序：遍历左子树 -> 遍历右子树 -> 后访问根结点；后访问根结点
 * 层序：自上而下，从左到右逐层访问结点；
-[![](http://idiotsky.me/images1/java-treemap-5.png)](http://idiotsky.me/images1/java-treemap-5.png)
+[![](http://idiotsky.top/images1/java-treemap-5.png)](http://idiotsky.top/images1/java-treemap-5.png)
 
 # 二叉查找树
 二叉查找树（Binary Search Tree），也称有序二叉树（ordered binary tree）,排序二叉树（sorted binary tree），是指一棵空树或者具有下列性质的二叉树：
@@ -71,28 +71,28 @@ public static int binarySearch(Integer[] srcArray, int des) {
 4. 没有键值相等的节点（no duplicate nodes）。
 
 如下一个二叉树
-[![](http://idiotsky.me/images1/java-treemap-6.png)](http://idiotsky.me/images1/java-treemap-6.png)
+[![](http://idiotsky.top/images1/java-treemap-6.png)](http://idiotsky.top/images1/java-treemap-6.png)
 
 在此基础上，加上节点之间的大小关系，就是二叉查找树：
-[![](http://idiotsky.me/images1/java-treemap-7.png)](http://idiotsky.me/images1/java-treemap-7.png)
+[![](http://idiotsky.top/images1/java-treemap-7.png)](http://idiotsky.top/images1/java-treemap-7.png)
 
 ## 查找
 查找操作和二分查找类似，将key和节点的key比较，如果小于，那么就在Left Node节点查找,如果大于，则在Right Node节点查找，如果相等，直接返回Value。
-[![](http://idiotsky.me/images1/java-treemap-8.png)](http://idiotsky.me/images1/java-treemap-8.png)
+[![](http://idiotsky.top/images1/java-treemap-8.png)](http://idiotsky.top/images1/java-treemap-8.png)
 
 ## 插入
 插入和查找类似，首先查找有没有和key相同的，如果有，更新；如果没有找到，那么创建新的节点。
-[![](http://idiotsky.me/images1/java-treemap-9.png)](http://idiotsky.me/images1/java-treemap-9.png)
+[![](http://idiotsky.top/images1/java-treemap-9.png)](http://idiotsky.top/images1/java-treemap-9.png)
 
 下面是插入动画效果：
-[![](http://idiotsky.me/images1/java-treemap-10.gif)](http://idiotsky.me/images1/java-treemap-10.gif)
+[![](http://idiotsky.top/images1/java-treemap-10.gif)](http://idiotsky.top/images1/java-treemap-10.gif)
 
 随机插入形成树的动画如下，可以看到，插入的时候树还是能够保持近似平衡状态：
-[![](http://idiotsky.me/images1/java-treemap-11.gif)](http://idiotsky.me/images1/java-treemap-11.gif)
+[![](http://idiotsky.top/images1/java-treemap-11.gif)](http://idiotsky.top/images1/java-treemap-11.gif)
 
 ## 最大最小值
 如下图可以看出，二叉查找树的最大最小值是有规律的：
-[![](http://idiotsky.me/images1/java-treemap-12.png)](http://idiotsky.me/images1/java-treemap-12.png)
+[![](http://idiotsky.top/images1/java-treemap-12.png)](http://idiotsky.top/images1/java-treemap-12.png)
 
 从图中可以看出，二叉查找树中，最左和最右节点即为最小值和最大值
 
@@ -100,17 +100,17 @@ public static int binarySearch(Integer[] srcArray, int des) {
 删除元素操作在二叉树的操作中应该是比较复杂的。首先来看下比较简单的删除最大最小值得方法。
 
 以删除最小值为例，我们首先找到最小值，及最左边左子树为空的节点，然后返回其右子树作为新的左子树。操作示意图如下：
-[![](http://idiotsky.me/images1/java-treemap-13.png)](http://idiotsky.me/images1/java-treemap-13.png)
+[![](http://idiotsky.top/images1/java-treemap-13.png)](http://idiotsky.top/images1/java-treemap-13.png)
 
 删除最大值也是类似。
 
 现在来分析一般情况，假定我们要删除指定key的某一个节点。这个问题的难点在于：删除最大最小值的操作，删除的节点只有1个子节点或者没有子节点，这样比较简单。但是如果删除任意节点，就有可能出现删除的节点有0个，1 个，2个子节点的情况，现在来逐一分析。
 
 当删除的节点没有子节点时，直接将该父节点指向该节点的link设置为null。
-[![](http://idiotsky.me/images1/java-treemap-14.png)](http://idiotsky.me/images1/java-treemap-14.png)
+[![](http://idiotsky.top/images1/java-treemap-14.png)](http://idiotsky.top/images1/java-treemap-14.png)
 
 当删除的节点只有1个子节点时，将该子节点替换为要删除的节点即可。
-[![](http://idiotsky.me/images1/java-treemap-15.png)](http://idiotsky.me/images1/java-treemap-15.png)
+[![](http://idiotsky.top/images1/java-treemap-15.png)](http://idiotsky.top/images1/java-treemap-15.png)
 
 当删除的节点有2个子节点时，问题就变复杂了。
 
@@ -121,14 +121,14 @@ public static int binarySearch(Integer[] srcArray, int des) {
 4. 将x的做节点设置为t的左节点。
 
 整个过程如下图：
-[![](http://idiotsky.me/images1/java-treemap-16.png)](http://idiotsky.me/images1/java-treemap-16.png)
+[![](http://idiotsky.top/images1/java-treemap-16.png)](http://idiotsky.top/images1/java-treemap-16.png)
 
 随着删除的进行，二叉树会变得不太平衡，下面是动画演示。
-[![](http://idiotsky.me/images1/java-treemap-17.gif)](http://idiotsky.me/images1/java-treemap-17.gif)
+[![](http://idiotsky.top/images1/java-treemap-17.gif)](http://idiotsky.top/images1/java-treemap-17.gif)
 
 ## 分析
 二叉查找树的运行时间和树的形状有关，树的形状又和插入元素的顺序有关。在最好的情况下，节点完全平衡，从根节点到最底层叶子节点只有lgN个节点。在最差的情况下，根节点到最底层叶子节点会有N各节点。在一般情况下，树的形状和最好的情况接近。
-[![](http://idiotsky.me/images1/java-treemap-18.png)](http://idiotsky.me/images1/java-treemap-18.png)
+[![](http://idiotsky.top/images1/java-treemap-18.png)](http://idiotsky.top/images1/java-treemap-18.png)
 
 ## 小结
 它和二分查找一样，插入和查找的时间复杂度均为lgN，但是在最坏的情况下仍然会有N的时间复杂度。原因在于插入和删除元素的时候，树没有保持平衡。所以我们希望在最坏的情况也有较好的时间复杂度，那就要求树能够尽可能平衡，也就产生了2-3树和红黑树等平衡树。
@@ -147,48 +147,48 @@ public static int binarySearch(Integer[] srcArray, int des) {
 3. 对于3节点，该节点保存两个key及对应value，以及三个指向左中右的节点。左节点也是一个2-3节点，所有的值均比两个key中的最小的key还要小；中间节点也是一个2-3节点，中间节点的key值在两个跟节点key值之间；右节点也是一个2-3节点，节点的所有key值比两个key中的最大的key还要大。
 
 如果中序遍历2-3查找树，就可以得到排好序的序列。在一个完全平衡的2-3查找树中，根节点到每一个为空节点的距离都相同。
-[![](http://idiotsky.me/images2/java-treemap-19.png)](http://idiotsky.me/images2/java-treemap-19.png)
+[![](http://idiotsky.top/images2/java-treemap-19.png)](http://idiotsky.top/images2/java-treemap-19.png)
 
 ## 查找
 在进行2-3树的平衡之前，我们先假设已经处于平衡状态，我们先看基本的查找操作。
 
 2-3树的查找和二叉查找树类似，我们首先和其跟节点进行比较，如果相等，则查找成功；否则根据比较的条件，在其左中右子树中递归查找，如果找到的节点为空，则未找到，否则返回。查找过程如下图：
-[![](http://idiotsky.me/images2/java-treemap-20.png)](http://idiotsky.me/images2/java-treemap-20.png)
+[![](http://idiotsky.top/images2/java-treemap-20.png)](http://idiotsky.top/images2/java-treemap-20.png)
 
 ## 插入
 ### 往一个2-node节点插入
 往2-3树中插入元素和往二叉查找树中插入元素一样，首先要进行查找，然后将节点挂到未找到的节点上。2-3树之所以能够保证在最差的情况下的效率的原因在于其插入之后仍然能够保持平衡状态。如果查找后未找到的节点是一个2-node节点，那么很容易，我们只需要将新的元素放到这个2-node节点里面使其变成一个3-node节点即可。但是如果查找的节点结束于一个3-node节点，那么可能有点麻烦。
-[![](http://idiotsky.me/images2/java-treemap-21.png)](http://idiotsky.me/images2/java-treemap-21.png)
+[![](http://idiotsky.top/images2/java-treemap-21.png)](http://idiotsky.top/images2/java-treemap-21.png)
 
 ### 往一个3-node节点插入
 往一个3-node节点插入一个新的节点可能会遇到很多种不同的情况，下面首先从一个最简单的只包含一个3-node节点的树开始讨论。
 #### 只包含一个3-node节点
-[![](http://idiotsky.me/images2/java-treemap-22.png)](http://idiotsky.me/images2/java-treemap-22.png)
+[![](http://idiotsky.top/images2/java-treemap-22.png)](http://idiotsky.top/images2/java-treemap-22.png)
 
 如上图，假设2-3树只包含一个3-node节点，这个节点有两个key，没有空间来插入第三个key了，最自然的方式是我们假设这个节点能存放三个元素，暂时使其变成一个4-node节点，同时他包含四个子节点。然后，我们将这个4-node节点的中间元素提升，左边的节点作为其左节点，右边的元素作为其右节点。插入完成，变为平衡2-3查找树，树的高度从0变为1。
 
 #### 节点是3-node，父节点是2-node
 和第一种情况一样，我们也可以将新的元素插入到3-node节点中，使其成为一个临时的4-node节点，然后，将该节点中的中间元素提升到父节点即2-node节点中，使其父节点成为一个3-node节点，然后将左右节点分别挂在这个3-node节点的恰当位置。操作如下图：
-[![](http://idiotsky.me/images2/java-treemap-23.png)](http://idiotsky.me/images2/java-treemap-23.png)
+[![](http://idiotsky.top/images2/java-treemap-23.png)](http://idiotsky.top/images2/java-treemap-23.png)
 
 #### 节点是3-node，父节点也是3-node
 当我们插入的节点是3-node的时候，我们将该节点拆分，中间元素提升至父节点，但是此时父节点是一个3-node节点，插入之后，父节点变成了4-node节点，然后继续将中间元素提升至其父节点，直至遇到一个父节点是2-node节点，然后将其变为3-node，不需要继续进行拆分。
-[![](http://idiotsky.me/images2/java-treemap-24.png)](http://idiotsky.me/images2/java-treemap-24.png)
+[![](http://idiotsky.top/images2/java-treemap-24.png)](http://idiotsky.top/images2/java-treemap-24.png)
 
 #### 根节点分裂
 当根节点到子节点都是3-node节点的时候，这时如果我们要在子节点插入新的元素的时候，会一直拆分到根节点，在最后一步的时候，根节点变成了一个4-node节点，这个时候，就需要将根节点拆分为两个2-node节点，树的高度加1，这个操作过程如下：
-[![](http://idiotsky.me/images2/java-treemap-25.png)](http://idiotsky.me/images2/java-treemap-25.png)
+[![](http://idiotsky.top/images2/java-treemap-25.png)](http://idiotsky.top/images2/java-treemap-25.png)
 
 #### 本地转换
 将一个4-node拆分为2-3node涉及到6种可能的操作。这4-node可能在跟节点，也可能是2-node的左子节点或者右子节点。或者是一个3-node的左，中，右子节点。所有的这些改变都是本地的，不需要检查或者修改其他部分的节点。所以只需要常数次操作即可完成2-3树的平衡。
-[![](http://idiotsky.me/images2/java-treemap-26.png)](http://idiotsky.me/images2/java-treemap-26.png)
+[![](http://idiotsky.top/images2/java-treemap-26.png)](http://idiotsky.top/images2/java-treemap-26.png)
 
 #### 性质
 这些本地操作保持了2-3树的平衡。对于4-node节点变形为2-3节点，变形前后树的高度没有发生变化。只有当跟节点是4-node节点，变形后树的高度才加一。如下图所示：
-[![](http://idiotsky.me/images2/java-treemap-27.png)](http://idiotsky.me/images2/java-treemap-27.png)
+[![](http://idiotsky.top/images2/java-treemap-27.png)](http://idiotsky.top/images2/java-treemap-27.png)
 
 ## 分析
-[![](http://idiotsky.me/images2/java-treemap-28.png)](http://idiotsky.me/images2/java-treemap-28.png)
+[![](http://idiotsky.top/images2/java-treemap-28.png)](http://idiotsky.top/images2/java-treemap-28.png)
 
 2-3树的查找效率与树的高度是息息相关的。
 * 在最坏的情况下，也就是所有的节点都是2-node节点，查找效率为lgN
@@ -216,7 +216,7 @@ public static int binarySearch(Integer[] srcArray, int des) {
 
 ## 定义
 红黑树的主要是想对2-3查找树进行编码，尤其是对2-3查找树中的3-nodes节点添加额外的信息。红黑树中将节点之间的链接分为两种不同类型，红色链接，他用来链接两个2-nodes节点来表示一个3-nodes节点。黑色链接用来链接普通的2-3节点。特别的，使用红色链接的两个2-nodes来表示一个3-nodes节点，并且向左倾斜，即一个2-node是另一个2-node的左子节点。这种做法的好处是查找的时候不用做任何修改，和普通的二叉查找树相同。
-[![](http://idiotsky.me/images2/java-treemap-29.png)](http://idiotsky.me/images2/java-treemap-29.png)
+[![](http://idiotsky.top/images2/java-treemap-29.png)](http://idiotsky.top/images2/java-treemap-29.png)
 
 根据以上描述，红黑树定义如下：
 红黑树是一种具有红色和黑色链接的平衡查找树，同时满足：
@@ -225,11 +225,11 @@ public static int binarySearch(Integer[] srcArray, int des) {
 * 整个树完全黑色平衡，即从根节点到所以叶子结点的路径上，黑色链接的个数都相同。
 
 下图可以看到红黑树其实是2-3树的另外一种表现形式：如果我们将红色的连线水平绘制，那么他链接的两个2-node节点就是2-3树中的一个3-node节点了。
-[![](http://idiotsky.me/images2/java-treemap-30.png)](http://idiotsky.me/images2/java-treemap-30.png)
+[![](http://idiotsky.top/images2/java-treemap-30.png)](http://idiotsky.top/images2/java-treemap-30.png)
 
 ## 表示
 我们可以在二叉查找树的每一个节点上增加一个新的表示颜色的标记。该标记指示该节点指向其父节点的颜色。
-[![](http://idiotsky.me/images2/java-treemap-31.png)](http://idiotsky.me/images2/java-treemap-31.png)
+[![](http://idiotsky.top/images2/java-treemap-31.png)](http://idiotsky.top/images2/java-treemap-31.png)
 
 ## 实现
 ### 查找
@@ -244,27 +244,27 @@ public static int binarySearch(Integer[] srcArray, int des) {
 旋转又分为__左旋__和__右旋__。通常左旋操作用于将一个向右倾斜的红色链接旋转为向左链接。对比操作前后，可以看出，该操作实际上是将红线链接的两个节点中的一个较大的节点移动到根节点上。
 
 左旋的动画效果如下： 
-[![](http://idiotsky.me/images2/java-treemap-32.gif)](http://idiotsky.me/images2/java-treemap-32.gif)
+[![](http://idiotsky.top/images2/java-treemap-32.gif)](http://idiotsky.top/images2/java-treemap-32.gif)
 
 右旋的动画效果如下：
-[![](http://idiotsky.me/images2/java-treemap-33.gif)](http://idiotsky.me/images2/java-treemap-33.gif)
+[![](http://idiotsky.top/images2/java-treemap-33.gif)](http://idiotsky.top/images2/java-treemap-33.gif)
 
 #### 颜色反转
 当出现一个临时的4-node的时候，即一个节点的两个子节点均为红色，如下图：
-[![](http://idiotsky.me/images2/java-treemap-34.png)](http://idiotsky.me/images2/java-treemap-34.png)
+[![](http://idiotsky.top/images2/java-treemap-34.png)](http://idiotsky.top/images2/java-treemap-34.png)
 
-[![](http://idiotsky.me/images2/java-treemap-35.png)](http://idiotsky.me/images2/java-treemap-35.png)
+[![](http://idiotsky.top/images2/java-treemap-35.png)](http://idiotsky.top/images2/java-treemap-35.png)
 
 这其实是个A，E，S 4-node连接，我们需要将E提升至父节点，操作方法很简单，就是把E对子节点的连线设置为黑色，自己的颜色设置为红色。
 
 有了以上基本操作方法之后，我们现在对应之前对__2-3树的平衡操作来对红黑树进行平衡操作__，这两者是可以一一对应的，如下图：
-[![](http://idiotsky.me/images2/java-treemap-36.png)](http://idiotsky.me/images2/java-treemap-36.png)
+[![](http://idiotsky.top/images2/java-treemap-36.png)](http://idiotsky.top/images2/java-treemap-36.png)
 
 现在来讨论各种情况：
 
 #### Case 1 往一个2-node节点底部插入新的节点
 先热身一下，首先我们看对于只有一个节点的红黑树，插入一个新的节点的操作：
-[![](http://idiotsky.me/images2/java-treemap-37.png)](http://idiotsky.me/images2/java-treemap-37.png)
+[![](http://idiotsky.top/images2/java-treemap-37.png)](http://idiotsky.top/images2/java-treemap-37.png)
 
 这种情况很简单，只需要：
 * 标准的二叉查找树遍历即可。__新插入的节点标记为红色__
@@ -272,14 +272,14 @@ public static int binarySearch(Integer[] srcArray, int des) {
 
 #### Case 2往一个3-node节点底部插入新的节点
 先热身一下，假设我们往一个只有两个节点的树中插入元素，如下图，根据待插入元素与已有元素的大小，又可以分为如下三种情况：
-[![](http://idiotsky.me/images2/java-treemap-38.png)](http://idiotsky.me/images2/java-treemap-38.png)
+[![](http://idiotsky.top/images2/java-treemap-38.png)](http://idiotsky.top/images2/java-treemap-38.png)
 
 * 如果带插入的节点比现有的两个节点都大，这种情况最简单。我们只需要将新插入的节点连接到右边子树上即可，然后将中间的元素提升至根节点。这样根节点的左右子树都是红色的节点了，我们只需要调研FlipColor方法即可。其他情况经过反转操作后都会和这一样。
 * 如果插入的节点比最小的元素要小，那么将新节点添加到最左侧，这样就有两个连接红色的节点了，这是对中间节点进行右旋操作，使中间结点成为根节点。这是就转换到了第一种情况，这时候只需要再进行一次FlipColor操作即可。
 * 如果插入的节点的值位于两个节点之间，那么将新节点插入到左侧节点的右子节点。因为该节点的右子节点是红色的，所以需要进行左旋操作。操作完之后就变成第二种情况了，再进行一次右旋，然后再调用FlipColor操作即可完成平衡操作。
 
 有了以上基础，我们现在来总结一下往一个3-node节点底部插入新的节点的操作步骤，下面是一个典型的操作过程图：
-[![](http://idiotsky.me/images2/java-treemap-39.png)](http://idiotsky.me/images2/java-treemap-39.png)
+[![](http://idiotsky.top/images2/java-treemap-39.png)](http://idiotsky.top/images2/java-treemap-39.png)
 
 可以看出，操作步骤如下：
 1. 执行标准的二叉查找树插入操作，__新插入的节点元素用红色标识__。
@@ -288,7 +288,7 @@ public static int binarySearch(Integer[] srcArray, int des) {
 4. 如果需要，__左旋操作使红色节点左倾__。
 5. 在有些情况下，需要递归调用Case1 Case2，来进行递归操作。如下：
 
-[![](http://idiotsky.me/images2/java-treemap-40.png)](http://idiotsky.me/images2/java-treemap-40.png)
+[![](http://idiotsky.top/images2/java-treemap-40.png)](http://idiotsky.top/images2/java-treemap-40.png)
 
 ### 分析
 对红黑树的分析其实就是对2-3查找树的分析，红黑树能够保证在最坏的情况下都能保证对数的时间复杂度，也就是树的高度。
@@ -296,13 +296,13 @@ public static int binarySearch(Integer[] srcArray, int des) {
 在分析之前，为了更加直观，下面是以升序，降序和随机构建一颗红黑树的动画：
 
 以升序插入构建红黑树：
-[![](http://idiotsky.me/images2/java-treemap-41.gif)](http://idiotsky.me/images2/java-treemap-41.gif)
+[![](http://idiotsky.top/images2/java-treemap-41.gif)](http://idiotsky.top/images2/java-treemap-41.gif)
 
 以降序插入构建红黑树：
-[![](http://idiotsky.me/images2/java-treemap-42.gif)](http://idiotsky.me/images2/java-treemap-42.gif)
+[![](http://idiotsky.top/images2/java-treemap-42.gif)](http://idiotsky.top/images2/java-treemap-42.gif)
 
 随机插入构建红黑树:
-[![](http://idiotsky.me/images2/java-treemap-43.gif)](http://idiotsky.me/images2/java-treemap-43.gif)
+[![](http://idiotsky.top/images2/java-treemap-43.gif)](http://idiotsky.top/images2/java-treemap-43.gif)
 
 从上面三张动画效果中，可以很直观的看出，红黑树在各种情况下都能维护良好的平衡性，从而能够保证最差情况下的查找，插入效率。
 
@@ -312,7 +312,7 @@ public static int binarySearch(Integer[] srcArray, int des) {
 最坏的情况就是，红黑树中除了最左侧路径全部是由3-node节点组成，即__红黑相间的路径长度是全黑路径长度的2倍__。
 
 下图是一个典型的红黑树，从中可以看到最长的路径(红黑相间的路径)是最短路径的2倍：
-[![](http://idiotsky.me/images2/java-treemap-44.png)](http://idiotsky.me/images2/java-treemap-44.png)
+[![](http://idiotsky.top/images2/java-treemap-44.png)](http://idiotsky.top/images2/java-treemap-44.png)
 
 #### 红黑树的平均高度大约为lgN
 由于红黑树是2-3查找树的一种实现，所以平均高度大约为lgN
@@ -322,7 +322,7 @@ public static int binarySearch(Integer[] srcArray, int des) {
 
 # 红黑树在java中的实现
 虽说上面红黑树是2-3树的一种实现，但是在java中红黑树有一个很明显的特点就是，3节点可以出现在右子树上
-[![](http://idiotsky.me/images2/java-treemap-45.png)](http://idiotsky.me/images2/java-treemap-45.png)
+[![](http://idiotsky.top/images2/java-treemap-45.png)](http://idiotsky.top/images2/java-treemap-45.png)
 
 上面图片的68节点如果是按前一章的实现的话，在插入68的时候，相当于在2节点的右边插入，是需要左旋的。可上图很明显在java的红黑树是允许的，所以不做任何处理。
 
@@ -574,11 +574,11 @@ private void fixAfterInsertion(Entry<K,V> x) {
 再来个实例看看，好理解
 
 以下图红黑树为例
-[![](http://idiotsky.me/images2/java-treemap-46.png)](http://idiotsky.me/images2/java-treemap-46.png)
+[![](http://idiotsky.top/images2/java-treemap-46.png)](http://idiotsky.top/images2/java-treemap-46.png)
 
 现在我们要增加一个节点50，放在节点47的右子树上。
 
-[![](http://idiotsky.me/images2/java-treemap-47.png)](http://idiotsky.me/images2/java-treemap-47.png)
+[![](http://idiotsky.top/images2/java-treemap-47.png)](http://idiotsky.top/images2/java-treemap-47.png)
 
 新增节点和父节点冲突，叔父节点是红色的，进行变色操作，把父亲节点和叔父节点都变成黑色，祖父节点变成红色，然后再对祖父节点进行调整。
 
@@ -591,7 +591,7 @@ if (colorOf(y) == RED) {
                 }
 ````
 
-[![](http://idiotsky.me/images2/java-treemap-48.png)](http://idiotsky.me/images2/java-treemap-48.png)
+[![](http://idiotsky.top/images2/java-treemap-48.png)](http://idiotsky.top/images2/java-treemap-48.png)
 
 叔父节点y是黑色的，并且x是右孩子，先进行左旋转，把红色节点转移到左分支。
 
@@ -603,7 +603,7 @@ if (x == rightOf(parentOf(x))) {
 
 ````
 
-[![](http://idiotsky.me/images2/java-treemap-49.png)](http://idiotsky.me/images2/java-treemap-49.png)
+[![](http://idiotsky.top/images2/java-treemap-49.png)](http://idiotsky.top/images2/java-treemap-49.png)
 
 再把x的父节点变黑，祖父节点变红，然后把祖父节点右旋转。
 
@@ -613,7 +613,7 @@ setColor(parentOf(parentOf(x)), RED);
 rotateRight(parentOf(parentOf(x)));
 ````
 
-[![](http://idiotsky.me/images2/java-treemap-50.png)](http://idiotsky.me/images2/java-treemap-50.png)
+[![](http://idiotsky.top/images2/java-treemap-50.png)](http://idiotsky.top/images2/java-treemap-50.png)
 
 就这样，又符合上面的规则了。其实用2-3树的思维看上面的过程，是不是跟前一章基于2-3树的红黑树的平衡过程类似呢。
 
@@ -779,14 +779,14 @@ private void fixAfterDeletion(Entry<K,V> x) {
 ### 示例
 #### 删除的节点只有一个子节点（删除390）
 根据上面的引申规则，这个节点肯定是黑色，子节点是红色
-[![](http://idiotsky.me/images2/java-treemap-51.png)](http://idiotsky.me/images2/java-treemap-51.png)
+[![](http://idiotsky.top/images2/java-treemap-51.png)](http://idiotsky.top/images2/java-treemap-51.png)
 
 #### 删除红色的节点并且没有子节点（删除833）
-[![](http://idiotsky.me/images2/java-treemap-52.png)](http://idiotsky.me/images2/java-treemap-52.png)
+[![](http://idiotsky.top/images2/java-treemap-52.png)](http://idiotsky.top/images2/java-treemap-52.png)
 
 #### 删除黑色的节点并且没有子节点（删除22）
 ##### 兄弟节点是红色的情况
-[![](http://idiotsky.me/images2/java-treemap-53.png)](http://idiotsky.me/images2/java-treemap-53.png)
+[![](http://idiotsky.top/images2/java-treemap-53.png)](http://idiotsky.top/images2/java-treemap-53.png)
 
 变色+旋转，给x节点增加一个红色的父亲节点
 ````java
@@ -797,7 +797,7 @@ if (colorOf(sib) == RED) {
                     sib = rightOf(parentOf(x));
 }
 ````
-[![](http://idiotsky.me/images2/java-treemap-54.png)](http://idiotsky.me/images2/java-treemap-54.png)
+[![](http://idiotsky.top/images2/java-treemap-54.png)](http://idiotsky.top/images2/java-treemap-54.png)
 
 此时x的新兄弟节点是黑色，并且孩子节点全是黑色（叶子节点是黑色的），把兄弟节点变色，然后x指向父节点，while循环继续调整。
 ````java
@@ -806,7 +806,7 @@ if (colorOf(leftOf(sib))  == BLACK &&
                     setColor(sib, RED);
                     x = parentOf(x);
 ````
-[![](http://idiotsky.me/images2/java-treemap-55.png)](http://idiotsky.me/images2/java-treemap-55.png)
+[![](http://idiotsky.top/images2/java-treemap-55.png)](http://idiotsky.top/images2/java-treemap-55.png)
 
 节点是红色，跳出循环。循环外把该节点变黑。
 ````java
@@ -814,7 +814,7 @@ while (x != root && colorOf(x) == BLACK) {}
 setColor(x, BLACK);
 ````
 
-[![](http://idiotsky.me/images2/java-treemap-56.png)](http://idiotsky.me/images2/java-treemap-56.png)
+[![](http://idiotsky.top/images2/java-treemap-56.png)](http://idiotsky.top/images2/java-treemap-56.png)
 
 方法返回后，deleteEntry方法把22节点删除，整个过程结束。
 
@@ -828,14 +828,14 @@ if (p.parent != null) {
             }
 
 ````
-[![](http://idiotsky.me/images2/java-treemap-57.png)](http://idiotsky.me/images2/java-treemap-57.png)
+[![](http://idiotsky.top/images2/java-treemap-57.png)](http://idiotsky.top/images2/java-treemap-57.png)
 
 ##### 兄弟节点是黑色的情况
 上面是旋转变化过程中其实已经遇见了这种情况，并且兄弟节点的孩子节点全是黑色，可以直接变色处理，下面来看一下，兄弟节点是黑色，并且有孩子节点是红色的情况
 
 继续上面的红黑树，下面删除65节点
 
-[![](http://idiotsky.me/images2/java-treemap-58.png)](http://idiotsky.me/images2/java-treemap-58.png)
+[![](http://idiotsky.top/images2/java-treemap-58.png)](http://idiotsky.top/images2/java-treemap-58.png)
 
 兄弟节点是黑色，并且有红色的孩子节点，针对x是左孩子的情况下，如果红色节点是左孩子，需要通过旋转操作移到右边
 
@@ -848,7 +848,7 @@ if (colorOf(rightOf(sib)) == BLACK) {
                     }
 ````
 
-[![](http://idiotsky.me/images2/java-treemap-59.png)](http://idiotsky.me/images2/java-treemap-59.png)
+[![](http://idiotsky.top/images2/java-treemap-59.png)](http://idiotsky.top/images2/java-treemap-59.png)
 
 然后再进行变色旋转操作，给x节点增加一个黑色的父节点。x = root结束循环。
 ````java
@@ -858,12 +858,12 @@ setColor(rightOf(sib), BLACK);
 rotateLeft(parentOf(x));
 x = root;
 ````
-[![](http://idiotsky.me/images2/java-treemap-60.png)](http://idiotsky.me/images2/java-treemap-60.png)
+[![](http://idiotsky.top/images2/java-treemap-60.png)](http://idiotsky.top/images2/java-treemap-60.png)
 
 方法返回，deleteEntry方法把65节点删除，整个过程结束。
 
 #### 删除节点有两个孩子节点的情况
-[![](http://idiotsky.me/images2/java-treemap-61.png)](http://idiotsky.me/images2/java-treemap-61.png)
+[![](http://idiotsky.top/images2/java-treemap-61.png)](http://idiotsky.top/images2/java-treemap-61.png)
 
 删除节点55，该节点有两个孩子节点，deleteEntry方法中会查找继承者节点，即图中的65节点，把65节点的key和value赋值给55节点，然后转化为删除p指向的65节点。
 ````java
@@ -874,7 +874,7 @@ if (p.left != null && p.right != null) {
             p = s;
         }
 ````
-[![](http://idiotsky.me/images2/java-treemap-62.jpg)](http://idiotsky.me/images2/java-treemap-62.jpg)
+[![](http://idiotsky.top/images2/java-treemap-62.jpg)](http://idiotsky.top/images2/java-treemap-62.jpg)
 因为继承者节点没有左孩子节点，所以这个问题又变成了删除有一个孩子节点或者无孩子节点的问题。（参照上面）
 
 # 总结

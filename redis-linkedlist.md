@@ -23,7 +23,7 @@ typedef struct listNode {
 } listNode;
 ````
 多个 listNode 可以通过 prev 和 next 指针组成双端链表， 如图 3-1 所示。
-[![](http://idiotsky.me/images/redis-linkedlist-1.png)](http://idiotsky.me/images/redis-linkedlist-1.png)
+[![](http://idiotsky.top/images/redis-linkedlist-1.png)](http://idiotsky.top/images/redis-linkedlist-1.png)
 <!-- more -->
 # 链表
 虽然仅仅使用多个 listNode 结构就可以组成链表， 但使用 adlist.h/list 来持有链表的话， 操作起来会更方便：
@@ -56,7 +56,7 @@ list 结构为链表提供了表头指针 head 、表尾指针 tail ， 以及�
 * match 函数则用于对比链表节点所保存的值和另一个输入值是否相等。
 
 图 3-2 是由一个 list 结构和三个 listNode 结构组成的链表：
-[![](http://idiotsky.me/images/redis-linkedlist-2.png)](http://idiotsky.me/images/redis-linkedlist-2.png)
+[![](http://idiotsky.top/images/redis-linkedlist-2.png)](http://idiotsky.top/images/redis-linkedlist-2.png)
 
 Redis 的链表实现的特性可以总结如下：
 * 双端： 链表节点带有 prev 和 next 指针， 获取某个节点的前置节点和后置节点的复杂度都是 O(1) 。

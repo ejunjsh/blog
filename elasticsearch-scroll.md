@@ -27,7 +27,7 @@ POST /my_index/my_type/_search
 <!-- more -->
 
 ## Query 阶段
-[![](http://idiotsky.me/images2/es-scroll-1.jpg)](http://idiotsky.me/images2/es-scroll-1.jpg)
+[![](http://idiotsky.top/images2/es-scroll-1.jpg)](http://idiotsky.top/images2/es-scroll-1.jpg)
 
 如上图所示，描述了一次搜索请求的 query 阶段。
 1. Client 发送一次搜索请求，node1 接收到请求，然后，node1 创建一个大小为 from + size 的优先级队列用来存结果，我们管 node1 叫 coordinating node。
@@ -40,7 +40,7 @@ coordinating node 计算好自己的优先级队列后，query 阶段结束，�
 
 ## Fetch 阶段
 query 阶段知道了要取哪些数据，但是并没有取具体的数据，这就是 fetch 阶段要做的。
-[![](http://idiotsky.me/images2/es-scroll-2.jpg)](http://idiotsky.me/images2/es-scroll-2.jpg)
+[![](http://idiotsky.top/images2/es-scroll-2.jpg)](http://idiotsky.top/images2/es-scroll-2.jpg)
 
 上图展示了 fetch 过程：
 1. coordinating node 发送 GET 请求到相关shards。

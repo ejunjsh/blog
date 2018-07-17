@@ -11,7 +11,7 @@ categories: redis
 压缩列表是 Redis 为了节约内存而开发的， 由一系列特殊编码的连续内存块组成的顺序型（sequential）数据结构。
 一个压缩列表可以包含任意多个节点（entry）， 每个节点可以保存一个字节数组或者一个整数值。
 图 7-1 展示了压缩列表的各个组成部分， 表 7-1 则记录了各个组成部分的类型、长度、以及用途。
-[![](http://idiotsky.me/images1/redis-ziplist-1.png)](http://idiotsky.me/images1/redis-ziplist-1.png)
+[![](http://idiotsky.top/images1/redis-ziplist-1.png)](http://idiotsky.top/images1/redis-ziplist-1.png)
 
 表 7-1 压缩列表各个组成部分的详细说明
 
@@ -29,13 +29,13 @@ zlend|	uint8_t|	1 字节|	特殊值 0xFF （十进制 255 ），用于标记压�
 * 列表 zltail 属性的值为 0x3c （十进制 60）， 这表示如果我们有一个指向压缩列表起始地址的指针 p ， 那么只要用指针 p 加上偏移量 60 ， 就可以计算出表尾节点 entry3 的地址。
 * 列表 zllen 属性的值为 0x3 （十进制 3）， 表示压缩列表包含三个节点。
 
-[![](http://idiotsky.me/images1/redis-ziplist-2.png)](http://idiotsky.me/images1/redis-ziplist-2.png)
+[![](http://idiotsky.top/images1/redis-ziplist-2.png)](http://idiotsky.top/images1/redis-ziplist-2.png)
 图 7-3 展示了另一个压缩列表示例：
 * 列表 zlbytes 属性的值为 0xd2 （十进制 210）， 表示压缩列表的总长为 210 字节。
 * 列表 zltail 属性的值为 0xb3 （十进制 179）， 这表示如果我们有一个指向压缩列表起始地址的指针 p ， 那么只要用指针 p 加上偏移量 179 ， 就可以计算出表尾节点 entry5 的地址。
 * 列表 zllen 属性的值为 0x5 （十进制 5）， 表示压缩列表包含五个节点。
 
-[![](http://idiotsky.me/images1/redis-ziplist-3.png)](http://idiotsky.me/images1/redis-ziplist-3.png)
+[![](http://idiotsky.top/images1/redis-ziplist-3.png)](http://idiotsky.top/images1/redis-ziplist-3.png)
 
 # 压缩列表节点的构成
 每个压缩列表节点可以保存一个字节数组或者一个整数值， 其中， 字节数组可以是以下三种长度的其中一种：
@@ -52,7 +52,7 @@ zlend|	uint8_t|	1 字节|	特殊值 0xFF （十进制 255 ），用于标记压�
 6. int64_t 类型整数。
 
 每个压缩列表节点都由 previous\_entry\_length 、 encoding 、 content 三个部分组成， 如图 7-4 所示。
-[![](http://idiotsky.me/images1/redis-ziplist-4.png)](http://idiotsky.me/images1/redis-ziplist-4.png)
+[![](http://idiotsky.top/images1/redis-ziplist-4.png)](http://idiotsky.top/images1/redis-ziplist-4.png)
 接下来的内容将分别介绍这三个组成部分。
 
 ## previous\_entry\_length
@@ -63,14 +63,14 @@ previous\_entry\_length 属性的长度可以是 1 字节或者 5 字节：
 * 如果前一节点的长度大于等于 254 字节， 那么 previous\_entry\_length 属性的长度为 5 字节： 其中属性的第一字节会被设置为 0xFE （十进制值 254）， 而之后的四个字节则用于保存前一节点的长度。
 
 图 7-5 展示了一个包含一字节长 previous\_entry\_length 属性的压缩列表节点， 属性的值为 0x05 ， 表示前一节点的长度为 5 字节。
-[![](http://idiotsky.me/images1/redis-ziplist-5.png)](http://idiotsky.me/images1/redis-ziplist-5.png)
+[![](http://idiotsky.top/images1/redis-ziplist-5.png)](http://idiotsky.top/images1/redis-ziplist-5.png)
 图 7-6 展示了一个包含五字节长 previous\_entry\_length 属性的压缩节点， 属性的值为 0xFE00002766 ， 其中值的最高位字节 0xFE 表示这是一个五字节长的 previous\_entry\_length 属性， 而之后的四字节 0x00002766 （十进制值 10086 ）才是前一节点的实际长度。
-[![](http://idiotsky.me/images1/redis-ziplist-6.png)](http://idiotsky.me/images1/redis-ziplist-6.png)
+[![](http://idiotsky.top/images1/redis-ziplist-6.png)](http://idiotsky.top/images1/redis-ziplist-6.png)
 
 因为节点的 previous\_entry\_length 属性记录了前一个节点的长度， 所以程序可以通过指针运算， 根据当前节点的起始地址来计算出前一个节点的起始地址。
 
 举个例子， 如果我们有一个指向当前节点起始地址的指针 c ， 那么我们只要用指针 c 减去当前节点 previous\_entry\_length 属性的值， 就可以得出一个指向前一个节点起始地址的指针 p ， 如图 7-7 所示。
-[![](http://idiotsky.me/images1/redis-ziplist-7.png)](http://idiotsky.me/images1/redis-ziplist-7.png)
+[![](http://idiotsky.top/images1/redis-ziplist-7.png)](http://idiotsky.top/images1/redis-ziplist-7.png)
 
 压缩列表的从表尾向表头遍历操作就是使用这一原理实现的： 只要我们拥有了一个指向某个节点起始地址的指针， 那么通过这个指针以及这个节点的 previous\_entry\_length 属性， 程序就可以一直向前一个节点回溯， 最终到达压缩列表的表头节点。
 
@@ -81,10 +81,10 @@ previous\_entry\_length 属性的长度可以是 1 字节或者 5 字节：
 * 通过用 p3 减去 entry2 节点 previous\_entry\_length 属性的值， 我们得到一个指向 entry2 前一节点 entry1 起始地址的指针 p4 ， entry1 为压缩列表的表头节点；
 * 最终， 我们从表尾节点向表头节点遍历了整个列表。
 
-[![](http://idiotsky.me/images1/redis-ziplist-8.png)](http://idiotsky.me/images1/redis-ziplist-8.png)
-[![](http://idiotsky.me/images1/redis-ziplist-9.png)](http://idiotsky.me/images1/redis-ziplist-9.png)
-[![](http://idiotsky.me/images1/redis-ziplist-10.png)](http://idiotsky.me/images1/redis-ziplist-10.png)
-[![](http://idiotsky.me/images1/redis-ziplist-11.png)](http://idiotsky.me/images1/redis-ziplist-11.png)
+[![](http://idiotsky.top/images1/redis-ziplist-8.png)](http://idiotsky.top/images1/redis-ziplist-8.png)
+[![](http://idiotsky.top/images1/redis-ziplist-9.png)](http://idiotsky.top/images1/redis-ziplist-9.png)
+[![](http://idiotsky.top/images1/redis-ziplist-10.png)](http://idiotsky.top/images1/redis-ziplist-10.png)
+[![](http://idiotsky.top/images1/redis-ziplist-11.png)](http://idiotsky.top/images1/redis-ziplist-11.png)
 
 ## encoding
 节点的 encoding 属性记录了节点的 content 属性所保存数据的类型以及长度：
@@ -120,13 +120,13 @@ previous\_entry\_length 属性的长度可以是 1 字节或者 5 字节：
 * 编码的后六位 001011 记录了字节数组的长度 11 ；
 * content 属性保存着节点的值 "hello world" 。
 
-[![](http://idiotsky.me/images1/redis-ziplist-12.png)](http://idiotsky.me/images1/redis-ziplist-12.png)
+[![](http://idiotsky.top/images1/redis-ziplist-12.png)](http://idiotsky.top/images1/redis-ziplist-12.png)
 
 图 7-10 展示了一个保存整数值的节点示例：
 * 编码 11000000 表示节点保存的是一个 int16_t 类型的整数值；
 * content 属性保存着节点的值 10086 。
 
-[![](http://idiotsky.me/images1/redis-ziplist-13.png)](http://idiotsky.me/images1/redis-ziplist-13.png)
+[![](http://idiotsky.top/images1/redis-ziplist-13.png)](http://idiotsky.top/images1/redis-ziplist-13.png)
 
 # 连锁更新
 前面说过， 每个节点的 previous\_entry\_length 属性都记录了前一个节点的长度：
@@ -134,11 +134,11 @@ previous\_entry\_length 属性的长度可以是 1 字节或者 5 字节：
 * 如果前一节点的长度大于等于 254 字节， 那么 previous\_entry\_length 属性需要用 5 字节长的空间来保存这个长度值。
 
 现在， 考虑这样一种情况： 在一个压缩列表中， 有多个连续的、长度介于 250 字节到 253 字节之间的节点 e1 至 eN ， 如图 7-11 所示。
-[![](http://idiotsky.me/images1/redis-ziplist-14.png)](http://idiotsky.me/images1/redis-ziplist-14.png)
+[![](http://idiotsky.top/images1/redis-ziplist-14.png)](http://idiotsky.top/images1/redis-ziplist-14.png)
 因为 e1 至 eN 的所有节点的长度都小于 254 字节， 所以记录这些节点的长度只需要 1 字节长的 previous\_entry\_length 属性， 换句话说， e1 至 eN 的所有节点的 previous\_entry\_length 属性都是 1 字节长的。
 
 这时， 如果我们将一个长度大于等于 254 字节的新节点 new 设置为压缩列表的表头节点， 那么 new 将成为 e1 的前置节点， 如图 7-12 所示。
-[![](http://idiotsky.me/images1/redis-ziplist-15.png)](http://idiotsky.me/images1/redis-ziplist-15.png)
+[![](http://idiotsky.top/images1/redis-ziplist-15.png)](http://idiotsky.top/images1/redis-ziplist-15.png)
 
 因为 e1 的 previous\_entry\_length 属性仅长 1 字节， 它没办法保存新节点 new 的长度， 所以程序将对压缩列表执行空间重分配操作， 并将 e1 节点的 previous\_entry\_length 属性从原来的 1 字节长扩展为 5 字节长。
 
@@ -149,16 +149,16 @@ previous\_entry\_length 属性的长度可以是 1 字节或者 5 字节：
 正如扩展 e1 引发了对 e2 的扩展一样， 扩展 e2 也会引发对 e3 的扩展， 而扩展 e3 又会引发对 e4 的扩展……为了让每个节点的 previous\_entry\_length 属性都符合压缩列表对节点的要求， 程序需要不断地对压缩列表执行空间重分配操作， 直到 eN 为止。
 
 Redis 将这种在特殊情况下产生的连续多次空间扩展操作称之为“连锁更新”（cascade update）， 图 7-13 展示了这一过程。
-[![](http://idiotsky.me/images1/redis-ziplist-16.png)](http://idiotsky.me/images1/redis-ziplist-16.png)
-[![](http://idiotsky.me/images1/redis-ziplist-17.png)](http://idiotsky.me/images1/redis-ziplist-17.png)
-[![](http://idiotsky.me/images1/redis-ziplist-18.png)](http://idiotsky.me/images1/redis-ziplist-18.png)
-[![](http://idiotsky.me/images1/redis-ziplist-19.png)](http://idiotsky.me/images1/redis-ziplist-19.png)
-[![](http://idiotsky.me/images1/redis-ziplist-20.png)](http://idiotsky.me/images1/redis-ziplist-20.png)
+[![](http://idiotsky.top/images1/redis-ziplist-16.png)](http://idiotsky.top/images1/redis-ziplist-16.png)
+[![](http://idiotsky.top/images1/redis-ziplist-17.png)](http://idiotsky.top/images1/redis-ziplist-17.png)
+[![](http://idiotsky.top/images1/redis-ziplist-18.png)](http://idiotsky.top/images1/redis-ziplist-18.png)
+[![](http://idiotsky.top/images1/redis-ziplist-19.png)](http://idiotsky.top/images1/redis-ziplist-19.png)
+[![](http://idiotsky.top/images1/redis-ziplist-20.png)](http://idiotsky.top/images1/redis-ziplist-20.png)
 
 除了添加新节点可能会引发连锁更新之外， 删除节点也可能会引发连锁更新。
 
 考虑图 7-14 所示的压缩列表， 如果 e1 至 eN 都是大小介于 250 字节至 253 字节的节点， big 节点的长度大于等于 254 字节（需要 5 字节的 previous\_entry\_length 来保存）， 而 small 节点的长度小于 254 字节（只需要 1 字节的 previous\_entry\_length 来保存）， 那么当我们将 small 节点从压缩列表中删除之后， 为了让 e1 的 previous\_entry\_length 属性可以记录 big 节点的长度， 程序将扩展 e1 的空间， 并由此引发之后的连锁更新。
-[![](http://idiotsky.me/images1/redis-ziplist-21.png)](http://idiotsky.me/images1/redis-ziplist-21.png)
+[![](http://idiotsky.top/images1/redis-ziplist-21.png)](http://idiotsky.top/images1/redis-ziplist-21.png)
 因为连锁更新在最坏情况下需要对压缩列表执行 N 次空间重分配操作， 而每次空间重分配的最坏复杂度为 O(N) ， 所以连锁更新的最坏复杂度为 O(N^2) 。
 
 要注意的是， 尽管连锁更新的复杂度较高， 但它真正造成性能问题的几率是很低的：

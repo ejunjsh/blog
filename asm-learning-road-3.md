@@ -71,7 +71,7 @@ _start:
 		;;
 ````
 这里我们能看到我们把1放到rax，2放到rdx，之后用这些寄存器依次放入到栈。栈是LIFO（后进先出）。所以这个栈或者应用程序将是下面这个结构：
-[![](http://idiotsky.me/images1/asm-learning-road-3-1.png)](http://idiotsky.me/images1/asm-learning-road-3-1.png)
+[![](http://idiotsky.top/images1/asm-learning-road-3-1.png)](http://idiotsky.top/images1/asm-learning-road-3-1.png)
 然后我们从堆栈中复制具有地址rsp + 8的值。这意味着我们获取堆栈顶部的地址，加上8并将该地址的值复制到rax。之后rax值将为1。
 
 # 例子

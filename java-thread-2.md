@@ -61,7 +61,7 @@ public class TickeDemo {
 }
 ````
 运行程序结果如下（仅截取部分数据）：
-[![](http://idiotsky.me/images/java-thread-2-1.png)](http://idiotsky.me/images/java-thread-2-1.png)
+[![](http://idiotsky.top/images/java-thread-2-1.png)](http://idiotsky.top/images/java-thread-2-1.png)
 从运行结果，我们就可以看出我们3个售票窗口同时卖出了96号票，这显然是不合逻辑的，其实这个问题就是我们前面所说的线程同步问题。不同的线程都对同一个数据进了操作这就容易导致数据错乱的问题，也就是线程不同步。那么这个问题该怎么解决呢？在给出解决思路之前我们先来分析一下这个问题是怎么产生的？我们声明一个线程类TicketSeller，在这个类中我们又声明了一个成员变量num也就是票的数量，然后我们通过run方法不断的去获取票数并输出，最后我们在外部类TicketDemo中创建了四个线程同时操作这个数据，运行后就出现我们刚才所说的线程同步问题，从这里我们可以看出产生线程同步(线程安全)问题的条件有两个：1.多个线程在操作共享的数据（num），2.操作共享数据的线程代码有多条（4条线程）；既然原因知道了，那该怎么解决？
 >解决思路：将多条操作共享数据的线程代码封装起来，当有线程在执行这些代码的时候，其他线程时不可以参与运算的。必须要当前线程把这些代码都执行完毕后，其他线程才可以参与运算。 好了，思路知道了，我们就用java代码的方式来解决这个问题。
 
@@ -168,9 +168,9 @@ public class TicketSellerWithLock implements Runnable {
 ````
 TicketDemo类无需变化，线程安全问题就此解决。
 但是还是要说一下公平锁的问题，上面例子，不开公平锁的结果如下：
-[![](http://idiotsky.me/images/java-thread-2-2.png)](http://idiotsky.me/images/java-thread-2-2.png)
+[![](http://idiotsky.top/images/java-thread-2-2.png)](http://idiotsky.top/images/java-thread-2-2.png)
 开公平锁的结果如下：
-[![](http://idiotsky.me/images/java-thread-2-3.png)](http://idiotsky.me/images/java-thread-2-3.png)
+[![](http://idiotsky.top/images/java-thread-2-3.png)](http://idiotsky.top/images/java-thread-2-3.png)
 *你会发现不开公平锁，cpu钟爱用第一个线程做事情，而开了公平锁后，基本是各个线程交替执行。上面提到公平锁是会消耗性能的，如果CPU调度的时候选择的不是公平调度的那个线程，CPU会放弃本次调度，干别的事情，如果老是调度不到的话，是浪费CPU调度的。*
 
 ## 通过synchronied关键字的方式解决线程安全问题
@@ -536,7 +536,7 @@ Thread-0...生产者...北京烤鸭69
 不对呀，我们才生产一只烤鸭，怎么就被消费了2次啊，有的烤鸭生产了也没有被消费啊？难道共享数据源没有进行线程同步？回顾下KaoYaResource.java
 共享数据count的获取方法都进行synchronized关键字同步了呀！那怎么还会出现数据混乱的现象啊？
 分析：确实，我们对共享数据也采用了同步措施，而且也应用了等待/通知机制，但是这样的措施只在单生产者单消费者的情况下才能正确应用，但从运行结果来看，我们之前的单生产者单消费者安全处理措施就不太适合多生产者多消费者的情况了。那么问题出在哪里？可以明确的告诉大家，肯定是在资源共享类，下面我们就来分析问题是如何出现，又该如何解决？直接上图
-[![](http://idiotsky.me/images/java-thread-2-4.png)](http://idiotsky.me/images/java-thread-2-4.png)
+[![](http://idiotsky.top/images/java-thread-2-4.png)](http://idiotsky.top/images/java-thread-2-4.png)
 
 解决后的资源代码如下只将if改为了while：
 ````java

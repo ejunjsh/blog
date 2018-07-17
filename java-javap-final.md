@@ -7,7 +7,7 @@ categories: java
 
 > 一直很好奇`final`的类字段在class文件是怎么表示的，所以用javap看看怎么回事
 
-# 没有final修饰的类
+# 没有`final`修饰的类的静态字段
 
 定义一个类
 
@@ -30,49 +30,7 @@ public class test{
 javac test.java
 javap -verbose test.class
 
-Classfile /root/test.class
-  Last modified Jul 17, 2018; size 506 bytes
-  MD5 checksum 0616d08e9bc479a61a8d637d6963da06
-  Compiled from "test.java"
-public class test
-  SourceFile: "test.java"
-  minor version: 0
-  major version: 51
-  flags: ACC_PUBLIC, ACC_SUPER
-Constant pool:
-   #1 = Methodref          #7.#19         //  java/lang/Object."<init>":()V
-   #2 = Fieldref           #20.#21        //  java/lang/System.out:Ljava/io/PrintStream;
-   #3 = Fieldref           #6.#22         //  test.str:Ljava/lang/String;
-   #4 = Methodref          #23.#24        //  java/io/PrintStream.println:(Ljava/lang/String;)V
-   #5 = String             #25            //  严
-   #6 = Class              #26            //  test
-   #7 = Class              #27            //  java/lang/Object
-   #8 = Utf8               str
-   #9 = Utf8               Ljava/lang/String;
-  #10 = Utf8               <init>
-  #11 = Utf8               ()V
-  #12 = Utf8               Code
-  #13 = Utf8               LineNumberTable
-  #14 = Utf8               main
-  #15 = Utf8               ([Ljava/lang/String;)V
-  #16 = Utf8               <clinit>
-  #17 = Utf8               SourceFile
-  #18 = Utf8               test.java
-  #19 = NameAndType        #10:#11        //  "<init>":()V
-  #20 = Class              #28            //  java/lang/System
-  #21 = NameAndType        #29:#30        //  out:Ljava/io/PrintStream;
-  #22 = NameAndType        #8:#9          //  str:Ljava/lang/String;
-  #23 = Class              #31            //  java/io/PrintStream
-  #24 = NameAndType        #32:#33        //  println:(Ljava/lang/String;)V
-  #25 = Utf8               严
-  #26 = Utf8               test
-  #27 = Utf8               java/lang/Object
-  #28 = Utf8               java/lang/System
-  #29 = Utf8               out
-  #30 = Utf8               Ljava/io/PrintStream;
-  #31 = Utf8               java/io/PrintStream
-  #32 = Utf8               println
-  #33 = Utf8               (Ljava/lang/String;)V
+# 省略常量池
 {
   public static java.lang.String str;
     flags: ACC_PUBLIC, ACC_STATIC
@@ -143,7 +101,7 @@ Constant pool:
 ````
 `getstatic`是用来读取类的静态字段的，这里读出来放入操作数栈。
 
-# 有final修饰
+# 有`final`修饰的类静态字段
 
 改一下这个类，加`final`修饰下
 
@@ -164,47 +122,7 @@ public class test{
 javac test.java
 javap -verbose test.class
 
-Classfile /root/test.class
-  Last modified Jul 17, 2018; size 464 bytes
-  MD5 checksum 561fcdacae7be4b6da3c78fd99b87719
-  Compiled from "test.java"
-public class test
-  SourceFile: "test.java"
-  minor version: 0
-  major version: 51
-  flags: ACC_PUBLIC, ACC_SUPER
-Constant pool:
-   #1 = Methodref          #6.#18         //  java/lang/Object."<init>":()V
-   #2 = Fieldref           #19.#20        //  java/lang/System.out:Ljava/io/PrintStream;
-   #3 = String             #21            //  严
-   #4 = Methodref          #22.#23        //  java/io/PrintStream.println:(Ljava/lang/String;)V
-   #5 = Class              #24            //  test
-   #6 = Class              #25            //  java/lang/Object
-   #7 = Utf8               str
-   #8 = Utf8               Ljava/lang/String;
-   #9 = Utf8               ConstantValue
-  #10 = Utf8               <init>
-  #11 = Utf8               ()V
-  #12 = Utf8               Code
-  #13 = Utf8               LineNumberTable
-  #14 = Utf8               main
-  #15 = Utf8               ([Ljava/lang/String;)V
-  #16 = Utf8               SourceFile
-  #17 = Utf8               test.java
-  #18 = NameAndType        #10:#11        //  "<init>":()V
-  #19 = Class              #26            //  java/lang/System
-  #20 = NameAndType        #27:#28        //  out:Ljava/io/PrintStream;
-  #21 = Utf8               严
-  #22 = Class              #29            //  java/io/PrintStream
-  #23 = NameAndType        #30:#31        //  println:(Ljava/lang/String;)V
-  #24 = Utf8               test
-  #25 = Utf8               java/lang/Object
-  #26 = Utf8               java/lang/System
-  #27 = Utf8               out
-  #28 = Utf8               Ljava/io/PrintStream;
-  #29 = Utf8               java/io/PrintStream
-  #30 = Utf8               println
-  #31 = Utf8               (Ljava/lang/String;)V
+# 省略常量池
 {
   public static final java.lang.String str;
     flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL
@@ -253,7 +171,7 @@ Constant pool:
 
 接下来看看非静态的字段在加`final`或不加会不会有什么不同呢
 
-# 不加final的字段
+# 不加final的实例字段
 
 ````java
 public class test{
@@ -312,7 +230,7 @@ public class test{
 
 留意下`getfield`指令，主要就是获取`t`实例的`str`的值，其他的都是差不多的了
 
-# 加`final`
+# 加`final`的实例字段
 
 ````java
 public class test{
@@ -370,7 +288,7 @@ public class test{
         line 7: 21
 }
 
-```
+````
 `getfield`不见了，变成了熟悉的`ldc`,很明显了，加了`final`之后还是去常量池去找。
 
 
@@ -378,7 +296,7 @@ public class test{
 
 ## 静态字段的赋值
 
-上面的静态字段在没有final的情况下，是生成一段静态块的，这块代码在类加载的时候执行，在加final之后，所有用到这个静态字段都变成直接去常量池里面取，所以就没必要一个一个静态块了
+上面的静态字段在没有`final`的情况下，是生成一段静态块的，这块代码在类加载的时候执行，在加`final`之后，所有用到这个静态字段都变成直接去常量池里面取，所以就没必要一个一个静态块了
 
 ````
   static {};

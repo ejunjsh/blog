@@ -40,7 +40,7 @@ categories: go
 
 先上图：
 
-[![](http://idiotsky.me/images2/go-goroutine.jpg)](http://idiotsky.me/images2/go-goroutine.jpg)
+[![](http://idiotsky.top/images2/go-goroutine.jpg)](http://idiotsky.top/images2/go-goroutine.jpg)
 
 * 并发：处理器被划分为一个个时间分片，多个线程在处理器中交替执行，同一个时刻，只有一个线程被执行（通用地来说，支持并发是一种系统拥有交替执行多个任务的能力的表现）
 * 并行：多个线程，在多个处理器上同时执行。
@@ -59,19 +59,19 @@ categories: go
 
 goroutine的调度可以理解为多线程调度协程（goroutine）。所以这里调度会有三个角色：线程，调度器，协程。它们分别用M,P,G来表示吧。
 
-[![](http://idiotsky.me/images2/go-goroutine-1.jpg)](http://idiotsky.me/images2/go-goroutine-1.jpg)
+[![](http://idiotsky.top/images2/go-goroutine-1.jpg)](http://idiotsky.top/images2/go-goroutine-1.jpg)
 
 * M代表系统线程，也就是前面说的普通线程。
 * P代表调度器，我们可以把它当做单线程的本地调度器。（注：GOMAXPROCS环境变量代表的个数是P的个数，推荐值为CPU的核心数）
 * G代表goroutine，它包含了SP、PC寄存器，以及其它调度相关信息。
 
-[![](http://idiotsky.me/images2/go-goroutine-2.jpg)](http://idiotsky.me/images2/go-goroutine-2.jpg)
+[![](http://idiotsky.top/images2/go-goroutine-2.jpg)](http://idiotsky.top/images2/go-goroutine-2.jpg)
 
 上图是2个M（线程），每个线程对应一个处理器（P），M是必须关联P才能执行协程（G）的。图中蓝G代表的是运行中的goroutine，灰G表示的待执行的Goroutine，待执行的Goroutine存储在 P 中的一个局部队列中，此时P执行Goroutine会这个队列中取，不用加锁，提高了并发度。（Go1.0版本中，调度器取Goroutine是去一个全局队列中取，需要加锁，线程会经常阻塞等待锁）
 
 __如果其中一个G执行的时候，发生了系统调用，阻塞了怎么办？__
 
-[![](http://idiotsky.me/images2/go-goroutine-3.jpg)](http://idiotsky.me/images2/go-goroutine-3.jpg)
+[![](http://idiotsky.top/images2/go-goroutine-3.jpg)](http://idiotsky.top/images2/go-goroutine-3.jpg)
 
 上图左边，G0中陷入系统调用，导致M0阻塞。
 
@@ -85,7 +85,7 @@ __如果其中一个G执行的时候，发生了系统调用，阻塞了怎么�
 
 __当P局部队列不均衡时怎么处理？如果有多个P，其中一个P的局部队列Goroutine执行完了。__
 
-[![](http://idiotsky.me/images2/go-goroutine-4.jpg)](http://idiotsky.me/images2/go-goroutine-4.jpg)
+[![](http://idiotsky.top/images2/go-goroutine-4.jpg)](http://idiotsky.top/images2/go-goroutine-4.jpg)
 
 如果一个P局部队列为空，那么它尝试从全局队列中取Goroutine，如全局队列为空，则会随机从其它P的局部队列中“挪”一半Goroutine到自己的队列当中， 以保证所有的M都是有任务执行的，间接做到负载均衡（可以参考go源码的findrunnable()函数 ）
 

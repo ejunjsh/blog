@@ -10,7 +10,7 @@ categories: linux
 
 所以Linux的做法就是：父子进程共用同一物理内存。如下图：
 
-[![](http://idiotsky.me/images2/linux-copy-on-write-1.png)](http://idiotsky.me/images2/linux-copy-on-write-1.png) 
+[![](http://idiotsky.top/images2/linux-copy-on-write-1.png)](http://idiotsky.top/images2/linux-copy-on-write-1.png) 
 <!-- more -->
 
 但操作系统的要求是：进程之间的内存应该要独立，就是读写A进程的内存空间不应该影响B进程的内存内容。读操作是不会改变内存中的内容，所以对于读操作来说，共享物理内存是安全的。但是对于写操作就不一样，如果父子进程共用了相同的物理内存，那么对子进程的内存进行写操作同时会影响到父进程，所以违反了操作系统的要求。
@@ -19,8 +19,8 @@ Linux的解决方案是：把共用的物理内存设置为只读，因为读操
 
 `do_wp_page()`函数先进行一些安全监测，然后调用`__do_wp_page()`函数做最后的复制操作。去掉一些监测后，`__do_wp_page()`函数的代码如下图：
 
-[![](http://idiotsky.me/images2/linux-copy-on-write-3.jpg)](http://idiotsky.me/images2/linux-copy-on-write-3.jpg) 
+[![](http://idiotsky.top/images2/linux-copy-on-write-3.jpg)](http://idiotsky.top/images2/linux-copy-on-write-3.jpg) 
 
 `__do_wp_page()`首先会申请一块新的物理内存，然后复制旧的物理内存页的内容到新的物理内存也中，然后设置虚拟内存与物理内存的映射关系。最后把父子进程的物理内存设置可读写，这样父子进程相同的虚拟内存都指向不同的物理内存，所以达到进程之间内存隔离的目的。如下图：
 
-[![](http://idiotsky.me/images2/linux-copy-on-write-2.png)](http://idiotsky.me/images2/linux-copy-on-write-2.png) 
+[![](http://idiotsky.top/images2/linux-copy-on-write-2.png)](http://idiotsky.top/images2/linux-copy-on-write-2.png) 

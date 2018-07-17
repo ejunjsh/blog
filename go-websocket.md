@@ -17,7 +17,7 @@ categories: go
 WebSocket 协议在2008年诞生，2011年成为国际标准。所有浏览器都已经支持了。
 
 它的最大特点就是，服务器可以主动向客户端推送信息，客户端也可以主动向服务器发送信息，是真正的双向平等对话，属于[服务器推送](https://en.wikipedia.org/wiki/Push_technology)技术的一种。
-[![](http://idiotsky.me/images2/go-websocket-1.png)](http://idiotsky.me/images2/go-websocket-1.png)
+[![](http://idiotsky.top/images2/go-websocket-1.png)](http://idiotsky.top/images2/go-websocket-1.png)
 
 <!-- more -->
 其他特点包括：
@@ -31,7 +31,7 @@ WebSocket 协议在2008年诞生，2011年成为国际标准。所有浏览器�
 ws://example.com:80/some/path
 ````
 
-[![](http://idiotsky.me/images2/go-websocket-2.jpg)](http://idiotsky.me/images2/go-websocket-2.jpg)
+[![](http://idiotsky.top/images2/go-websocket-2.jpg)](http://idiotsky.top/images2/go-websocket-2.jpg)
 
 # 小试
 用一个echo的例子来试一下websocket

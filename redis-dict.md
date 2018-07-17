@@ -31,7 +31,7 @@ table 属性是一个数组， 数组中的每个元素都是一个指向 dict.h
 size 属性记录了哈希表的大小， 也即是 table 数组的大小， 而 used 属性则记录了哈希表目前已有节点（键值对）的数量。
 sizemask 属性的值总是等于 size - 1 ， 这个属性和哈希值一起决定一个键应该被放到 table 数组的哪个索引上面。
 图 4-1 展示了一个大小为 4 的空哈希表 （没有包含任何键值对）。
-[![](http://idiotsky.me/images/redis-dict-1.png)](http://idiotsky.me/images/redis-dict-1.png)
+[![](http://idiotsky.top/images/redis-dict-1.png)](http://idiotsky.top/images/redis-dict-1.png)
 <!-- more -->
 # 哈希表节点
 哈希表节点使用 dictEntry 结构表示， 每个 dictEntry 结构都保存着一个键值对：
@@ -56,7 +56,7 @@ typedef struct dictEntry {
 key 属性保存着键值对中的键， 而 v 属性则保存着键值对中的值， 其中键值对的值可以是一个指针， 或者是一个 uint64\_t 整数， 又或者是一个 int64\_t 整数。
 next 属性是指向另一个哈希表节点的指针， 这个指针可以将多个哈希值相同的键值对连接在一次， 以此来解决键冲突（collision）的问题。
 举个例子， 图 4-2 就展示了如何通过 next 指针， 将两个索引值相同的键 k1 和 k0 连接在一起。
-[![](http://idiotsky.me/images/redis-dict-2.png)](http://idiotsky.me/images/redis-dict-2.png)
+[![](http://idiotsky.top/images/redis-dict-2.png)](http://idiotsky.top/images/redis-dict-2.png)
 
 # 字典
 ````c
@@ -109,7 +109,7 @@ ht 属性是一个包含两个项的数组， 数组中的每个项都是一个 
 除了 ht[1] 之外， 另一个和 rehash 有关的属性就是 rehashidx ： 它记录了 rehash 目前的进度， 如果目前没有在进行 rehash ， 那么它的值为 -1 。
 
 图 4-3 展示了一个普通状态下（没有进行 rehash）的字典：
-[![](http://idiotsky.me/images/redis-dict-3.png)](http://idiotsky.me/images/redis-dict-3.png)
+[![](http://idiotsky.top/images/redis-dict-3.png)](http://idiotsky.top/images/redis-dict-3.png)
 
 # 哈希算法
 当要将一个新的键值对添加到字典里面时， 程序需要先根据键值对的键计算出哈希值和索引值， 然后再根据索引值， 将包含新键值对的哈希表节点放到哈希表数组的指定索引上面。
@@ -123,7 +123,7 @@ hash = dict->type->hashFunction(key);
 //根据情况不同， ht[x] 可以是 ht[0] 或者 ht[1]
 index = hash & dict->ht[x].sizemask;
 ````
-[![](http://idiotsky.me/images/redis-dict-4.png)](http://idiotsky.me/images/redis-dict-4.png)
+[![](http://idiotsky.top/images/redis-dict-4.png)](http://idiotsky.top/images/redis-dict-4.png)
 举个例子， 对于图 4-4 所示的字典来说， 如果我们要将一个键值对 k0 和 v0 添加到字典里面， 那么程序会先使用语句：
 ````c
 hash = dict->type->hashFunction(k0);
@@ -134,7 +134,7 @@ hash = dict->type->hashFunction(k0);
 index = hash & dict->ht[0].sizemask = 8 & 3 = 0;
 ````
 计算出键 k0 的索引值 0 ， 这表示包含键值对 k0 和 v0 的节点应该被放置到哈希表数组的索引 0 位置上， 如图 4-5 所示。
-[![](http://idiotsky.me/images/redis-dict-5.png)](http://idiotsky.me/images/redis-dict-5.png)
+[![](http://idiotsky.top/images/redis-dict-5.png)](http://idiotsky.top/images/redis-dict-5.png)
 当字典被用作数据库的底层实现， 或者哈希键的底层实现时， Redis 使用 MurmurHash2 算法来计算键的哈希值。
 
 MurmurHash 算法最初由 Austin Appleby 于 2008 年发明， 这种算法的优点在于， 即使输入的键是有规律的， 算法仍能给出一个很好的随机分布性，并且算法的计算速度也非常快。
@@ -147,8 +147,8 @@ MurmurHash 算法目前的最新版本为 MurmurHash3 ， 而 Redis 使用的是
 Redis 的哈希表使用链地址法（separate chaining）来解决键冲突： 每个哈希表节点都有一个 next 指针， 多个哈希表节点可以用 next 指针构成一个单向链表， 被分配到同一个索引上的多个节点可以用这个单向链表连接起来， 这就解决了键冲突的问题。
 
 举个例子， 假设程序要将键值对 k2 和 v2 添加到图 4-6 所示的哈希表里面， 并且计算得出 k2 的索引值为 2 ， 那么键 k1 和 k2 将产生冲突， 而解决冲突的办法就是使用 next 指针将键 k2 和 k1 所在的节点连接起来， 如图 4-7 所示。
-[![](http://idiotsky.me/images/redis-dict-6.png)](http://idiotsky.me/images/redis-dict-6.png)
-[![](http://idiotsky.me/images/redis-dict-7.png)](http://idiotsky.me/images/redis-dict-7.png)
+[![](http://idiotsky.top/images/redis-dict-6.png)](http://idiotsky.top/images/redis-dict-6.png)
+[![](http://idiotsky.top/images/redis-dict-7.png)](http://idiotsky.top/images/redis-dict-7.png)
 因为 dictEntry 节点组成的链表没有指向链表表尾的指针， 所以为了速度考虑， 程序总是将新节点添加到链表的表头位置（复杂度为 O(1)）， 排在其他已有节点的前面。
 
 # rehash
@@ -167,10 +167,10 @@ Redis 的哈希表使用链地址法（separate chaining）来解决键冲突：
 3. 释放 ht[0] ，并将 ht[1] 设置为 ht[0] ，然后为 ht[1] 分配一个空白哈希表，如图 4-11 所示。
 
 至此， 对哈希表的扩展操作执行完毕， 程序成功将哈希表的大小从原来的 4 改为了现在的 8 。
-[![](http://idiotsky.me/images/redis-dict-8.png)](http://idiotsky.me/images/redis-dict-8.png)
-[![](http://idiotsky.me/images/redis-dict-9.png)](http://idiotsky.me/images/redis-dict-9.png)
-[![](http://idiotsky.me/images/redis-dict-10.png)](http://idiotsky.me/images/redis-dict-10.png)
-[![](http://idiotsky.me/images/redis-dict-11.png)](http://idiotsky.me/images/redis-dict-11.png)
+[![](http://idiotsky.top/images/redis-dict-8.png)](http://idiotsky.top/images/redis-dict-8.png)
+[![](http://idiotsky.top/images/redis-dict-9.png)](http://idiotsky.top/images/redis-dict-9.png)
+[![](http://idiotsky.top/images/redis-dict-10.png)](http://idiotsky.top/images/redis-dict-10.png)
+[![](http://idiotsky.top/images/redis-dict-11.png)](http://idiotsky.top/images/redis-dict-11.png)
 
 # 哈希表的扩展与收缩
 当以下条件中的任意一个被满足时， 程序会自动开始对哈希表执行扩展操作：
@@ -211,12 +211,12 @@ load_factor = 256 / 512 = 0.5
 渐进式 rehash 的好处在于它采取分而治之的方式， 将 rehash 键值对所需的计算工作均滩到对字典的每个添加、删除、查找和更新操作上， 从而避免了集中式 rehash 而带来的庞大计算量。
 
 图 4-12 至图 4-17 展示了一次完整的渐进式 rehash 过程， 注意观察在整个 rehash 过程中， 字典的 rehashidx 属性是如何变化的。
-[![](http://idiotsky.me/images/redis-dict-12.png)](http://idiotsky.me/images/redis-dict-12.png)
-[![](http://idiotsky.me/images/redis-dict-13.png)](http://idiotsky.me/images/redis-dict-13.png)
-[![](http://idiotsky.me/images/redis-dict-14.png)](http://idiotsky.me/images/redis-dict-14.png)
-[![](http://idiotsky.me/images/redis-dict-15.png)](http://idiotsky.me/images/redis-dict-15.png)
-[![](http://idiotsky.me/images/redis-dict-16.png)](http://idiotsky.me/images/redis-dict-16.png)
-[![](http://idiotsky.me/images/redis-dict-17.png)](http://idiotsky.me/images/redis-dict-17.png)
+[![](http://idiotsky.top/images/redis-dict-12.png)](http://idiotsky.top/images/redis-dict-12.png)
+[![](http://idiotsky.top/images/redis-dict-13.png)](http://idiotsky.top/images/redis-dict-13.png)
+[![](http://idiotsky.top/images/redis-dict-14.png)](http://idiotsky.top/images/redis-dict-14.png)
+[![](http://idiotsky.top/images/redis-dict-15.png)](http://idiotsky.top/images/redis-dict-15.png)
+[![](http://idiotsky.top/images/redis-dict-16.png)](http://idiotsky.top/images/redis-dict-16.png)
+[![](http://idiotsky.top/images/redis-dict-17.png)](http://idiotsky.top/images/redis-dict-17.png)
 
 # 渐进式 rehash 执行期间的哈希表操作
 因为在进行渐进式 rehash 的过程中， 字典会同时使用 ht[0] 和 ht[1] 两个哈希表， 所以在渐进式 rehash 进行期间， 字典的删除（delete）、查找（find）、更新（update）等操作会在两个哈希表上进行： 比如说， 要在字典里面查找一个键的话， 程序会先在 ht[0] 里面进行查找， 如果没找到的话， 就会继续到 ht[1] 里面进行查找， 诸如此类。

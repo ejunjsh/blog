@@ -49,16 +49,16 @@ man malloc
 在现代操作系统中，不论是虚拟内存还是物理内存，都不是以字节为单位进行管理的，而是以页（Page）为单位。一个内存页是一段固定大小的连续内存地址的总称，具体到Linux中，典型的内存页大小为4096Byte（4K）。
 
 所以内存地址可以分为页号和页内偏移量。下面以64位机器，4G物理内存，4K页大小为例，虚拟内存地址和物理内存地址的组成如下：
-[![](http://idiotsky.me/images2/c-malloc-1.png)](http://idiotsky.me/images2/c-malloc-1.png)
+[![](http://idiotsky.top/images2/c-malloc-1.png)](http://idiotsky.top/images2/c-malloc-1.png)
 
 上面是虚拟内存地址，下面是物理内存地址。由于页大小都是4K，所以页内便宜都是用低12位表示，而剩下的高地址表示页号。
 
 MMU映射单位并不是字节，而是页，这个映射通过查一个常驻内存的数据结构[页表](http://en.wikipedia.org/wiki/Page_table)来实现。现在计算机具体的内存地址映射比较复杂，为了加快速度会引入一系列缓存和优化，例如[TLB](http://en.wikipedia.org/wiki/Translation_lookaside_buffer)等机制。下面给出一个经过简化的内存地址翻译示意图，虽然经过了简化，但是基本原理与现代计算机真实的情况的一致的。
-[![](http://idiotsky.me/images2/c-malloc-2.png)](http://idiotsky.me/images2/c-malloc-2.png)
+[![](http://idiotsky.top/images2/c-malloc-2.png)](http://idiotsky.top/images2/c-malloc-2.png)
 
 ### 内存页与磁盘页
 我们知道一般将内存看做磁盘的的缓存，有时MMU在工作时，会发现页表表明某个内存页不在物理内存中，此时会触发一个缺页异常（Page Fault），此时系统会到磁盘中相应的地方将磁盘页载入到内存中，然后重新执行由于缺页而失败的机器指令。关于这部分，因为可以看做对malloc实现是透明的，所以不再详细讲述，有兴趣的可以参考《深入理解计算机系统》相关章节。
-[![](http://idiotsky.me/images2/c-malloc-3.png)](http://idiotsky.me/images2/c-malloc-3.png)
+[![](http://idiotsky.top/images2/c-malloc-3.png)](http://idiotsky.top/images2/c-malloc-3.png)
 
 ## Linux进程级内存管理
 
@@ -68,7 +68,7 @@ MMU映射单位并不是字节，而是页，这个映射通过查一个常驻�
 以Linux 64位系统为例。理论上，64bit内存地址可用空间为0x0000000000000000 ~ 0xFFFFFFFFFFFFFFFF，这是个相当庞大的空间，Linux实际上只用了其中一小部分（256T）。
 
 根据[Linux内核相关文档](https://www.kernel.org/doc/Documentation/x86/x86_64/mm.txt)描述，Linux64位操作系统仅使用低47位，高17位做扩展（只能是全0或全1）。所以，实际用到的地址为空间为0x0000000000000000 ~ 0x00007FFFFFFFFFFF和0xFFFF800000000000 ~ 0xFFFFFFFFFFFFFFFF，其中前面为用户空间（User Space），后者为内核空间（Kernel Space）。图示如下：
-[![](http://idiotsky.me/images2/c-malloc-4.png)](http://idiotsky.me/images2/c-malloc-4.png)
+[![](http://idiotsky.top/images2/c-malloc-4.png)](http://idiotsky.top/images2/c-malloc-4.png)
 
 对用户来说，主要关注的空间是User Space。将User Space放大后，可以看到里面主要分为如下几段：
 * Code：这是整个用户空间的最低地址部分，存放的是指令（也就是程序所编译成的可执行机器码）
@@ -84,7 +84,7 @@ MMU映射单位并不是字节，而是页，这个映射通过查一个常驻�
 一般来说，malloc所申请的内存主要从Heap区域分配（本文不考虑通过mmap申请大块内存的情况）。
 
 由上文知道，进程所面对的虚拟内存地址空间，只有按页映射到物理内存地址，才能真正使用。受物理存储容量限制，整个堆虚拟内存空间不可能全部映射到实际的物理内存。Linux对堆的管理示意如下：
-[![](http://idiotsky.me/images2/c-malloc-5.png)](http://idiotsky.me/images2/c-malloc-5.png)
+[![](http://idiotsky.top/images2/c-malloc-5.png)](http://idiotsky.top/images2/c-malloc-5.png)
 
 Linux维护一个break指针，这个指针指向堆空间的某个地址。从堆起始地址到break之间的地址空间为映射好的，可以供进程访问；而从break往上，是未映射的地址空间，如果访问这段空间则程序会报错。
 
@@ -155,7 +155,7 @@ struct s_block {
 };
 ````
 由于我们只考虑64位机器，为了方便，我们在结构体最后填充一个int，使得结构体本身的长度为8的倍数，以便内存对齐。示意图如下：
-[![](http://idiotsky.me/images2/c-malloc-6.png)](http://idiotsky.me/images2/c-malloc-6.png)
+[![](http://idiotsky.top/images2/c-malloc-6.png)](http://idiotsky.top/images2/c-malloc-6.png)
 
 ### 寻找合适的block
 现在考虑如何在block链中查找合适的block。一般来说有两种查找算法：
@@ -197,7 +197,7 @@ t_block extend_heap(t_block last, size_t s) {
 
 ### 分裂block
 First fit有一个比较致命的缺点，就是可能会让很小的size占据很大的一块block，此时，为了提高payload，应该在剩余数据区足够大的情况下，将其分裂为一个新的block，示意如下：
-[![](http://idiotsky.me/images2/c-malloc-7.png)](http://idiotsky.me/images2/c-malloc-7.png)
+[![](http://idiotsky.top/images2/c-malloc-7.png)](http://idiotsky.top/images2/c-malloc-7.png)
 
 实现代码：
 ````c

@@ -11,7 +11,7 @@ categories: java
 3、limit：写模式下，limit表示最多能往Buffer里写多少数据，等于capacity值；读模式下，limit表示最多可以读取多少数据。
 4、capacity：缓存数组大小
 
-[![](http://idiotsky.me/images3/java-nio-channel-buffer.png)](http://idiotsky.me/images3/java-nio-channel-buffer.png)
+[![](http://idiotsky.top/images3/java-nio-channel-buffer.png)](http://idiotsky.top/images3/java-nio-channel-buffer.png)
 <!-- more -->
 
 mark()：把当前的position赋值给mark
@@ -72,7 +72,7 @@ public final Buffer rewind() {
 * ShortBuffer
 * MappedByteBuffer
 
-[![](http://idiotsky.me/images3/java-nio-channel-buffer-1.png)](http://idiotsky.me/images3/java-nio-channel-buffer-1.png)
+[![](http://idiotsky.top/images3/java-nio-channel-buffer-1.png)](http://idiotsky.top/images3/java-nio-channel-buffer-1.png)
 
 # ByteBuffer
 ByteBuffer的实现类包括"HeapByteBuffer"和"DirectByteBuffer"两种。

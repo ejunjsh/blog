@@ -6,7 +6,7 @@ categories: javascript
 ---
 几个礼拜之前我们开始一系列对于JavaScript以及其本质工作原理的深入挖掘：我们认为通过了解JavaScript的构建方式以及它们是如何共同合作的，你就能够写出更好的代码以及应用。
 
-这个系列的第一篇博客专注于介绍[对于引擎，运行时以及调用栈的概述](http://idiotsky.me/2017/08/26/javascript-how-work/)。[第二篇博客近距离地检测了Google V8 引擎的内部](http://idiotsky.me/2017/08/26/javascript-how-work-2/)并且提供了一些如何写出更好的JavaScript代码的建议。
+这个系列的第一篇博客专注于介绍[对于引擎，运行时以及调用栈的概述](http://idiotsky.top/2017/08/26/javascript-how-work/)。[第二篇博客近距离地检测了Google V8 引擎的内部](http://idiotsky.top/2017/08/26/javascript-how-work-2/)并且提供了一些如何写出更好的JavaScript代码的建议。
 
 在第三篇博客中，我们将会讨论另外一个关键的话题。这个话题由于随着编程语言的逐渐成熟和复杂化，越来越被开发者所忽视，这个话题就是在日常工作中使用到的——内存管理。
 
@@ -20,14 +20,14 @@ categories: javascript
 # 内存生命周期
 不管你在使用什么编程语言，内存的生命周期基本上都是一样的：
 
-[![](http://idiotsky.me/images1/javascript-how-work-3-1.png)](http://idiotsky.me/images1/javascript-how-work-3-1.png)
+[![](http://idiotsky.top/images1/javascript-how-work-3-1.png)](http://idiotsky.top/images1/javascript-how-work-3-1.png)
 
 下面是对于周期中每一步所发生的情况的概述：
  * **分配内存**——操作系统为你的程序分配内存并且允许其使用。在低层次语言中（比如C），这正是开发者应该处理的操作。在高层次的语言，然而，就由语言帮你实现了。
  * **使用内存**——当你的程序确实在使用之前分配的内存的阶段。当你在使用你代码里面分配的变量的时候会发生**读**以及**写**操作。
  * **释放内存**——这个阶段就是释放你不再需要的内存，从而这些内存被释放并且能够再次被使用。和**分配内存**操作一样，这在低层次的语言也是开发者需要明确的操作。
 
-对于调用栈以及内存堆有一个快速的概念认识，你可以阅读我们[关于这个话题的第一篇博客](http://idiotsky.me/2017/08/26/javascript-how-work/)。
+对于调用栈以及内存堆有一个快速的概念认识，你可以阅读我们[关于这个话题的第一篇博客](http://idiotsky.top/2017/08/26/javascript-how-work/)。
 
 ## 什么是内存？
 在我们讲述JavaScript内存之前，我们将简要地讨论一下内存是什么以及它们是如何在 nutshell 中工作的。
@@ -61,7 +61,7 @@ categories: javascript
 在上述的例子中，编译器知道每一个变量的准确的内存地址。事实上，无论我们何时写变量 n ，这都会在内部转化为类似于“内存地址 4127963”的东西。
 
 注意如果我们希望在这访问 x[4] 我们将会需要访问和 m 相关联的数据。这是因为我们在访问数组里面并不存在的元素——它比数组实际分配的最后一个元素 x[3] 要多4个字节，并且最后可能是阅读（或者重写）一些 m 的比特。这将很可能给程序的其他部分带来一些不良的后果。
-[![](http://idiotsky.me/images1/javascript-how-work-3-2.png)](http://idiotsky.me/images1/javascript-how-work-3-2.png)
+[![](http://idiotsky.top/images1/javascript-how-work-3-2.png)](http://idiotsky.top/images1/javascript-how-work-3-2.png)
 
 当函数调用其它函数的时候，当它被调用的时候都会获取它自己的堆栈块。它在那保存了它所有的局部变量，但是还会有一个程序计数器记录它执行的位置。当这个函数执行完毕，它的内存块就可以再次用于其他目的。
 
@@ -80,7 +80,7 @@ categories: javascript
 在此，在编译阶段中，编译器就没有办法知道数组需要多少内存，因为它取决于用户的输入。
 
 因此，它就不能够为栈上的变量分配空间。相反，我们的程序需要明确地询问操作运行时需要的空间数量。这个内存是从**堆空间**中分配出来的。动态内存和静态内存分配的区别总结如下表格：
-[![](http://idiotsky.me/images1/javascript-how-work-3-3.png)](http://idiotsky.me/images1/javascript-how-work-3-3.png)
+[![](http://idiotsky.top/images1/javascript-how-work-3-3.png)](http://idiotsky.top/images1/javascript-how-work-3-3.png)
 
 为了深入地理解动态内存分配是如何工作的，我们需要花费更多的时间在**指针**，这个可能有点偏离这篇博客的话题。如果你感兴趣了解更多，在评论里面告诉我，我将会在后续的博客中挖掘更多的细节。
 
@@ -222,7 +222,7 @@ function f() {
 
 f();
 ```
-[![](http://idiotsky.me/images1/javascript-how-work-3-4.png)](http://idiotsky.me/images1/javascript-how-work-3-4.png)
+[![](http://idiotsky.top/images1/javascript-how-work-3-4.png)](http://idiotsky.top/images1/javascript-how-work-3-4.png)
 
 ## 标记-清除算法
 
@@ -233,7 +233,7 @@ f();
 2. 所有的root都会被监测并且被标志成活跃的（比如不是垃圾）。所有的子代也会递归地被监测。所有能够由root访问的一切都不会被认为是垃圾。
 3. 所有不再被标志成活跃的内存块都被认为是垃圾。这个收集器现在就可以释放这些内存并将它们返还给操作系统。
 
-[![](http://idiotsky.me/images1/javascript-how-work-3-5.gif)](http://idiotsky.me/images1/javascript-how-work-3-5.gif)
+[![](http://idiotsky.top/images1/javascript-how-work-3-5.gif)](http://idiotsky.top/images1/javascript-how-work-3-5.gif)
 
 
 这个算法要优于之前的因为“一个具有0引用的对象”可以让一个对象不能够再被访问。但是相反的却不一定成立，比如我们遇到循环的时候。
@@ -246,7 +246,7 @@ f();
 
 在上述的第一个例子中，在函数调用返回之后，这两个对象不能够被全局对象所访问。因此，垃圾收集器就会发现它们不能够被访问了。
 
-[![](http://idiotsky.me/images1/javascript-how-work-3-6.png)](http://idiotsky.me/images1/javascript-how-work-3-6.png)
+[![](http://idiotsky.top/images1/javascript-how-work-3-6.png)](http://idiotsky.top/images1/javascript-how-work-3-6.png)
 
 即使在这两个对象之间存在着引用，它们再也不能从root访问了。
 
@@ -265,7 +265,7 @@ f();
 
 实质上，内存泄漏可以被定义为应用程序不再需要的内存，但是由于某些原因不会返回到操作系统或可用内存池。
 
-[![](http://idiotsky.me/images1/javascript-how-work-3-7.jpg)](http://idiotsky.me/images1/javascript-how-work-3-7.jpg)
+[![](http://idiotsky.top/images1/javascript-how-work-3-7.jpg)](http://idiotsky.top/images1/javascript-how-work-3-7.jpg)
 
 编程语言有支持管理内存的不同方法。 然而，某块内存是否被使用实际上是一个[不可判定的问题](ttps://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management#Release_when_the_memory_is_not_needed_anymore)。 换句话说，只有开发人员可以清楚一个内存是否可以返回到操作系统。
 

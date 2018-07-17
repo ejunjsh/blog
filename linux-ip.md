@@ -22,7 +22,7 @@ $ ip addr show enp0s3
 ````
 这里 enp0s3 是网卡的名字。
 
-[![](http://idiotsky.me/images3/linux-ip-1.jpg)](http://idiotsky.me/images3/linux-ip-1.jpg) 
+[![](http://idiotsky.top/images3/linux-ip-1.jpg)](http://idiotsky.top/images3/linux-ip-1.jpg) 
 
 # 案例 2：启用/禁用网卡
 使用 ip 命令来启用一个被禁用的网卡：
@@ -61,7 +61,7 @@ $ sudo ip addr del 192.168.0.10/24 dev enp0s3
 $  sudo ip addr add 192.168.0.20/24 dev enp0s3 label enp0s3:1 
 ````
 
-[![](http://idiotsky.me/images3/linux-ip-2.jpg)](http://idiotsky.me/images3/linux-ip-2.jpg) 
+[![](http://idiotsky.top/images3/linux-ip-2.jpg)](http://idiotsky.top/images3/linux-ip-2.jpg) 
 
 # 案例 6：检查路由/默认网关的信息
 查看路由信息会给我们显示数据包到达目的地的路由路径。要查看网络路由信息，执行下面命令：
@@ -69,7 +69,7 @@ $  sudo ip addr add 192.168.0.20/24 dev enp0s3 label enp0s3:1
 $  ip route show 
 ````
 
-[![](http://idiotsky.me/images3/linux-ip-3.jpg)](http://idiotsky.me/images3/linux-ip-3.jpg) 
+[![](http://idiotsky.top/images3/linux-ip-3.jpg)](http://idiotsky.top/images3/linux-ip-3.jpg) 
 
 在上面输出结果中，我们能够看到所有网卡上数据包的路由信息。我们也可以获取特定 IP 的路由信息，方法是：
 ````shell
@@ -111,7 +111,7 @@ RP，是地址解析协议Address Resolution Protocol的缩写，用于将 IP �
 ip neigh
 ````
 
-[![](http://idiotsky.me/images3/linux-ip-4.jpg)](http://idiotsky.me/images3/linux-ip-4.jpg) 
+[![](http://idiotsky.top/images3/linux-ip-4.jpg)](http://idiotsky.top/images3/linux-ip-4.jpg) 
 
 # 案例 10：修改 ARP 记录
 删除 ARP 记录的命令为：
@@ -134,7 +134,7 @@ $ sudo ip neigh add 192.168.0.150 lladdr 33:1g:75:37:r3:84 dev enp0s3 nud perm
 $ ip -s link 
 ````
 
-[![](http://idiotsky.me/images3/linux-ip-5.jpg)](http://idiotsky.me/images3/linux-ip-5.jpg) 
+[![](http://idiotsky.top/images3/linux-ip-5.jpg)](http://idiotsky.top/images3/linux-ip-5.jpg) 
 
 
 # 案例 12：获取帮助

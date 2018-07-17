@@ -11,7 +11,7 @@ tcp在网络OSI的七层模型中的第四层——Transport(传输)层，IP在�
 首先，我们需要知道，我们程序的数据首先会打到TCP的Segment中，然后TCP的Segment会打到IP的Packet中，然后再打到以太网Ethernet的Frame中，传到对端后，各个层解析自己的协议，然后把数据交给更高层的协议处理。
 # TCP头格式
 接下来，我们来看一下TCP头的格式
-[![](http://idiotsky.me/images1/tcp-something-1.jpg)](http://idiotsky.me/images1/tcp-something-1.jpg)
+[![](http://idiotsky.top/images1/tcp-something-1.jpg)](http://idiotsky.top/images1/tcp-something-1.jpg)
 你需要注意这么几点：
 * TCP的包是没有IP地址的，那是IP层上的事。但是有源端口和目标端口。
 * 一个TCP连接需要四个元组来表示是同一个连接（src\_ip, src\_port, dst\_ip, dst\_port）准确说是五元组，还有一个是协议。但因为这里只是说TCP协议，所以，这里我只说四元组。
@@ -23,19 +23,19 @@ tcp在网络OSI的七层模型中的第四层——Transport(传输)层，IP在�
 
 <!-- more -->
 关于其它的东西，可以参看下面的图示
-[![](http://idiotsky.me/images1/tcp-something-2.jpg)](http://idiotsky.me/images1/tcp-something-2.jpg)
+[![](http://idiotsky.top/images1/tcp-something-2.jpg)](http://idiotsky.top/images1/tcp-something-2.jpg)
 
 # TCP的状态机
 其实，网络上的传输是没有连接的，包括TCP也是一样的。而TCP所谓的“连接”，其实只不过是在通讯的双方维护一个“连接状态”，让它看上去好像有连接一样。所以，TCP的状态变换是非常重要的。
 
 下面是：“TCP协议的状态机”  和 “TCP建链接”、“TCP断链接”、“传数据” 的对照图，我把两个图并排放在一起，这样方便在你对照着看。另外，下面这两个图非常非常的重要，你一定要记牢。
-[![](http://idiotsky.me/images1/tcp-something-3.png)](http://idiotsky.me/images1/tcp-something-3.png)
-[![](http://idiotsky.me/images1/tcp-something-4.jpg)](http://idiotsky.me/images1/tcp-something-4.jpg)
+[![](http://idiotsky.top/images1/tcp-something-3.png)](http://idiotsky.top/images1/tcp-something-3.png)
+[![](http://idiotsky.top/images1/tcp-something-4.jpg)](http://idiotsky.top/images1/tcp-something-4.jpg)
 很多人会问，为什么建链接要3次握手，断链接需要4次挥手？
 * __对于建链接的3次握手__，主要是要初始化Sequence Number 的初始值。通信的双方要互相通知对方自己的初始化的Sequence Number（缩写为ISN：Inital Sequence Number）——所以叫SYN，全称Synchronize Sequence Numbers。也就上图中的 x 和 y。这个号要作为以后的数据通信的序号，以保证应用层接收到的数据不会因为网络上的传输的问题而乱序（TCP会用这个序号来拼接数据）。
 * __对于4次挥手__，其实你仔细看是2次，因为TCP是全双工的，所以，发送方和接收方都需要Fin和Ack。只不过，有一方是被动的，所以看上去就成了所谓的4次挥手。如果两边同时断连接，那就会就进入到CLOSING状态，然后到达TIME_WAIT状态。下图是双方同时断连接的示意图（你同样可以对照着TCP状态机看）：
 
-[![](http://idiotsky.me/images1/tcp-something-5.png)](http://idiotsky.me/images1/tcp-something-5.png)
+[![](http://idiotsky.top/images1/tcp-something-5.png)](http://idiotsky.top/images1/tcp-something-5.png)
 另外，有几个事情需要注意一下：
 * __关于建连接时SYN超时__。试想一下，如果server端接到了clien发的SYN后回了SYN-ACK后client掉线了，server端没有收到client回来的ACK，那么，这个连接处于一个中间状态，即没成功，也没失败。于是，server端如果在一定时间内没有收到的TCP会重发SYN-ACK。在Linux下，默认重试次数为5次，重试的间隔时间从1s开始每次都翻售，5次的重试时间间隔为1s, 2s, 4s, 8s, 16s，总共31s，第5次发出后还要等32s都知道第5次也超时了，所以，总共需要 1s + 2s + 4s+ 8s+ 16s + 32s = 2^6 -1 = 63s，TCP才会把断开这个连接。
 * __关于SYN Flood攻击__。一些恶意的人就为此制造了SYN Flood攻击——给服务器发了一个SYN后，就下线了，于是服务器需要默认等63s才会断开连接，这样，攻击者就可以把服务器的syn连接的队列耗尽，让正常的连接请求不能处理。于是，Linux下给了一个叫tcp\_syncookies的参数来应对这个事——当SYN队列满了后，TCP会通过源地址端口、目标地址端口和时间戳打造出一个特别的Sequence Number发回去（又叫cookie），如果是攻击者则不会有响应，如果是正常连接，则会把这个 SYN Cookie发回来，然后服务端可以通过cookie建连接（即使你不在SYN队列中）。请注意，请先千万别用tcp\_syncookies来处理正常的大负载的连接的情况。因为，synccookies是妥协版的TCP协议，并不严谨。对于正常的请求，你应该调整三个TCP参数可供你选择，第一个是：tcp\_synack\_retries 可以用他来减少重试次数；第二个是：tcp\_max\_syn\_backlog，可以增大SYN连接数；第三个是：tcp\_abort\_on\_overflow 处理不过来干脆就直接拒绝连接了。
@@ -52,7 +52,7 @@ tcp在网络OSI的七层模型中的第四层——Transport(传输)层，IP在�
 
 # 数据传输中的Sequence Number
 下图是我从Wireshark中截了个我在访问coolshell.cn时的有数据传输的图给你看一下，SeqNum是怎么变的。（使用Wireshark菜单中的Statistics ->Flow Graph… ）
-[![](http://idiotsky.me/images1/tcp-something-6.jpg)](http://idiotsky.me/images1/tcp-something-6.jpg)
+[![](http://idiotsky.top/images1/tcp-something-6.jpg)](http://idiotsky.top/images1/tcp-something-6.jpg)
 你可以看到，__SeqNum的增加是和传输的字节数相关的__。上图中，三次握手后，来了两个Len:1440的包，而第二个包的SeqNum就成了1441。然后第一个ACK回的是1441，表示第一个1440收到了。
 
 _SeqNum为当前成功发送的数据字节数，ACK为当前成功接收的数据字节数_
@@ -79,12 +79,12 @@ TCP要保证所有的数据包都可以到达，所以，必需要有重传机�
 于是，TCP引入了一种叫Fast Retransmit 的算法，不以时间驱动，而以数据驱动重传。也就是说，如果，包没有连续到达，就ack最后那个可能被丢了的包，如果发送方连续收到3次相同的ack，就重传。Fast Retransmit的好处是不用等timeout了再重传。
 
 比如：如果发送方发出了1，2，3，4，5份数据，第一份先到送了，于是就ack回2，结果2因为某些原因没收到，3到达了，于是还是ack回2，后面的4和5都到了，但是还是ack回2，因为2还是没有收到，于是发送端收到了三个ack=2的确认，知道了2还没有到，于是就马上重转2。然后，接收端收到了2，此时因为3，4，5都收到了，于是ack回6。示意图如下：
-[![](http://idiotsky.me/images1/tcp-something-7.png)](http://idiotsky.me/images1/tcp-something-7.png)
+[![](http://idiotsky.top/images1/tcp-something-7.png)](http://idiotsky.top/images1/tcp-something-7.png)
 Fast Retransmit只解决了一个问题，就是timeout的问题，它依然面临一个艰难的选择，就是，是重传之前的一个还是重传所有的问题。对于上面的示例来说，是重传#2呢还是重传#2，#3，#4，#5呢？因为发送端并不清楚这连续的3个ack(2)是谁传回来的？也许发送端发了20份数据，是#6，#10，#20传来的呢。这样，发送端很有可能要重传从2到20的这堆数据（这就是某些TCP的实际的实现）。可见，这是一把双刃剑。
 
 ## SACK 方法
 另外一种更好的方式叫：Selective Acknowledgment (SACK)（参看[RFC 2018](http://tools.ietf.org/html/rfc2018)），这种方式需要在TCP头里加一个SACK的东西，ACK还是Fast Retransmit的ACK，SACK则是汇报收到的数据碎版。参看下图：
-[![](http://idiotsky.me/images1/tcp-something-8.jpg)](http://idiotsky.me/images1/tcp-something-8.jpg)
+[![](http://idiotsky.top/images1/tcp-something-8.jpg)](http://idiotsky.top/images1/tcp-something-8.jpg)
 
 这样，在发送端就可以根据回传的SACK来知道哪些数据到了，哪些没有到。于是就优化了Fast Retransmit的算法。当然，这个协议需要两边都支持。在 Linux下，可以通过tcp_sack参数打开这个功能（Linux 2.4后默认打开）。
 
@@ -163,7 +163,7 @@ RTO = min [ UBOUND,  max [ LBOUND,   (β * SRTT) ]  ]
 这个问题无论你选那头都是按下葫芦起了瓢。 如下图所示：
 * 情况（a）是ack没回来，所以重传。如果你计算第一次发送和ACK的时间，那么，明显算大了。
 * 情况（b）是ack回来慢了，但是导致了重传，但刚重传不一会儿，之前ACK就回来了。如果你是算重传的时间和ACK回来的时间的差，就会算短了。
-[![](http://idiotsky.me/images1/tcp-something-9.jpg)](http://idiotsky.me/images1/tcp-something-9.jpg)
+[![](http://idiotsky.top/images1/tcp-something-9.jpg)](http://idiotsky.top/images1/tcp-something-9.jpg)
 
 所以1987年的时候，搞了一个叫[Karn / Partridge Algorithm](http://en.wikipedia.org/wiki/Karn's_Algorithm)，这个算法的最大特点是——__忽略重传，不把重传的RTT做采样__（你看，你不需要去解决不存在的问题）。
 
@@ -183,7 +183,7 @@ RTO= µ * SRTT + ∂ *DevRTT —— 神一样的公式
 需要说明一下，如果你不了解TCP的滑动窗口这个事，你等于不了解TCP协议。我们都知道，__TCP必需要解决的可靠传输以及包乱序（reordering）的问题__，所以，TCP必需要知道网络实际的数据处理带宽或是数据处理速度，这样才不会引起网络拥塞，导致丢包。
 
 所以，TCP引入了一些技术和设计来做网络流控，Sliding Window是其中一个技术。 前面我们说过，TCP头里有一个字段叫Window，又叫Advertised-Window，这个字段是接收端告诉发送端自己还有多少缓冲区可以接收数据。于是发送端就可以根据这个接收端的处理能力来发送数据，而不会导致接收端处理不过来。 为了说明滑动窗口，我们需要先看一下TCP缓冲区的一些数据结构：
-[![](http://idiotsky.me/images1/tcp-something-10.jpg)](http://idiotsky.me/images1/tcp-something-10.jpg)
+[![](http://idiotsky.top/images1/tcp-something-10.jpg)](http://idiotsky.top/images1/tcp-something-10.jpg)
 
 上图中，我们可以看到：
 * 接收端LastByteRead指向了TCP缓冲区中读到的位置，NextByteExpected指向的地方是收到的连续包的最后一个位置，LastByteRcved指向的是收到的包的最后一个位置，我们可以看到中间有些数据还没有到达，所以有数据空白区。
@@ -194,7 +194,7 @@ RTO= µ * SRTT + ∂ *DevRTT —— 神一样的公式
 * 而发送方会根据这个窗口来控制发送数据的大小，以保证接收方可以处理。
 
 下面我们来看一下发送方的滑动窗口示意图：
-[![](http://idiotsky.me/images1/tcp-something-11.png)](http://idiotsky.me/images1/tcp-something-11.png)
+[![](http://idiotsky.top/images1/tcp-something-11.png)](http://idiotsky.top/images1/tcp-something-11.png)
 
 上图中分成了四个部分，分别是：（其中那个黑模型就是滑动窗口）
 * #1已收到ack确认的数据。
@@ -203,10 +203,10 @@ RTO= µ * SRTT + ∂ *DevRTT —— 神一样的公式
 * #4窗口以外的数据（接收方没空间）
 
 下面是个滑动后的示意图（收到36的ack，并发出了46-51的字节）：
-[![](http://idiotsky.me/images1/tcp-something-12.png)](http://idiotsky.me/images1/tcp-something-12.png)
+[![](http://idiotsky.top/images1/tcp-something-12.png)](http://idiotsky.top/images1/tcp-something-12.png)
 
 下面我们来看一个接受端控制发送端的图示：
-[![](http://idiotsky.me/images1/tcp-something-13.png)](http://idiotsky.me/images1/tcp-something-13.png)
+[![](http://idiotsky.top/images1/tcp-something-13.png)](http://idiotsky.top/images1/tcp-something-13.png)
 
 ## Zero Window
 上图，我们可以看到一个处理缓慢的Server（接收端）是怎么把Client（发送端）的TCP Sliding Window给降成0的。此时，你一定会问，如果Window变成0了，TCP会怎么样？是不是发送端就不发数据了？是的，发送端就不发数据了，你可以想像成“Window Closed”，那你一定还会问，如果发送端不发数据了，接收方一会儿Window size 可用了，怎么通知发送端呢？
@@ -259,7 +259,7 @@ setsockopt(sock_fd, IPPROTO_TCP, TCP_NODELAY, (char *)&value,sizeof(int));
 4. 还有一个ssthresh（slow start threshold），是一个上限，当cwnd >= ssthresh时，就会进入“拥塞避免算法”（后面会说这个算法）
 
 所以，我们可以看到，如果网速很快的话，ACK也会返回得快，RTT也会短，那么，这个慢启动就一点也不慢。下图说明了这个过程。
-[![](http://idiotsky.me/images1/tcp-something-14.jpg)](http://idiotsky.me/images1/tcp-something-14.jpg)
+[![](http://idiotsky.top/images1/tcp-something-14.jpg)](http://idiotsky.top/images1/tcp-something-14.jpg)
 
 这里，我需要提一下的是一篇Google的论文《[An Argument for Increasing TCP’s Initial Congestion Window](http://static.googleusercontent.com/media/research.google.com/zh-CN//pubs/archive/36640.pdf)》Linux 3.0后采用了这篇论文的建议——把cwnd 初始化成了 10个MSS。 而Linux 3.0以前，比如2.6，Linux采用了[RFC3390](http://www.rfc-editor.org/rfc/rfc3390.txt)，cwnd是跟MSS的值来变的，如果MSS< 1095，则cwnd = 4；如果MSS>2190，则cwnd=2；其它情况下，则是3。
 
@@ -310,7 +310,7 @@ setsockopt(sock_fd, IPPROTO_TCP, TCP_NODELAY, (char *)&value,sizeof(int));
 
 ## 算法示意图
 下面我们来看一个简单的图示以同时看一下上面的各种算法的样子：
-[![](http://idiotsky.me/images1/tcp-something-15.jpg)](http://idiotsky.me/images1/tcp-something-15.jpg)
+[![](http://idiotsky.top/images1/tcp-something-15.jpg)](http://idiotsky.top/images1/tcp-something-15.jpg)
 
 ## FACK算法
 FACK全称Forward Acknowledgment 算法，论文地址在这里（PDF）[Forward Acknowledgement: Refining TCP Congestion Control](http://conferences.sigcomm.org/sigcomm/1996/papers/mathis.pdf) 这个算法是其于SACK的，前面我们说过SACK是使用了TCP扩展字段Ack了有哪些数据收到，哪些数据没有收到，他比Fast Retransmit的3 个duplicated acks好处在于，前者只知道有包丢了，不知道是一个还是多个，而SACK可以准确的知道有哪些包丢了。 所以，SACK可以让发送端这边在重传过程中，把那些丢掉的包重传，而不是一个一个的传，但这样的一来，如果重传的包数据比较多的话，又会导致本来就很忙的网络就更忙了。所以，FACK用来做重传过程中的拥塞流控。
@@ -325,7 +325,7 @@ FACK全称Forward Acknowledgment 算法，论文地址在这里（PDF）[Forward
 # 其它拥塞控制算法简介
 ## TCP Vegas 拥塞控制算法
 这个算法1994年被提出，它主要对TCP Reno 做了些修改。这个算法通过对RTT的非常重的监控来计算一个基准RTT。然后通过这个基准RTT来估计当前的网络实际带宽，如果实际带宽比我们的期望的带宽要小或是要多的活，那么就开始线性地减少或增加cwnd的大小。如果这个计算出来的RTT大于了Timeout后，那么，不等ack超时就直接重传。（Vegas 的核心思想是用RTT的值来影响拥塞窗口，而不是通过丢包） 这个算法的论文是《TCP Vegas: End to End Congestion Avoidance on a Global Internet》这篇论文给了Vegas和 New Reno的对比：
-[![](http://idiotsky.me/images1/tcp-something-16.jpg)](http://idiotsky.me/images1/tcp-something-16.jpg)
+[![](http://idiotsky.top/images1/tcp-something-16.jpg)](http://idiotsky.top/images1/tcp-something-16.jpg)
 
 关于这个算法实现，你可以参看Linux源码：[/net/ipv4/tcp_vegas.h](http://lxr.free-electrons.com/source/net/ipv4/tcp_vegas.h)， [/net/ipv4/tcp_vegas.c](http://lxr.free-electrons.com/source/net/ipv4/tcp_vegas.c)
 

@@ -27,9 +27,9 @@ epoll的两种工作模式：
 * __ET__：edge-trigger，边缘触发模式，只有某个socket从unreadable变为readable或从unwritable变为writable时，epoll_wait才会返回该socket。
 
 socket读数据
-[![](http://idiotsky.me/images/epoll-mechanism-1.png)](http://idiotsky.me/images/epoll-mechanism-1.png)
+[![](http://idiotsky.top/images/epoll-mechanism-1.png)](http://idiotsky.top/images/epoll-mechanism-1.png)
 
 socket写数据
-[![](http://idiotsky.me/images/epoll-mechanism-2.png)](http://idiotsky.me/images/epoll-mechanism-2.png)
+[![](http://idiotsky.top/images/epoll-mechanism-2.png)](http://idiotsky.top/images/epoll-mechanism-2.png)
 
 参考 http://www.jianshu.com/p/0d497fe5484a

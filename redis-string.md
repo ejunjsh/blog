@@ -27,7 +27,7 @@ struct sdshdr {
 * free 属性的值为 0 ， 表示这个 SDS 没有分配任何未使用空间。
 * len 属性的值为 5 ， 表示这个 SDS 保存了一个五字节长的字符串。
 * buf 属性是一个 char 类型的数组， 数组的前五个字节分别保存了 'R' 、 'e' 、 'd' 、 'i' 、 's' 五个字符， 而最后一个字节则保存了空字符 '\0' 。
-[![](http://idiotsky.me/images/redis-string-1.png)](http://idiotsky.me/images/redis-string-1.png)
+[![](http://idiotsky.top/images/redis-string-1.png)](http://idiotsky.top/images/redis-string-1.png)
 SDS 遵循 C 字符串以空字符结尾的惯例， 保存空字符的 1 字节空间不计算在 SDS 的 len 属性里面， 并且为空字符分配额外的 1 字节空间， 以及添加空字符到字符串末尾等操作都是由 SDS 函数自动完成的， 所以这个空字符对于 SDS 的使用者来说是完全透明的。
 
 遵循空字符结尾这一惯例的好处是， SDS 可以直接重用一部分 C 字符串函数库里面的函数。
@@ -42,31 +42,31 @@ printf("%s", s->buf);
 图 2-2 展示了另一个 SDS 示例:
 * 这个 SDS 和之前展示的 SDS 一样， 都保存了字符串值 "Redis" 。
 * 这个 SDS 和之前展示的 SDS 的区别在于， 这个 SDS 为 buf 数组分配了五字节未使用空间， 所以它的 free 属性的值为 5 （图中使用五个空格来表示五字节的未使用空间）。
-[![](http://idiotsky.me/images/redis-string-2.png)](http://idiotsky.me/images/redis-string-2.png)
+[![](http://idiotsky.top/images/redis-string-2.png)](http://idiotsky.top/images/redis-string-2.png)
 
 # SDS 与 C 字符串的区别
 根据传统， C 语言使用长度为 N+1 的字符数组来表示长度为 N 的字符串， 并且字符数组的最后一个元素总是空字符 '\0' 。
 
 比如说， 图 2-3 就展示了一个值为 "Redis" 的 C 字符串：
-[![](http://idiotsky.me/images/redis-string-3.png)](http://idiotsky.me/images/redis-string-3.png)
+[![](http://idiotsky.top/images/redis-string-3.png)](http://idiotsky.top/images/redis-string-3.png)
 C 语言使用的这种简单的字符串表示方式， 并不能满足 Redis 对字符串在安全性、效率、以及功能方面的要求， 本节接下来的内容将详细对比 C 字符串和 SDS 之间的区别， 并说明 SDS 比 C 字符串更适用于 Redis 的原因。
 
 ## 常数复杂度获取字符串长度
 因为 C 字符串并不记录自身的长度信息， 所以为了获取一个 C 字符串的长度， 程序必须遍历整个字符串， 对遇到的每个字符进行计数， 直到遇到代表字符串结尾的空字符为止， 这个操作的复杂度为 O(N) 。
 
 举个例子， 图 2-4 展示了程序计算一个 C 字符串长度的过程。
-[![](http://idiotsky.me/images/redis-string-4.png)](http://idiotsky.me/images/redis-string-4.png)
-[![](http://idiotsky.me/images/redis-string-5.png)](http://idiotsky.me/images/redis-string-5.png)
-[![](http://idiotsky.me/images/redis-string-6.png)](http://idiotsky.me/images/redis-string-6.png)
-[![](http://idiotsky.me/images/redis-string-7.png)](http://idiotsky.me/images/redis-string-7.png)
-[![](http://idiotsky.me/images/redis-string-8.png)](http://idiotsky.me/images/redis-string-8.png)
-[![](http://idiotsky.me/images/redis-string-9.png)](http://idiotsky.me/images/redis-string-9.png)
+[![](http://idiotsky.top/images/redis-string-4.png)](http://idiotsky.top/images/redis-string-4.png)
+[![](http://idiotsky.top/images/redis-string-5.png)](http://idiotsky.top/images/redis-string-5.png)
+[![](http://idiotsky.top/images/redis-string-6.png)](http://idiotsky.top/images/redis-string-6.png)
+[![](http://idiotsky.top/images/redis-string-7.png)](http://idiotsky.top/images/redis-string-7.png)
+[![](http://idiotsky.top/images/redis-string-8.png)](http://idiotsky.top/images/redis-string-8.png)
+[![](http://idiotsky.top/images/redis-string-9.png)](http://idiotsky.top/images/redis-string-9.png)
 和 C 字符串不同， 因为 SDS 在 len 属性中记录了 SDS 本身的长度， 所以获取一个 SDS 长度的复杂度仅为 O(1) 。
 
 举个例子， 对于图 2-5 所示的 SDS 来说， 程序只要访问 SDS 的 len 属性， 就可以立即知道 SDS 的长度为 5 字节：
-[![](http://idiotsky.me/images/redis-string-10.png)](http://idiotsky.me/images/redis-string-10.png)
+[![](http://idiotsky.top/images/redis-string-10.png)](http://idiotsky.top/images/redis-string-10.png)
 又比如说， 对于图 2-6 展示的 SDS 来说， 程序只要访问 SDS 的 len 属性， 就可以立即知道 SDS 的长度为 11 字节。
-[![](http://idiotsky.me/images/redis-string-11.png)](http://idiotsky.me/images/redis-string-11.png)
+[![](http://idiotsky.top/images/redis-string-11.png)](http://idiotsky.top/images/redis-string-11.png)
 设置和更新 SDS 长度的工作是由 SDS 的 API 在执行时自动完成的， 使用 SDS 无须进行任何手动修改长度的工作。
 
 通过使用 SDS 而不是 C 字符串， Redis 将获取字符串长度所需的复杂度从 O(N) 降低到了 O(1) ， 这确保了获取字符串长度的工作不会成为 Redis 的性能瓶颈。
@@ -83,13 +83,13 @@ char *strcat(char *dest, const char *src);
 因为 C 字符串不记录自身的长度， 所以 strcat 假定用户在执行这个函数时， 已经为 dest 分配了足够多的内存， 可以容纳 src 字符串中的所有内容， 而一旦这个假定不成立时， 就会产生缓冲区溢出。
 
 举个例子， 假设程序里有两个在内存中紧邻着的 C 字符串 s1 和 s2 ， 其中 s1 保存了字符串 "Redis" ， 而 s2 则保存了字符串 "MongoDB" ， 如图 2-7 所示。
-[![](http://idiotsky.me/images/redis-string-12.png)](http://idiotsky.me/images/redis-string-12.png)
+[![](http://idiotsky.top/images/redis-string-12.png)](http://idiotsky.top/images/redis-string-12.png)
 如果一个程序员决定通过执行：
 ````c
 strcat(s1, " Cluster");
 ````
 将 s1 的内容修改为 "Redis Cluster" ， 但粗心的他却忘了在执行 strcat 之前为 s1 分配足够的空间， 那么在 strcat 函数执行之后， s1 的数据将溢出到 s2 所在的空间中， 导致 s2 保存的内容被意外地修改， 如图 2-8 所示。
-[![](http://idiotsky.me/images/redis-string-13.png)](http://idiotsky.me/images/redis-string-13.png)
+[![](http://idiotsky.top/images/redis-string-13.png)](http://idiotsky.top/images/redis-string-13.png)
 与 C 字符串不同， SDS 的空间分配策略完全杜绝了发生缓冲区溢出的可能性： 当 SDS API 需要对 SDS 进行修改时， API 会先检查 SDS 的空间是否满足修改所需的要求， 如果不满足的话， API 会自动将 SDS 的空间扩展至执行修改所需的大小， 然后才执行实际的修改操作， 所以使用 SDS 既不需要手动修改 SDS 的空间大小， 也不会出现前面所说的缓冲区溢出问题。
 
 举个例子， SDS 的 API 里面也有一个用于执行拼接操作的 sdscat 函数， 它可以将一个 C 字符串拼接到给定 SDS 所保存的字符串的后面， 但是在执行拼接操作之前， sdscat 会先检查给定 SDS 的空间是否足够， 如果不够的话， sdscat 就会先扩展 SDS 的空间， 然后才执行拼接操作。
@@ -100,8 +100,8 @@ sdscat(s, " Cluster");
 
 ````
 其中 SDS 值 s 如图 2-9 所示， 那么 sdscat 将在执行拼接操作之前检查 s 的长度是否足够， 在发现 s 目前的空间不足以拼接 " Cluster" 之后， sdscat 就会先扩展 s 的空间， 然后才执行拼接 " Cluster" 的操作， 拼接操作完成之后的 SDS 如图 2-10 所示。
-[![](http://idiotsky.me/images/redis-string-14.png)](http://idiotsky.me/images/redis-string-14.png)
-[![](http://idiotsky.me/images/redis-string-15.png)](http://idiotsky.me/images/redis-string-15.png)
+[![](http://idiotsky.top/images/redis-string-14.png)](http://idiotsky.top/images/redis-string-14.png)
+[![](http://idiotsky.top/images/redis-string-15.png)](http://idiotsky.top/images/redis-string-15.png)
 注意图 2-10 所示的 SDS ： sdscat 不仅对这个 SDS 进行了拼接操作， 它还为 SDS 分配了 13 字节的未使用空间， 并且拼接之后的字符串也正好是 13 字节长， 这种现象既不是 bug 也不是巧合， 它和 SDS 的空间分配策略有关， 接下来的小节将对这一策略进行说明
 ## 减少修改字符串时带来的内存重分配次数
 正如前两个小节所说， 因为 C 字符串并不记录自身的长度， 所以对于一个包含了 N 个字符的 C 字符串来说， 这个 C 字符串的底层实现总是一个 N+1 个字符长的数组（额外的一个字符空间用于保存空字符）。
@@ -144,14 +144,14 @@ strcat(s, " Tutorial");
 sdscat(s, " Cluster");
 ````
 那么 sdscat 将执行一次内存重分配操作， 将 SDS 的长度修改为 13 字节， 并将 SDS 的未使用空间同样修改为 13 字节， 如图 2-12 所示。
-[![](http://idiotsky.me/images/redis-string-16.png)](http://idiotsky.me/images/redis-string-16.png)
-[![](http://idiotsky.me/images/redis-string-17.png)](http://idiotsky.me/images/redis-string-17.png)
+[![](http://idiotsky.top/images/redis-string-16.png)](http://idiotsky.top/images/redis-string-16.png)
+[![](http://idiotsky.top/images/redis-string-17.png)](http://idiotsky.top/images/redis-string-17.png)
 如果这时， 我们再次对 s 执行：
 ````c
 sdscat(s, " Tutorial");
 ````
 那么这次 sdscat 将不需要执行内存重分配： 因为未使用空间里面的 13 字节足以保存 9 字节的 " Tutorial" ， 执行 sdscat 之后的 SDS 如图 2-13 所示。
-[![](http://idiotsky.me/images/redis-string-18.png)](http://idiotsky.me/images/redis-string-18.png)
+[![](http://idiotsky.top/images/redis-string-18.png)](http://idiotsky.top/images/redis-string-18.png)
 在扩展 SDS 空间之前， SDS API 会先检查未使用空间是否足够， 如果足够的话， API 就会直接使用未使用空间， 而无须执行内存重分配。
 
 通过这种预分配策略， SDS 将连续增长 N 次字符串所需的内存重分配次数从必定 N 次降低为最多 N 次。
@@ -166,8 +166,8 @@ sdscat(s, " Tutorial");
 sdstrim(s, "XY");   // 移除 SDS 字符串中的所有 'X' 和 'Y'
 ````
 会将 SDS 修改成图 2-15 所示的样子。
-[![](http://idiotsky.me/images/redis-string-19.png)](http://idiotsky.me/images/redis-string-19.png)
-[![](http://idiotsky.me/images/redis-string-20.png)](http://idiotsky.me/images/redis-string-20.png)
+[![](http://idiotsky.top/images/redis-string-19.png)](http://idiotsky.top/images/redis-string-19.png)
+[![](http://idiotsky.top/images/redis-string-20.png)](http://idiotsky.top/images/redis-string-20.png)
 注意执行 sdstrim 之后的 SDS 并没有释放多出来的 8 字节空间， 而是将这 8 字节空间作为未使用空间保留在了 SDS 里面， 如果将来要对 SDS 进行增长操作的话， 这些未使用空间就可能会派上用场。
 
 举个例子， 如果现在对 s 执行：
@@ -175,7 +175,7 @@ sdstrim(s, "XY");   // 移除 SDS 字符串中的所有 'X' 和 'Y'
 sdscat(s, " Redis");
 ````
 那么完成这次 sdscat 操作将不需要执行内存重分配： 因为 SDS 里面预留的 8 字节空间已经足以拼接 6 个字节长的 " Redis" ， 如图 2-16 所示。
-[![](http://idiotsky.me/images/redis-string-21.png)](http://idiotsky.me/images/redis-string-21.png)
+[![](http://idiotsky.top/images/redis-string-21.png)](http://idiotsky.top/images/redis-string-21.png)
 通过惰性空间释放策略， SDS 避免了缩短字符串时所需的内存重分配操作， 并为将来可能有的增长操作提供了优化。
 
 与此同时， SDS 也提供了相应的 API ， 让我们可以在有需要时， 真正地释放 SDS 里面的未使用空间， 所以不用担心惰性空间释放策略会造成内存浪费。
@@ -184,18 +184,18 @@ sdscat(s, " Redis");
 C 字符串中的字符必须符合某种编码（比如 ASCII）， 并且除了字符串的末尾之外， 字符串里面不能包含空字符， 否则最先被程序读入的空字符将被误认为是字符串结尾 —— 这些限制使得 C 字符串只能保存文本数据， 而不能保存像图片、音频、视频、压缩文件这样的二进制数据。
 
 举个例子， 如果有一种使用空字符来分割多个单词的特殊数据格式， 如图 2-17 所示， 那么这种格式就不能使用 C 字符串来保存， 因为 C 字符串所用的函数只会识别出其中的 "Redis" ， 而忽略之后的 "Cluster" 。
-[![](http://idiotsky.me/images/redis-string-22.png)](http://idiotsky.me/images/redis-string-22.png)
+[![](http://idiotsky.top/images/redis-string-22.png)](http://idiotsky.top/images/redis-string-22.png)
 虽然数据库一般用于保存文本数据， 但使用数据库来保存二进制数据的场景也不少见， 因此， 为了确保 Redis 可以适用于各种不同的使用场景， SDS 的 API 都是二进制安全的（binary-safe）： 所有 SDS API 都会以处理二进制的方式来处理 SDS 存放在 buf 数组里的数据， 程序不会对其中的数据做任何限制、过滤、或者假设 —— 数据在写入时是什么样的， 它被读取时就是什么样。
 
 这也是我们将 SDS 的 buf 属性称为字节数组的原因 —— Redis 不是用这个数组来保存字符， 而是用它来保存一系列二进制数据。
 
 比如说， 使用 SDS 来保存之前提到的特殊数据格式就没有任何问题， 因为 SDS 使用 len 属性的值而不是空字符来判断字符串是否结束， 如图 2-18 所示。
-[![](http://idiotsky.me/images/redis-string-23.png)](http://idiotsky.me/images/redis-string-23.png)
+[![](http://idiotsky.top/images/redis-string-23.png)](http://idiotsky.top/images/redis-string-23.png)
 通过使用二进制安全的 SDS ， 而不是 C 字符串， 使得 Redis 不仅可以保存文本数据， 还可以保存任意格式的二进制数据。
 
 # 兼容部分 C 字符串函数
 虽然 SDS 的 API 都是二进制安全的， 但它们一样遵循 C 字符串以空字符结尾的惯例： 这些 API 总会将 SDS 保存的数据的末尾设置为空字符， 并且总会在为 buf 数组分配空间时多分配一个字节来容纳这个空字符， 这是为了让那些保存文本数据的 SDS 可以重用一部分 `<string.h>` 库定义的函数。
-[![](http://idiotsky.me/images/redis-string-24.png)](http://idiotsky.me/images/redis-string-24.png)
+[![](http://idiotsky.top/images/redis-string-24.png)](http://idiotsky.top/images/redis-string-24.png)
 举个例子， 如图 2-19 所示， 如果我们有一个保存文本数据的 SDS 值 sds ， 那么我们就可以重用 `<string.h>/strcasecmp` 函数， 使用它来对比 SDS 保存的字符串和另一个 C 字符串：
 ````c
 strcasecmp(sds->buf, "hello world");

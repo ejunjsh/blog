@@ -9,7 +9,7 @@ HashMap是Java程序员使用频率最高的用于映射(键值对)处理的数�
 
 # 简介
 Java为数据结构中的映射定义了一个接口java.util.Map，此接口主要有四个常用的实现类，分别是HashMap、Hashtable、LinkedHashMap和TreeMap，类继承关系如下图所示：
-[![](http://idiotsky.me/images1/java-hashmap-1.png)](http://idiotsky.me/images1/java-hashmap-1.png)
+[![](http://idiotsky.top/images1/java-hashmap-1.png)](http://idiotsky.top/images1/java-hashmap-1.png)
 下面针对各个实现类的特点做一些说明：
 1. HashMap：它根据键的hashCode值存储数据，大多数情况下可以直接定位到它的值，因而具有很快的访问速度，但遍历顺序却是不确定的。 HashMap最多只允许一条记录的键为null，允许多条记录的值为null。HashMap非线程安全，即任一时刻可以有多个线程同时写HashMap，可能会导致数据的不一致。如果需要满足线程安全，可以用 Collections的synchronizedMap方法使HashMap具有线程安全的能力，或者使用ConcurrentHashMap。
 2. Hashtable：Hashtable是遗留类，很多映射的常用功能与HashMap类似，不同的是它承自Dictionary类，并且是线程安全的，任一时间只有一个线程能写Hashtable，并发性不如ConcurrentHashMap，因为ConcurrentHashMap引入了分段锁。Hashtable不建议在新代码中使用，不需要线程安全的场合可以用HashMap替换，需要线程安全的场合可以用ConcurrentHashMap替换。
@@ -25,7 +25,7 @@ Java为数据结构中的映射定义了一个接口java.util.Map，此接口主
 
 ## 存储结构-字段
 从结构实现来讲，HashMap是数组+链表+红黑树（JDK1.8增加了红黑树部分）实现的，如下如所示。
-[![](http://idiotsky.me/images1/java-hashmap-2.png)](http://idiotsky.me/images1/java-hashmap-2.png)
+[![](http://idiotsky.top/images1/java-hashmap-2.png)](http://idiotsky.top/images1/java-hashmap-2.png)
 这里需要讲明白两个问题：数据底层具体存储的是什么？这样的存储方式有什么优点呢？
 (1) 从源码可知，HashMap类中有一个非常重要的字段，就是 Node[] table，即哈希桶数组，明显它是一个Node的数组。我们来看Node[JDK1.8]是何物。
 ````java
@@ -97,11 +97,11 @@ static int indexFor(int h, int length) {  //jdk1.7的源码，jdk1.8没有这个
 在JDK1.8的实现中，优化了高位运算的算法，通过hashCode()的高16位异或低16位实现的：(h = k.hashCode()) ^ (h >>> 16)，主要是从速度、功效、质量来考虑的，这么做可以在数组table的length比较小的时候，也能保证考虑到高低Bit都参与到Hash的计算中，同时不会有太大的开销。
 
 下面举例说明下，n为table的长度。
-[![](http://idiotsky.me/images1/java-hashmap-3.png)](http://idiotsky.me/images1/java-hashmap-3.png)
+[![](http://idiotsky.top/images1/java-hashmap-3.png)](http://idiotsky.top/images1/java-hashmap-3.png)
 
 ## 分析HashMap的put方法
 HashMap的put方法执行过程可以通过下图来理解，自己有兴趣可以去对比源码更清楚地研究学习。
-[![](http://idiotsky.me/images1/java-hashmap-4.png)](http://idiotsky.me/images1/java-hashmap-4.png)
+[![](http://idiotsky.top/images1/java-hashmap-4.png)](http://idiotsky.top/images1/java-hashmap-4.png)
 1. 判断键值对数组table[i]是否为空或为null，否则执行resize()进行扩容；
 2. 根据键值key计算hash值得到插入的数组索引i，如果table[i]==null，直接新建节点添加，转向6，如果table[i]不为空，转向3；
 3. 判断table[i]的首个元素是否和key一样，如果相同直接覆盖value，否则转向4，这里的相同指的是hashCode以及equals；
@@ -211,13 +211,13 @@ void transfer(Entry[] newTable) {
 newTable[i]的引用赋给了e.next，也就是使用了单链表的头插入方式，同一位置上新元素总会被放在链表的头部位置；这样先放在一个索引上的元素终会被放到Entry链的尾部(如果发生了hash冲突的话），这一点和Jdk1.8有区别，下文详解。在旧数组中同一条Entry链上的元素，通过重新计算索引位置后，有可能被放到了新数组的不同位置上。
 
 下面举个例子说明下扩容过程。假设了我们的hash算法就是简单的用key mod 一下表的大小（也就是数组的长度）。其中的哈希桶数组table的size=2， 所以key = 3、7、5，put顺序依次为 5、7、3。在mod 2以后都冲突在table[1]这里了。这里假设负载因子 loadFactor=1，即当键值对的实际大小size 大于 table的实际大小时进行扩容。接下来的三个步骤是哈希桶数组 resize成4，然后所有的Node重新rehash的过程。
-[![](http://idiotsky.me/images1/java-hashmap-5.png)](http://idiotsky.me/images1/java-hashmap-5.png)
+[![](http://idiotsky.top/images1/java-hashmap-5.png)](http://idiotsky.top/images1/java-hashmap-5.png)
 下面我们讲解下JDK1.8做了哪些优化。经过观测可以发现，我们使用的是2次幂的扩展(指长度扩为原来2倍)，所以，元素的位置要么是在原位置，要么是在原位置再移动2次幂的位置。看下图可以明白这句话的意思，n为table的长度，图（a）表示扩容前的key1和key2两种key确定索引位置的示例，图（b）表示扩容后key1和key2两种key确定索引位置的示例，其中hash1是key1对应的哈希与高位运算结果。
-[![](http://idiotsky.me/images1/java-hashmap-6.png)](http://idiotsky.me/images1/java-hashmap-6.png)
+[![](http://idiotsky.top/images1/java-hashmap-6.png)](http://idiotsky.top/images1/java-hashmap-6.png)
 元素在重新计算hash之后，因为n变为2倍，那么n-1的mask范围在高位多1bit(红色)，因此新的index就会发生这样的变化：
-[![](http://idiotsky.me/images1/java-hashmap-7.png)](http://idiotsky.me/images1/java-hashmap-7.png)
+[![](http://idiotsky.top/images1/java-hashmap-7.png)](http://idiotsky.top/images1/java-hashmap-7.png)
 因此，我们在扩充HashMap的时候，不需要像JDK1.7的实现那样重新计算hash，只需要看看原来的hash值新增的那个bit是1还是0就好了，是0的话索引没变，是1的话索引变成“原索引+oldCap”，可以看看下图为16扩充为32的resize示意图：
-[![](http://idiotsky.me/images1/java-hashmap-8.png)](http://idiotsky.me/images1/java-hashmap-8.png)
+[![](http://idiotsky.top/images1/java-hashmap-8.png)](http://idiotsky.top/images1/java-hashmap-8.png)
 这个设计确实非常的巧妙，既省去了重新计算hash值的时间，而且同时，由于新增的1bit是0还是1可以认为是随机的，因此resize的过程，均匀的把之前的冲突的节点分散到新的bucket了。这一块就是JDK1.8新增的优化点。有一点注意区别，JDK1.7中rehash的时候，旧链表迁移新链表的时候，如果在新表的数组索引位置相同，则链表元素会倒置，但是从上图可以看出，JDK1.8不会倒置。有兴趣的同学可以研究下JDK1.8的resize源码，写的很赞，如下:
 ````java
 final Node<K,V>[] resize() {
@@ -331,15 +331,15 @@ public class HashMapInfiniteLoop {
 其中，map初始化为一个长度为2的数组，loadFactor=0.75，threshold=2*0.75=1，也就是说当put第二个key的时候，map就需要进行resize。
 
 通过设置断点让线程1和线程2同时debug到transfer方法(3.4小节代码块)的首行。注意此时两个线程已经成功添加数据。放开thread1的断点至transfer方法的“Entry next = e.next;” 这一行；然后放开线程2的的断点，让线程2进行resize。结果如下图。
-[![](http://idiotsky.me/images1/java-hashmap-9.png)](http://idiotsky.me/images1/java-hashmap-9.png)
+[![](http://idiotsky.top/images1/java-hashmap-9.png)](http://idiotsky.top/images1/java-hashmap-9.png)
 
 注意，Thread1的 e 指向了key(3)，而next指向了key(7)，其在线程二rehash后，指向了线程二重组后的链表。
 
 线程一被调度回来执行，先是执行 newTalbe[i] = e， 然后是e = next，导致了e指向了key(7)，而下一次循环的next = e.next导致了next指向了key(3)。
-[![](http://idiotsky.me/images1/java-hashmap-10.png)](http://idiotsky.me/images1/java-hashmap-10.png)
-[![](http://idiotsky.me/images1/java-hashmap-11.png)](http://idiotsky.me/images1/java-hashmap-11.png)
+[![](http://idiotsky.top/images1/java-hashmap-10.png)](http://idiotsky.top/images1/java-hashmap-10.png)
+[![](http://idiotsky.top/images1/java-hashmap-11.png)](http://idiotsky.top/images1/java-hashmap-11.png)
 e.next = newTable[i] 导致 key(3).next 指向了 key(7)。注意：此时的key(7).next 已经指向了key(3)， 环形链表就这样出现了。
-[![](http://idiotsky.me/images1/java-hashmap-12.png)](http://idiotsky.me/images1/java-hashmap-12.png)
+[![](http://idiotsky.top/images1/java-hashmap-12.png)](http://idiotsky.top/images1/java-hashmap-12.png)
 于是，当我们用线程一调用map.get(11)时，悲剧就出现了——Infinite Loop。
 
 # JDK1.8与JDK1.7的性能对比
@@ -418,7 +418,7 @@ public class Keys {
     }
 ````
 在测试中会查找不同的值，然后度量花费的时间，为了计算getKey的平均时间，我们遍历所有的get方法，计算总的时间，除以key的数量，计算一个平均值，主要用来比较，绝对值可能会受很多环境因素的影响。结果如下：
-[![](http://idiotsky.me/images1/java-hashmap-13.png)](http://idiotsky.me/images1/java-hashmap-13.png)
+[![](http://idiotsky.top/images1/java-hashmap-13.png)](http://idiotsky.top/images1/java-hashmap-13.png)
 通过观测测试结果可知，JDK1.8的性能要高于JDK1.7 15%以上，在某些size的区域上，甚至高于100%。由于Hash算法较均匀，JDK1.8引入的红黑树效果不明显，下面我们看看Hash不均匀的的情况。
 
 ## Hash极不均匀的情况
@@ -435,7 +435,7 @@ class Key implements Comparable<Key> {
 }
 ````
 仍然执行main方法，得出的结果如下表所示：
-[![](http://idiotsky.me/images1/java-hashmap-14.png)](http://idiotsky.me/images1/java-hashmap-14.png)
+[![](http://idiotsky.top/images1/java-hashmap-14.png)](http://idiotsky.top/images1/java-hashmap-14.png)
 
 从表中结果中可知，随着size的变大，JDK1.7的花费时间是增长的趋势，而JDK1.8是明显的降低趋势，并且呈现对数增长稳定。当一个链表太长的时候，HashMap会动态的将它替换成一个红黑树，会将时间复杂度从O(n)降为O(logn)。hash算法均匀和不均匀所花费的时间明显也不相同，这两种情况的相对比较，可以说明一个好的hash算法的重要性。
 >测试环境：处理器为2.2 GHz Intel Core i7，内存为16 GB 1600 MHz DDR3，SSD硬盘，使用默认的JVM参数，运行在64位的OS X 10.10.1上。

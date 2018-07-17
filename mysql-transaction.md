@@ -29,7 +29,7 @@ categories: mysql
 
 数据库的事务隔离越严格，并发副作用越小，但付出的代价也就越大，因为事务隔离实质上就是使事务在一定程度上 “串行化”进行，这显然与“并发”是矛盾的。同时，不同的应用对读一致性和事务隔离程度的要求也是不同的，比如许多应用对“不可重复读”和“幻读”并不敏感，可能更关心数据并发访问的能力。
 为了解决“隔离”与“并发”的矛盾，ISO/ANSI SQL92定义了4个事务隔离级别，每个级别的隔离程度不同，允许出现的副作用也不同，应用可以根据自己的业务逻辑要求，通过选择不同的隔离级别来平衡 “隔离”与“并发”的矛盾。下表很好地概括了这4个隔离级别的特性：
-[![](http://idiotsky.me/images/mysql-transaction-1.png)](http://idiotsky.me/images/mysql-transaction-1.png)
+[![](http://idiotsky.top/images/mysql-transaction-1.png)](http://idiotsky.top/images/mysql-transaction-1.png)
 
 # 通过例子理解事务的四种隔离级别
 首先，我们使用 test 数据库，新建 tx 表，表里面有id和num两个字段，并且打开两个客户端来操作同一个数据库。

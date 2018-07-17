@@ -10,7 +10,7 @@ categories: java
 类如其名，抽象的队列式的同步器，AQS定义了一套多线程访问共享资源的同步器框架，许多同步类实现都依赖于它，如常用的ReentrantLock/Semaphore/CountDownLatch...。
 
 # 框架
-[![](http://idiotsky.me/images1/java-aqs-1.png)](http://idiotsky.me/images1/java-aqs-1.png)
+[![](http://idiotsky.top/images1/java-aqs-1.png)](http://idiotsky.top/images1/java-aqs-1.png)
 
 <!-- more -->
 它维护了一个volatile int state（代表共享资源）和一个FIFO线程等待队列（多线程争用资源被阻塞时会进入此队列）。这里volatile是核心关键词，具体volatile的语义，在此不述。state的访问方式有三种:
@@ -201,7 +201,7 @@ public final void acquire(int arg) {
 4. 如果线程在等待过程中被中断过，它是不响应的。只是获取资源后才再进行自我中断selfInterrupt()，将中断补上。
 
 由于此函数是重中之重，我再用流程图总结一下：
-[![](http://idiotsky.me/images1/java-aqs-2.png)](http://idiotsky.me/images1/java-aqs-2.png)
+[![](http://idiotsky.top/images1/java-aqs-2.png)](http://idiotsky.top/images1/java-aqs-2.png)
 
 至此，acquire()的流程终于算是告一段落了。这也就是ReentrantLock.lock()的流程，不信你去看其lock()源码吧，整个函数就是一条acquire(1)！！
 

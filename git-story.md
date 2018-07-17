@@ -11,7 +11,7 @@ Git先生是一位很出名的摄影专家，他的主要职责是用它强大�
 老板（用户自己）新买了一块地皮（创建了一个目录），想聘请Git先生到此开设一个工作室来加快这个地皮的建设工作。老板用`git init` 招来了Git先生，Git先生在该目录下生成一个.git目录，用来作为自己的办公室，办公室用来记录自己的工作日志和成果。
 
 让我们来从空中俯瞰下这块新的地皮，和Git先生为它所设计的蓝图吧。
-[![](http://idiotsky.me/images1/git-story-1.jpg)](http://idiotsky.me/images1/git-story-1.jpg)
+[![](http://idiotsky.top/images1/git-story-1.jpg)](http://idiotsky.top/images1/git-story-1.jpg)
 
 下面我们来解释下，这几个区域的作用：
 Working Directory：Git先生的老板所买下的地皮，这个是实实在在物理层面的地皮，我们可以在上面种些花花草草，建点高楼大厦啥的。
@@ -24,7 +24,7 @@ Remote：这是一块云端区域，Git先生会在工作完一段时间后，�
 <!-- more -->
 # Go to work
 一切准备妥当后，Git先生马上就投入到了紧张的工作当中。老板首先就迫不及待的在地皮上上种了一朵花，然后马上命令Git来拍照留念。
-[![](http://idiotsky.me/images1/git-story-2.jpg)](http://idiotsky.me/images1/git-story-2.jpg)
+[![](http://idiotsky.top/images1/git-story-2.jpg)](http://idiotsky.top/images1/git-story-2.jpg)
 当然结果是失败的，Git也很苦恼，自己已经把所有流程和老板说过一遍了，但老板还是会鲁莽行事。然后Git先生又向老板耐心的解释了一下针对Git目录下某个修改的4种状态。
 > Untracked/Tracked
 > Not Staged/Staged
@@ -35,12 +35,12 @@ Remote：这是一块云端区域，Git先生会在工作完一段时间后，�
 老板学会这招后，又给这块地皮创建了树、草，并且也都分别让Git先生拍了照片保存。
 
 `git log`后我们看到了这三张照片，如果要查看详情还可以使用`git log -p`。
-[![](http://idiotsky.me/images1/git-story-3.jpg)](http://idiotsky.me/images1/git-story-3.jpg)
+[![](http://idiotsky.top/images1/git-story-3.jpg)](http://idiotsky.top/images1/git-story-3.jpg)
 > 导演注：Commit的id为对当前文件夹内容做SHA-1得来。
 
 # 上点儿色吧
 老板想把树涂成红色的，再给树取个名字叫big tree。他记得Git先生告诉过他可以用`git diff`来查看自己所做的改动
-[![](http://idiotsky.me/images1/git-story-4.jpg)](http://idiotsky.me/images1/git-story-4.jpg)
+[![](http://idiotsky.top/images1/git-story-4.jpg)](http://idiotsky.top/images1/git-story-4.jpg)
 看到了自己的修改后，老板满意的点点头，然后用`git add .`把它们都丢进了摄影棚。过后就出去忙其他事情了，回来后他发现自己忘记离开前做了啥事情了。此时他再用`git diff`查看，发现里面空空如也。老板愤怒的叫来了Git先生问他是咋回事。Git先生友善的解释了原因。
 
 “`git diff`显示了您当前修改和我办公室中所记录的最新一张照片之间的差异，但是您已经把这些改动都挪到我的摄影棚里了，git diff就没法查看了，如果您想看我摄影棚里摆了哪些东西。你可以使用`git diff --staged/cached`哦”
@@ -69,7 +69,7 @@ Remote：这是一块云端区域，Git先生会在工作完一段时间后，�
 老板经过上次的事件，发现自己可能会因为一时冲动做出一些错误的决定。就问Git先生是否有办法把自己所有操作行为都记录下来，而且还允许自己撤销任何一种错误的操作。Git先生向老板解释说：所有对HEAD指针的操作都会被记录下来。
 
 可以用`git reflog`查看到老板的所有HEAD操作
-[![](http://idiotsky.me/images1/git-story-5.jpg)](http://idiotsky.me/images1/git-story-5.jpg)
+[![](http://idiotsky.top/images1/git-story-5.jpg)](http://idiotsky.top/images1/git-story-5.jpg)
 最上面，我们可以看到是老板彻底回退了给树添加名字和颜色修改，执行了`git reset --hard HEAD~1`，而如果老板突然又后悔了，想恢复添加名字和颜色的修改。那么我们就可以通过执行`git reset --hard HEAD@{1}`来把操作回退到`HEAD@{1}`时，也就是加入名字和颜色那次commit。
 > 这里的reset也有三个选项，`--soft`，`--mixed`，`--hard`，因为这里执行的是恢复操作，所以这三个选项在这里的作用也需要反过来理解，hard自不用说，就是完全恢复到某个操作时的状态，而soft表示，虽然把HEAD指针拨到了某个操作时的状态，但在staging area中会产生可以让恢复后的状态重新修改回来的修改，就像物质与反物质那样。mixed同理。
 
@@ -115,7 +115,7 @@ Git先生：一切交给我，不过因为地皮开放出去后，涉及到多�
 
 `git remote add origin https://github.com/CPPAlien/GitTestRepo.git`//这里一般用origin，当然你可以换成其他任何名，你也可以添加多个remote地址git remote -v 可以用来查看所有云端地址信息
 `git push -u <remote> <branch> git push --set-upstream <remote> <branch>`用这两个命令来指明某个分支所对应到的remote地址。如果不指定，你在执行git push时需要明确写出remote和branch。
-[![](http://idiotsky.me/images1/git-story-6.jpg)](http://idiotsky.me/images1/git-story-6.jpg)
+[![](http://idiotsky.top/images1/git-story-6.jpg)](http://idiotsky.top/images1/git-story-6.jpg)
 
 因为是多人合作，所以就有可能别人在云端先与你提交了一些修改，而此时就需要进行git pull操作，把别人的修改拉取下来合并到本地。但直接git pull行为是不太安全的，因为它会直接产生merge行为，可能会导致你本地数据错乱。所以我们一般用git fetch，正确流程如下
 

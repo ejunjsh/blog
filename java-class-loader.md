@@ -82,7 +82,7 @@ Father init!
 
 # 类加载过程
 类从被加载到虚拟机内存中开始，到卸载出内存为止，它的整个生命周期包括：加载（Loading）、验证（Verification）、准备(Preparation)、解析(Resolution)、初始化(Initialization)、使用(Using)和卸载(Unloading)7个阶段。其中准备、验证、解析3个部分统称为连接（Linking）。如图所示。 
-[![](http://idiotsky.me/images1/java-class-loader-1.png)](http://idiotsky.me/images1/java-class-loader-1.png)
+[![](http://idiotsky.top/images1/java-class-loader-1.png)](http://idiotsky.top/images1/java-class-loader-1.png)
 
 加载、验证、准备、初始化和卸载这5个阶段的顺序是确定的，类的加载过程必须按照这种顺序按部就班地开始，而解析阶段则不一定：它在某些情况下可以在初始化阶段之后再开始，这是为了支持Java语言的运行时绑定（也称为动态绑定或晚期绑定）。以下陈述的内容都已HotSpot为基准。
 

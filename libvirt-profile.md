@@ -16,7 +16,7 @@ categories: openstack
 
 图 1. libvirt 比较和用例模型
 
-[![](http://idiotsky.me/images3/libvirt-profile-1.gif)](http://idiotsky.me/images3/libvirt-profile-1.gif)
+[![](http://idiotsky.top/images3/libvirt-profile-1.gif)](http://idiotsky.top/images3/libvirt-profile-1.gif)
 
 图中还显示了 libvirt 所用术语对照。这些术语很重要，因为在对 API 命名时会用到它们。两个根本区别在于，libvirt 将物理主机称作节点，将来宾操作系统称作域。这里需要注意的是，libvirt（及其应用程序）在宿主 Linux 操作系统（域 0）中运行。
 
@@ -25,14 +25,14 @@ categories: openstack
 
 图 2. 使用 libvirtd 控制远程虚拟机监控程序
 
-[![](http://idiotsky.me/images3/libvirt-profile-2.gif)](http://idiotsky.me/images3/libvirt-profile-2.gif)
+[![](http://idiotsky.top/images3/libvirt-profile-2.gif)](http://idiotsky.top/images3/libvirt-profile-2.gif)
 
 ## 虚拟机监控程序支持
 为支持各种虚拟机监控程序的可扩展性，libvirt 实施一种基于驱动程序的架构，该架构允许一种通用的 API 以通用方式为大量潜在的虚拟机监控程序提供服务。这意味着，一些虚拟机监控程序的某些专业功能在 API 中不可见。另外，有些虚拟机监控程序可能不能实施所有 API 功能，因而在特定驱动程序内被定义为不受支持。图 3 展示了 libvirt API 与相关驱动程序的层次结构。这里也需要注意，libvirtd 提供从远程应用程序访问本地域的方式。
 
 图 3. 基于驱动程序的 libvirt 架构
 
-[![](http://idiotsky.me/images3/libvirt-profile-3.gif)](http://idiotsky.me/images3/libvirt-profile-3.gif)
+[![](http://idiotsky.top/images3/libvirt-profile-3.gif)](http://idiotsky.top/images3/libvirt-profile-3.gif)
 
 在撰写此文时，libvirt 为表 1 所列的虚拟机监控程序实现了驱动程序。随着新的虚拟机监控程序在开源社区出现，其他驱动程序无疑也将可用。
 

@@ -8,7 +8,7 @@ categories: mysql
 
 # MySQL逻辑架构
 如果能在头脑中构建一幅MySQL各组件之间如何协同工作的架构图，有助于深入理解MySQL服务器。下图展示了MySQL的逻辑架构图。
-[![](http://idiotsky.me/images1/mysql-optimization-mechanism-1.jpg)](http://idiotsky.me/images1/mysql-optimization-mechanism-1.jpg)
+[![](http://idiotsky.top/images1/mysql-optimization-mechanism-1.jpg)](http://idiotsky.top/images1/mysql-optimization-mechanism-1.jpg)
 <!-- more -->
 MySQL逻辑架构整体分为三层，最上层为客户端层，并非MySQL所独有，诸如：连接处理、授权认证、安全等功能均在这一层处理。
 
@@ -20,7 +20,7 @@ MySQL大多数核心服务均在中间这一层，包括查询解析、分析、
 我们总是希望MySQL能够获得更高的查询性能，最好的办法是弄清楚MySQL是如何优化和执行查询的。一旦理解了这一点，就会发现：很多的查询优化工作实际上就是遵循一些原则让MySQL的优化器能够按照预想的合理方式运行而已。
 
 当向MySQL发送一个请求的时候，MySQL到底做了些什么呢？
-[![](http://idiotsky.me/images1/mysql-optimization-mechanism-2.jpg)](http://idiotsky.me/images1/mysql-optimization-mechanism-2.jpg)
+[![](http://idiotsky.top/images1/mysql-optimization-mechanism-2.jpg)](http://idiotsky.top/images1/mysql-optimization-mechanism-2.jpg)
 
 ## 客户端/服务端通信协议
 MySQL客户端/服务端通信协议是“半双工”的：在任一时刻，要么是服务器向客户端发送数据，要么是客户端向服务器发送数据，这两个动作不能同时发生。一旦一端开始发送消息，另一端要接收完整个消息才能响应它，所以我们无法也无须将一个消息切成小块独立发送，也没有办法进行流量控制。
@@ -127,19 +127,19 @@ MySQL的查询优化器是一个非常复杂的部件，它使用了非常多的
 B+Tree中的B是指balance，意为平衡。需要注意的是，B+树索引并不能找到一个给定键值的具体行，它找到的只是被查找数据行所在的页，接着数据库会把页读入到内存，再在内存中进行查找，最后得到要查找的数据。
 
 在介绍B+Tree前，先了解一下二叉查找树，它是一种经典的数据结构，其左子树的值总是小于根的值，右子树的值总是大于根的值，如下图①。如果要在这课树中查找值为5的记录，其大致流程：先找到根，其值为6，大于5，所以查找左子树，找到3，而5大于3，接着找3的右子树，总共找了3次。同样的方法，如果查找值为8的记录，也需要查找3次。所以二叉查找树的平均查找次数为(3 + 3 + 3 + 2 + 2 + 1) / 6 = 2.3次，而顺序查找的话，查找值为2的记录，仅需要1次，但查找值为8的记录则需要6次，所以顺序查找的平均查找次数为：(1 + 2 + 3 + 4 + 5 + 6) / 6 = 3.3次，因此大多数情况下二叉查找树的平均查找速度比顺序查找要快。
-[![](http://idiotsky.me/images1/mysql-optimization-mechanism-3.jpg)](http://idiotsky.me/images1/mysql-optimization-mechanism-3.jpg)
+[![](http://idiotsky.top/images1/mysql-optimization-mechanism-3.jpg)](http://idiotsky.top/images1/mysql-optimization-mechanism-3.jpg)
 
 由于二叉查找树可以任意构造，同样的值，可以构造出如图②的二叉查找树，显然这棵二叉树的查询效率和顺序查找差不多。若想二叉查找数的查询性能最高，需要这棵二叉查找树是平衡的，也即平衡二叉树（AVL树）。
 
 平衡二叉树首先需要符合二叉查找树的定义，其次必须满足任何节点的两个子树的高度差不能大于1。显然图②不满足平衡二叉树的定义，而图①是一课平衡二叉树。平衡二叉树的查找性能是比较高的（性能最好的是最优二叉树），查询性能越好，维护的成本就越大。比如图①的平衡二叉树，当用户需要插入一个新的值9的节点时，就需要做出如下变动。
-[![](http://idiotsky.me/images1/mysql-optimization-mechanism-4.jpg)](http://idiotsky.me/images1/mysql-optimization-mechanism-4.jpg)
+[![](http://idiotsky.top/images1/mysql-optimization-mechanism-4.jpg)](http://idiotsky.top/images1/mysql-optimization-mechanism-4.jpg)
 
 通过一次左旋操作就将插入后的树重新变为平衡二叉树是最简单的情况了，实际应用场景中可能需要旋转多次。至此我们可以考虑一个问题，平衡二叉树的查找效率还不错，实现也非常简单，相应的维护成本还能接受，为什么MySQL索引不直接使用平衡二叉树？
 
 随着数据库中数据的增加，索引本身大小随之增加，不可能全部存储在内存中，因此索引往往以索引文件的形式存储的磁盘上。这样的话，索引查找过程中就要产生磁盘I/O消耗，相对于内存存取，I/O存取的消耗要高几个数量级。可以想象一下一棵几百万节点的二叉树的深度是多少？如果将这么大深度的一颗二叉树放磁盘上，每读取一个节点，需要一次磁盘的I/O读取，整个查找的耗时显然是不能够接受的。那么如何减少查找过程中的I/O存取次数？
 
 一种行之有效的解决方法是减少树的深度，将二叉树变为m叉树（多路搜索树），而B+Tree就是一种多路搜索树。理解B+Tree时，只需要理解其最重要的两个特征即可：第一，所有的关键字（可以理解为数据）都存储在叶子节点（Leaf Page），非叶子节点（Index Page）并不存储真正的数据，所有记录节点都是按键值大小顺序存放在同一层叶子节点上。其次，所有的叶子节点由指针连接。如下图为高度为2的简化了的B+Tree。
-[![](http://idiotsky.me/images1/mysql-optimization-mechanism-5.jpg)](http://idiotsky.me/images1/mysql-optimization-mechanism-5.jpg)
+[![](http://idiotsky.top/images1/mysql-optimization-mechanism-5.jpg)](http://idiotsky.top/images1/mysql-optimization-mechanism-5.jpg)
 
 怎么理解这两个特征？MySQL将每个节点的大小设置为一个页的整数倍（原因下文会介绍），也就是在节点空间大小一定的情况下，每个节点可以存储更多的内结点，这样每个结点能索引的范围更大更精确。所有的叶子节点使用指针链接的好处是可以进行区间访问，比如上图中，如果查找大于20而小于30的记录，只需要找到节点20，就可以遍历指针依次找到25、30。如果没有链接指针的话，就无法进行区间查找。这也是MySQL使用B+Tree作为索引存储结构的重要原因。
 
@@ -153,15 +153,15 @@ MySQL巧妙利用了磁盘预读原理，将一个节点的大小设为等于一
 
 仍以上面的树为例，我们假设每个节点只能存储4个内节点。首先要插入第一个节点28，如下图所示。
 
-[![](http://idiotsky.me/images1/mysql-optimization-mechanism-6.jpg)](http://idiotsky.me/images1/mysql-optimization-mechanism-6.jpg)
+[![](http://idiotsky.top/images1/mysql-optimization-mechanism-6.jpg)](http://idiotsky.top/images1/mysql-optimization-mechanism-6.jpg)
 接着插入下一个节点70，在Index Page中查询后得知应该插入到50 - 70之间的叶子节点，但叶子节点已满，这时候就需要进行也分裂的操作，当前的叶子节点起点为50，所以根据中间值来拆分叶子节点，如下图所示。
-[![](http://idiotsky.me/images1/mysql-optimization-mechanism-7.jpg)](http://idiotsky.me/images1/mysql-optimization-mechanism-7.jpg)
+[![](http://idiotsky.top/images1/mysql-optimization-mechanism-7.jpg)](http://idiotsky.top/images1/mysql-optimization-mechanism-7.jpg)
 最后插入一个节点95，这时候Index Page和Leaf Page都满了，就需要做两次拆分，如下图所示。
-[![](http://idiotsky.me/images1/mysql-optimization-mechanism-8.jpg)](http://idiotsky.me/images1/mysql-optimization-mechanism-8.jpg)
+[![](http://idiotsky.top/images1/mysql-optimization-mechanism-8.jpg)](http://idiotsky.top/images1/mysql-optimization-mechanism-8.jpg)
 拆分后最终形成了这样一颗树。
-[![](http://idiotsky.me/images1/mysql-optimization-mechanism-9.jpg)](http://idiotsky.me/images1/mysql-optimization-mechanism-9.jpg)
+[![](http://idiotsky.top/images1/mysql-optimization-mechanism-9.jpg)](http://idiotsky.top/images1/mysql-optimization-mechanism-9.jpg)
 B+Tree为了保持平衡，对于新插入的值需要做大量的拆分页操作，而页的拆分需要I/O操作，为了尽可能的减少页的拆分操作，B+Tree也提供了类似于平衡二叉树的旋转功能。当Leaf Page已满但其左右兄弟节点没有满的情况下，B+Tree并不急于去做拆分操作，而是将记录移到当前所在页的兄弟节点上。通常情况下，左兄弟会被先检查用来做旋转操作。就比如上面第二个示例，当插入70的时候，并不会去做页拆分，而是左旋操作。
-[![](http://idiotsky.me/images1/mysql-optimization-mechanism-10.jpg)](http://idiotsky.me/images1/mysql-optimization-mechanism-10.jpg)
+[![](http://idiotsky.top/images1/mysql-optimization-mechanism-10.jpg)](http://idiotsky.top/images1/mysql-optimization-mechanism-10.jpg)
 
 通过旋转操作可以最大限度的减少页分裂，从而减少索引维护过程中的磁盘的I/O操作，也提高索引维护效率。需要注意的是，删除节点跟插入节点类似，仍然需要旋转和拆分操作，这里就不再说明。
 
@@ -178,7 +178,7 @@ key(last_name,first_name,dob)
 
 ````
 对于表中每一行数据，索引中包含了last\_name、first\_name、dob列的值，下图展示了索引是如何组织数据存储的。
-[![](http://idiotsky.me/images1/mysql-optimization-mechanism-11.jpg)](http://idiotsky.me/images1/mysql-optimization-mechanism-11.jpg)
+[![](http://idiotsky.top/images1/mysql-optimization-mechanism-11.jpg)](http://idiotsky.top/images1/mysql-optimization-mechanism-11.jpg)
 
 可以看到，索引首先根据第一个字段来排列顺序，当名字相同时，则根据第三个字段，即出生日期来排序，正是因为这个原因，才有了索引的“最左原则”。
 

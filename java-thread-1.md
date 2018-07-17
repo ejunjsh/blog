@@ -222,7 +222,7 @@ public class Deamon {
 * 超时阻塞（TIME_WAITING）：运行的线程执行sleep(long)或join(long)方法，或者发出了I/O请求时，JVM会把该线程置为阻塞状态。
 
 5.死亡状态（Dead）：线程执行完了或者因异常退出了run()方法，该线程结束生命周期。
-[![](http://idiotsky.me/images/java-thread-1-1.png)](http://idiotsky.me/images/java-thread-1-1.png)
+[![](http://idiotsky.top/images/java-thread-1-1.png)](http://idiotsky.top/images/java-thread-1-1.png)
 图中的方法解析如下：
 Thread.sleep()：在指定时间内让当前正在执行的线程暂停执行，但不会释放"锁标志"。不推荐使用。
 Thread.sleep(long)：使当前线程进入阻塞状态，在指定时间内不会执行。 

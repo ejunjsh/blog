@@ -28,11 +28,11 @@ categories: 分布式事务
 
 起初，事务仅限于对单一数据库资源的访问控制：
 
-[![](http://idiotsky.me/images3/dt-1.jpg)](http://idiotsky.me/images3/dt-1.jpg)
+[![](http://idiotsky.top/images3/dt-1.jpg)](http://idiotsky.top/images3/dt-1.jpg)
 
 架构服务化以后，事务的概念延伸到了服务中。倘若将一个单一的服务操作作为一个事务，那么整个服务操作只能涉及一个单一的数据库资源：
 
-[![](http://idiotsky.me/images3/dt-2.jpg)](http://idiotsky.me/images3/dt-2.jpg)
+[![](http://idiotsky.top/images3/dt-2.jpg)](http://idiotsky.top/images3/dt-2.jpg)
 
 这类基于单个服务单一数据库资源访问的事务，被称为本地事务（Local Transaction）。
 
@@ -42,17 +42,17 @@ categories: 分布式事务
 
 最早的分布式事务应用架构很简单，不涉及服务间的访问调用，仅仅是服务内操作涉及到对多个数据库资源的访问。
 
-[![](http://idiotsky.me/images3/dt-3.jpg)](http://idiotsky.me/images3/dt-3.jpg)
+[![](http://idiotsky.top/images3/dt-3.jpg)](http://idiotsky.top/images3/dt-3.jpg)
 
 当一个服务操作访问不同的数据库资源，又希望对它们的访问具有事务特性时，就需要采用分布式事务来协调所有的事务参与者。
 
 对于上面介绍的分布式事务应用架构，尽管一个服务操作会访问多个数据库资源，但是毕竟整个事务还是控制在单一服务的内部。如果一个服务操作需要调用另外一个服务，这时的事务就需要跨越多个服务了。在这种情况下，起始于某个服务的事务在调用另外一个服务的时候，需要以某种机制流转到另外一个服务，从而使被调用的服务访问的资源也自动加入到该事务当中来。下图反映了这样一个跨越多个服务的分布式事务：
 
-[![](http://idiotsky.me/images3/dt-4.jpg)](http://idiotsky.me/images3/dt-4.jpg)
+[![](http://idiotsky.top/images3/dt-4.jpg)](http://idiotsky.top/images3/dt-4.jpg)
 
 如果将上面这两种场景（一个服务可以调用多个数据库资源，也可以调用其他服务）结合在一起，对此进行延伸，整个分布式事务的参与者将会组成如下图所示的树形拓扑结构。在一个跨服务的分布式事务中，事务的发起者和提交均系同一个，它可以是整个调用的客户端，也可以是客户端最先调用的那个服务。
 
-[![](http://idiotsky.me/images3/dt-5.jpg)](http://idiotsky.me/images3/dt-5.jpg)
+[![](http://idiotsky.top/images3/dt-5.jpg)](http://idiotsky.top/images3/dt-5.jpg)
 
 较之基于单一数据库资源访问的本地事务，分布式事务的应用架构更为复杂。在不同的分布式应用架构下，实现一个分布式事务要考虑的问题并不完全一样，比如对多资源的协调、事务的跨服务传播等，实现机制也是复杂多变。尽管有这么多工程细节需要考虑，但分布式事务最核心的还是其 ACID 特性。因此，想要了解一个分布式事务，就先从了解它是怎么实现事务 ACID 特性开始。
 
@@ -64,7 +64,7 @@ categories: 分布式事务
 
 最早的分布式事务模型是 X/Open 国际联盟提出的 X/Open Distributed Transaction Processing（DTP）模型，也就是大家常说的 X/Open XA 协议，简称XA 协议。
 
-[![](http://idiotsky.me/images3/dt-6.jpg)](http://idiotsky.me/images3/dt-6.jpg)
+[![](http://idiotsky.top/images3/dt-6.jpg)](http://idiotsky.top/images3/dt-6.jpg)
 
 DTP 模型中包含一个全局事务管理器（TM，Transaction Manager）和多个资源管理器（RM，Resource Manager）。全局事务管理器负责管理全局事务状态与参与的资源，协同资源一起提交或回滚；资源管理器则负责具体的资源操作。
 
@@ -72,7 +72,7 @@ XA 协议描述了 TM 与 RM 之间的接口，允许多个资源在同一分布
 
 基于 DTP 模型的分布式事务流程大致如下：
 
-[![](http://idiotsky.me/images3/dt-7.jpg)](http://idiotsky.me/images3/dt-7.jpg)
+[![](http://idiotsky.top/images3/dt-7.jpg)](http://idiotsky.top/images3/dt-7.jpg)
 
 1. 应用程序（AP，Application）向 TM 申请开始一个全局事务。
 2. 针对要操作的 RM，AP 会先向 TM 注册（TM 负责记录 AP 操作过哪些 RM，即分支事务），TM 通过 XA 接口函数通知相应 RM 开启分布式事务的子事务，接着 AP 就可以对该 RM 管理的资源进行操作。
@@ -85,7 +85,7 @@ XA 协议使用 2PC（Two Phase Commit，两阶段提交）原子提交协议来
 
 两阶段提交是指将提交过程分为两个阶段，即准备阶段（投票阶段）和提交阶段（执行阶段）：
 
-[![](http://idiotsky.me/images3/dt-8.jpg)](http://idiotsky.me/images3/dt-8.jpg)
+[![](http://idiotsky.top/images3/dt-8.jpg)](http://idiotsky.top/images3/dt-8.jpg)
 
 准备阶段：
 
@@ -101,7 +101,7 @@ XA 协议中没有描述如何实现分布式事务的隔离性，但是 XA 协�
 
 以 MySQL 来举例，MySQL 使用 2PL（Two-Phase Locking，两阶段锁）机制来控制本地事务的并发，保证隔离性。2PL 与 2PC 类似，也是将锁操作分为加锁和解锁两个阶段，并且保证两个阶段完全不相交。加锁阶段，只加锁，不放锁。解锁阶段，只放锁，不加锁。
 
-[![](http://idiotsky.me/images3/dt-9.jpg)](http://idiotsky.me/images3/dt-9.jpg)
+[![](http://idiotsky.top/images3/dt-9.jpg)](http://idiotsky.top/images3/dt-9.jpg)
 
 如上图所示，在一个本地事务中，每执行一条更新操作之前，都会先获取对应的锁资源，只有获取锁资源成功才会执行该操作，并且一旦获取了锁资源就会持有该锁资源直到本事务执行结束。
 
@@ -115,7 +115,7 @@ MySQL 通过这种 2PL 机制，可以保证在本地事务执行过程中，其
 
 虽然单个 RM 上实现了Snapshot，但是在分布式应用架构下，会遇到什么问题呢？
 
-[![](http://idiotsky.me/images3/dt-10.jpg)](http://idiotsky.me/images3/dt-10.jpg)
+[![](http://idiotsky.top/images3/dt-10.jpg)](http://idiotsky.top/images3/dt-10.jpg)
 
 如上图所示，在 RM1 的本地子事务提交完毕到 RM2 的本地子事务提交完毕之间，只能读到 RM1 上子事务执行的内容，读不到 RM2 上的子事务。也就是说，虽然在单个 RM 上的本地事务是一致的，但是从全局来看，一个全局事务执行过程的中间状态被观察到了，全局一致性就被破坏了。
 
@@ -145,7 +145,7 @@ TCC 模型认为对于业务系统中一个特定的业务逻辑，其对外提�
 2. 确认操作 Confirm：真正执行的业务逻辑，不作任何业务检查，只使用 Try 阶段预留的业务资源。因此，只要 Try 操作成功，Confirm 必须能成功。另外，Confirm 操作需满足幂等性，保证一笔分布式事务有且只能成功一次。
 3. 取消操作 Cancel：释放 Try 阶段预留的业务资源。同样的，Cancel 操作也需要满足幂等性。
 
-[![](http://idiotsky.me/images3/dt-11.jpg)](http://idiotsky.me/images3/dt-11.jpg)
+[![](http://idiotsky.top/images3/dt-11.jpg)](http://idiotsky.top/images3/dt-11.jpg)
 
 TCC 分布式事务模型包括三部分：
 

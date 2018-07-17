@@ -11,7 +11,7 @@ categories: http
 就是http请求中的multipart/form-data,它会将表单的数据处理为一条消息，以标签为单元，用分隔符分开。既可以上传键值对，也可以上传文件。当上传的字段是文件时，会有Content-Type来表名文件类型；content-disposition，用来说明字段的一些信息；
 由于有boundary隔离，所以multipart/form-data既可以上传文件，也可以上传键值对，它采用了键值对的方式，所以可以上传多个文件。
 
-[![](http://idiotsky.me/images/postman-1.png)](http://idiotsky.me/images/postman-1.png)
+[![](http://idiotsky.top/images/postman-1.png)](http://idiotsky.top/images/postman-1.png)
 内容为
 ````
 POST /login HTTP/1.1
@@ -43,7 +43,7 @@ Content-Type:
 
 # x-www-form-urlencoded
 就是application/x-www-from-urlencoded,会将表单内的数据转换为键值对，并以urlencode为格式
-[![](http://idiotsky.me/images/postman-2.png)](http://idiotsky.me/images/postman-2.png)
+[![](http://idiotsky.top/images/postman-2.png)](http://idiotsky.top/images/postman-2.png)
 内容为
 ````
 POST /login HTTP/1.1
@@ -57,7 +57,7 @@ username=admin&password=admin123
 
 # raw
 可以上传任意格式的文本，可以上传text、json、xml、html等
-[![](http://idiotsky.me/images/postman-3.png)](http://idiotsky.me/images/postman-3.png)
+[![](http://idiotsky.top/images/postman-3.png)](http://idiotsky.top/images/postman-3.png)
 内容为
 ````
 POST /login HTTP/1.1

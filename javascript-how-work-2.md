@@ -24,7 +24,7 @@ categories: javascript
 
 # 为什么要创造一个V8引擎？
 V8引擎由Google创建并开源，c++编写。用于Google的Chrome浏览器。不像其他引擎，V8还是流行的Node.js的运行时引擎。
-[![](http://idiotsky.me/images/js-how-work-2-1.png)](http://idiotsky.me/images/js-how-work-2-1.png)
+[![](http://idiotsky.top/images/js-how-work-2-1.png)](http://idiotsky.top/images/js-how-work-2-1.png)
 V8是第一个为了性能提升的浏览器引擎。为了达到更好的性能，相比于使用解释器，V8更倾向于使用编译器编译javascript代码成更高效的机器码。它像其他现代化javascript引擎如SpiderMonkey或者Rhino (Mozilla)一样，使用__JIT(Just-In-Time)__编译器在执行阶段编译代码，唯一不同的是，V8不会生成字节码或任意中间代码。
 
 # V8曾经有两个编译器
@@ -46,7 +46,7 @@ V8引擎内部也用了一些线程：
 
 # 内联（inlining）
 首个优化方法就是内联，它会提前尽可能的内联更多的代码。内联是一个替换代码的一个过程，用方法体替换到调用的地方（其实就是方法展开）。这样一步简单的优化可以令接下来的优化更有意义。
-[![](http://idiotsky.me/images/js-how-work-2-2.png)](http://idiotsky.me/images/js-how-work-2-2.png)
+[![](http://idiotsky.top/images/js-how-work-2-2.png)](http://idiotsky.top/images/js-how-work-2-2.png)
 
 # 隐藏类(Hidden class)
 javascript是一种基于原型的语言：没有类和对象是通过克隆进程创建的(机翻😁)。javascript也是一种动态语言，他能够随意的添加和删除一个对象的属性，即使这个对象已经实例化了。
@@ -60,15 +60,15 @@ function Point(x, y) {
 var p1 = new Point(1, 2);
 ````
 一旦`new Point(1, 2)`被调用，V8将创建一个`C0`的隐藏类。
-[![](http://idiotsky.me/images/js-how-work-2-3.png)](http://idiotsky.me/images/js-how-work-2-3.png)
+[![](http://idiotsky.top/images/js-how-work-2-3.png)](http://idiotsky.top/images/js-how-work-2-3.png)
 由于`Point`没有属性定义,所以`C0`是空的。
 
 一旦`this.x = x`(在`Point`函数)被执行，V8将创建一个基于`C0`的隐藏类`C1`。`C1`描述了x的内存的位置（相对于对象指针），在这个情况下，x的位置存在[位移](http://en.wikipedia.org/wiki/Offset_%28computer_science%29)0上，这代表了`point`对象是一个连续的内存，它的第一个位移对应的是属性x。同时V8也用“类转换”更新了`C0`，表明了如果一个属性x加到`point`对象，隐藏类就应该要从`C0`转换到`C1`。所以现在`point`对象的隐藏类为`C1`。
-[![](http://idiotsky.me/images/js-how-work-2-4.png)](http://idiotsky.me/images/js-how-work-2-4.png)
+[![](http://idiotsky.top/images/js-how-work-2-4.png)](http://idiotsky.top/images/js-how-work-2-4.png)
 <small>_每一次一个新的属性加到一个对象，一条转换的路径更新到旧的隐藏类并指向新的隐藏类。隐藏类转换是很重要的，因为同样方式创建的对象都共享同一个隐藏类。如果两个对象共享一个隐藏类，同时相同的属性加到这个两个对象的话，那么转换将保证这两个对象还是共享同一个新的隐藏类，而且共享同一个隐藏类有益于优化代码。_</small>
 
 当`this.y = y`被执行，一个新的隐藏类`C1`被创建，同时一个类转换加到`C1`上面，表明了如果一个属性y加到一个`point`对象（已经有x属性的），就要把隐藏类转换成`C2`。现在`point`对象的隐藏类就是`C2`了。
-[![](http://idiotsky.me/images/js-how-work-2-5.png)](http://idiotsky.me/images/js-how-work-2-5.png)
+[![](http://idiotsky.top/images/js-how-work-2-5.png)](http://idiotsky.top/images/js-how-work-2-5.png)
 
 隐藏类的转换依赖于属性的加入顺序。看一下下面的代码：
 ````javascript
@@ -93,7 +93,7 @@ V8利用内联缓存技术来优化动态类型语言。内联缓存依赖于观
 所以隐藏类和内联缓存是怎么样关联起来的呢？无论一个指定对象方法什么时候被执行，V8引擎都会去查找那个对象的隐藏类去决定指定属性的访问位移。在两次成功调用相同隐藏类的相同方法后，V8就会忽略隐藏类的查找并简单的用属性位移和这个对象指针相加来确定地址。对于未来的那个方法的调用，V8都假设这个对象的隐藏类都没有改变，直接使用之前查找后对象内存的位移来访问属性，这样大大增加执行速度。
 
 相同类型的对象共享相同隐藏类是很重要的，原因是内存缓存。如果你创建两个相同类型的对象，但它们的隐藏类不同（前面例子有提到），V8将没办法用到内联缓存，因为尽管类型相同，但是它们对应的隐藏类分配的属性位移是不同的。
-[![](http://idiotsky.me/images/js-how-work-2-6.png)](http://idiotsky.me/images/js-how-work-2-6.png)
+[![](http://idiotsky.top/images/js-how-work-2-6.png)](http://idiotsky.top/images/js-how-work-2-6.png)
 <small>_这两个对象基本上是一样的，但是a和b属性是用不同的顺序创建的。_</small>
 
 # 编译机器码
@@ -116,7 +116,7 @@ V8的5.9版本在2017年初发布，一个新的执行管道被引入。这个�
 自从5.9版本的V8发布，full-codegen和Crankshaft（这两个技术从2010就开始服务V8了）不再被V8用来执行javascript，当V8团队要跟上新的javascript语言特性的步伐和这些特性更需要优化的支持。
 
 这就意味着V8总体来讲将是一个更简单和更容易维护的架构。
-[![](http://idiotsky.me/images/js-how-work-2-7.png)](http://idiotsky.me/images/js-how-work-2-7.png)
+[![](http://idiotsky.top/images/js-how-work-2-7.png)](http://idiotsky.top/images/js-how-work-2-7.png)
 <small>_在网页和Node.js的性能改进_</small>
 
 这些改进只是个开始。新的Ignition和TurboFan为更长远的优化铺平了道路，并在这几年提升javascript的性能和缩小Node.js和Chrome的差距。

@@ -67,7 +67,7 @@ class ConnectIOnHandler extends Thread{
 需要说明的是等待就绪的阻塞是不使用CPU的，是在“空等”；而真正的读写操作的阻塞是使用CPU的，真正在"干活"，而且这个过程非常快，属于memory copy，带宽通常在1GB/s级别以上，可以理解为基本不耗时。
 
 下图是几种常见I/O模型的对比：
-[![](http://idiotsky.me/images1/java-nio-1.jpg)](http://idiotsky.me/images1/java-nio-1.jpg)
+[![](http://idiotsky.top/images1/java-nio-1.jpg)](http://idiotsky.top/images1/java-nio-1.jpg)
 
 以socket.read()为例子：
 
@@ -146,7 +146,7 @@ Java的Selector对于Linux系统来说，有一个致命限制：同一个channe
 
 另外连接的处理和读写的处理通常可以选择分开，这样对于海量连接的注册和读写就可以分发。虽然read()和write()是比较高效无阻塞的函数，但毕竟会占用CPU，如果面对更高的并发则无能为力。
 
-[![](http://idiotsky.me/images1/java-nio.png)](http://idiotsky.me/images/java-nio.png)
+[![](http://idiotsky.top/images1/java-nio.png)](http://idiotsky.top/images/java-nio.png)
 
 # NIO在客户端的魔力
 通过上面的分析，可以看出NIO在服务端对于解放线程，优化I/O和处理海量连接方面，确实有自己的用武之地。那么在客户端上，NIO又有什么使用场景呢?

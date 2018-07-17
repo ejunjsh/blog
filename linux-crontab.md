@@ -30,7 +30,7 @@ categories: linux命令
 
 文件里的每一个请求必须包含以spaces和tabs分割的六个域。前五个字段可以取整数值，指定何时开始工作，第六个域是字符串，称为命令字段，其中包括了crontab调度执行的命令。  
 
-[![](http://idiotsky.me/images/linux-crontab.png)](http://idiotsky.me/images/linux-crontab.png)
+[![](http://idiotsky.top/images/linux-crontab.png)](http://idiotsky.top/images/linux-crontab.png)
 
 第一道第五个字段的整数取值范围及意义是：  
 * 0～59 表示分  

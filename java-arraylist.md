@@ -24,7 +24,7 @@ list.add("英语: 100");
 list.remove(0);
 ````
 在执行这四条语句时，是这么变化的：
-[![](http://idiotsky.me/images1/java-arraylist-3.png)](http://idiotsky.me/images1/java-arraylist-3.png)
+[![](http://idiotsky.top/images1/java-arraylist-3.png)](http://idiotsky.top/images1/java-arraylist-3.png)
 接下来看看几个常用的方法的源码分析。
 <!-- more -->
 # ArrayList属性
@@ -131,7 +131,7 @@ private void grow(int minCapacity) {
 }
 ````
 也就是说，当增加数据的时候，如果ArrayList的大小已经不满足需求时，那么就将数组变为原长度的1.5倍，之后的操作就是把老的数组拷到新的数组里面。例如，默认的数组大小是10，也就是说当我们add10个元素之后，再进行一次add时，就会发生自动扩容，数组长度由10变为了15具体情况如下所示：
-[![](http://idiotsky.me/images1/java-arraylist-2.png)](http://idiotsky.me/images1/java-arraylist-2.png)
+[![](http://idiotsky.top/images1/java-arraylist-2.png)](http://idiotsky.top/images1/java-arraylist-2.png)
 
 # set和get方法
 Array的set和get函数就比较简单了，先做index检查，然后执行赋值或访问操作：

@@ -6,7 +6,7 @@ categories: java
 ---
 # JVM 内存模型
 根据 JVM 规范，JVM 内存共分为虚拟机栈、堆、方法区、程序计数器、本地方法栈五个部分。
-[![](http://idiotsky.me/images/java8-permgen-metaspace-1.png)](http://idiotsky.me/images/java8-permgen-metaspace-1.png) 
+[![](http://idiotsky.top/images/java8-permgen-metaspace-1.png)](http://idiotsky.top/images/java8-permgen-metaspace-1.png) 
 <!-- more -->
 ## 虚拟机栈
 每个线程有一个私有的栈，随着线程的创建而创建。栈里面存着的是一种叫“栈帧”的东西，每个方法会创建一个栈帧，栈帧中存放了局部变量表（基本数据类型和对象引用）、操作数栈、方法出口等信息。栈的大小可以固定也可以动态扩展。当栈调用深度大于JVM所允许的范围，会抛出StackOverflowError的错误，不过这个深度范围不是一个恒定的值，我们通过下面这段程序可以测试一下这个结果：
@@ -36,7 +36,7 @@ public class StackErrorMock {
 代码段1
 
 运行三次，可以看出每次栈的深度都是不一样的，输出结果如下。
-[![](http://idiotsky.me/images/java8-permgen-metaspace-2.png)](http://idiotsky.me/images/java8-permgen-metaspace-2.png) 
+[![](http://idiotsky.top/images/java8-permgen-metaspace-2.png)](http://idiotsky.top/images/java8-permgen-metaspace-2.png) 
 至于红色框里的值是怎么出来的，就需要深入到 JVM 的源码中才能探讨，这里不作详细阐述。
 
 虚拟机栈除了上述错误外，还有另一种错误，那就是当申请不到空间时，会抛出 OutOfMemoryError。这里有一个小细节需要注意，catch 捕获的是 Throwable，而不是 Exception。因为 StackOverflowError 和 OutOfMemoryError 都不属于 Exception 的子类。
@@ -75,7 +75,7 @@ public class HeapOomMock {
 代码段2
 
 运行上述代码，输出结果如下：　
-[![](http://idiotsky.me/images/java8-permgen-metaspace-3.png)](http://idiotsky.me/images/java8-permgen-metaspace-3.png) 
+[![](http://idiotsky.top/images/java8-permgen-metaspace-3.png)](http://idiotsky.top/images/java8-permgen-metaspace-3.png) 
 *注意，这里我指定了堆内存的大小为16M，所以这个地方显示的count=14（这个数字不是固定的），至于为什么会是14或其他数字，需要根据 GC 日志来判断*
 
 ## 方法区
@@ -119,7 +119,7 @@ public class PermGenOomMock{
 代码段3
 
 运行结果如下：
-[![](http://idiotsky.me/images/java8-permgen-metaspace-4.png)](http://idiotsky.me/images/java8-permgen-metaspace-4.png) 
+[![](http://idiotsky.top/images/java8-permgen-metaspace-4.png)](http://idiotsky.top/images/java8-permgen-metaspace-4.png) 
 　　本例中使用的 JDK 版本是 1.7，指定的 PermGen 区的大小为 8M。通过每次生成不同URLClassLoader对象来加载Test类，从而生成不同的类对象，这样就能看到我们熟悉的 "java.lang.OutOfMemoryError: PermGen space " 异常了。这里之所以采用 JDK 1.7，是因为在 JDK 1.8 中， HotSpot 已经没有 “PermGen space”这个区间了，取而代之是一个叫做 Metaspace（元空间） 的东西。下面我们就来看看 Metaspace 与 PermGen space 的区别。
 
 # Metaspace（元空间）
@@ -146,11 +146,11 @@ public class StringOomMock {
 
 这段程序以2的指数级不断的生成新的字符串，这样可以比较快速的消耗内存。我们通过 JDK 1.6、JDK 1.7 和 JDK 1.8 分别运行：
 JDK 1.6 的运行结果：
-[![](http://idiotsky.me/images/java8-permgen-metaspace-5.png)](http://idiotsky.me/images/java8-permgen-metaspace-5.png) 
+[![](http://idiotsky.top/images/java8-permgen-metaspace-5.png)](http://idiotsky.top/images/java8-permgen-metaspace-5.png) 
 JDK 1.7的运行结果：
-[![](http://idiotsky.me/images/java8-permgen-metaspace-6.png)](http://idiotsky.me/images/java8-permgen-metaspace-6.png) 
+[![](http://idiotsky.top/images/java8-permgen-metaspace-6.png)](http://idiotsky.top/images/java8-permgen-metaspace-6.png) 
 JDK 1.8的运行结果：
-[![](http://idiotsky.me/images/java8-permgen-metaspace-7.png)](http://idiotsky.me/images/java8-permgen-metaspace-7.png) 
+[![](http://idiotsky.top/images/java8-permgen-metaspace-7.png)](http://idiotsky.top/images/java8-permgen-metaspace-7.png) 
 从上述结果可以看出，JDK 1.6下，会出现“PermGen Space”的内存溢出，而在 JDK 1.7和 JDK 1.8 中，会出现堆内存溢出，并且 JDK 1.8中 PermSize 和 MaxPermGen 已经无效。因此，可以大致验证 JDK 1.7 和 1.8 将字符串常量由永久代转移到堆中，并且 JDK 1.8 中已经不存在永久代的结论。现在我们看看元空间到底是一个什么东西？
 
 　　元空间的本质和永久代类似，都是对JVM规范中方法区的实现。不过元空间与永久代之间最大的区别在于：元空间并不在虚拟机中，而是使用本地内存。因此，默认情况下，元空间的大小仅受本地内存限制，但可以通过以下参数来指定元空间的大小：
@@ -163,7 +163,7 @@ JDK 1.8的运行结果：
 　　-XX:MaxMetaspaceFreeRatio，在GC之后，最大的Metaspace剩余空间容量的百分比，减少为释放空间所导致的垃圾收集
 
 现在我们在 JDK 8下重新运行一下代码段3，不过这次不再指定 PermSize 和 MaxPermSize。而是指定 MetaSpaceSize 和 MaxMetaSpaceSize的大小。输出结果如下：
-[![](http://idiotsky.me/images/java8-permgen-metaspace-8.png)](http://idiotsky.me/images/java8-permgen-metaspace-8.png) 
+[![](http://idiotsky.top/images/java8-permgen-metaspace-8.png)](http://idiotsky.top/images/java8-permgen-metaspace-8.png) 
 从输出结果，我们可以看出，这次不再出现永久代溢出，而是出现了元空间的溢出。
 
 # 总结

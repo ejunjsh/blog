@@ -71,9 +71,9 @@ public interface RunnableFuture<V> extends Runnable, Future<V> {
 2. 已启动，FutureTask.run()被执行的过程中，FutureTask处于已启动状态。
 3. 已完成，FutureTask.run()方法执行完正常结束，或者被取消或者抛出异常而结束，FutureTask都处于完成状态。
 
-[![](http://idiotsky.me/images/java-thread-4-1.png)](http://idiotsky.me/images/java-thread-4-1.png)
+[![](http://idiotsky.top/images/java-thread-4-1.png)](http://idiotsky.top/images/java-thread-4-1.png)
 下面我们再来看看FutureTask的方法执行示意图（方法和Future接口基本是一样的，这里就不过多描述了）
-[![](http://idiotsky.me/images/java-thread-4-2.png)](http://idiotsky.me/images/java-thread-4-2.png)
+[![](http://idiotsky.top/images/java-thread-4-2.png)](http://idiotsky.top/images/java-thread-4-2.png)
 分析：
 1. 当FutureTask处于未启动或已启动状态时，如果此时我们执行FutureTask.get()方法将导致调用线程阻塞；当FutureTask处于已完成状态时，执行FutureTask.get()方法将导致调用线程立即返回结果或者抛出异常。
 2. 当FutureTask处于未启动状态时，执行FutureTask.cancel()方法将导致此任务永远不会执行。
