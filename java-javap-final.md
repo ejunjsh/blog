@@ -1,7 +1,7 @@
 ---
 title: 用javap看一下final是什么
 date: 2018-07-17 22:23:29
-tags: [javap]
+tags: [javap,java]
 categories: java
 ---
 
@@ -30,7 +30,7 @@ public class test{
 javac test.java
 javap -verbose test.class
 
-# 省略常量池
+//省略常量池
 {
   public static java.lang.String str;
     flags: ACC_PUBLIC, ACC_STATIC
@@ -84,7 +84,7 @@ javap -verbose test.class
         line 2: 0
 ````
 
-上面的操作就是把常量赋值给类的静态字段`str`,这个字段之后在`main`函数会读出来。
+上面`ldc`的指令就是把常量从常量池读到操作数栈，`putstatic`指令从栈顶赋值给类的静态字段`str`,这个字段之后在`main`函数会读出来。
 
 ````
   public static void main(java.lang.String[]);
@@ -151,25 +151,9 @@ javap -verbose test.class
         line 6: 8
 }
 ````
-你会发现class文件没有之前的静态块了，而是直接在`main`函数里面直接调用常量池里`final`字段。
+你会发现class文件没有之前的静态块了，而且也不再用`getstatic`指令获取字段的值，而是直接`ldc`指令取常量池的值。
 
-````
-  public static void main(java.lang.String[]);
-    flags: ACC_PUBLIC, ACC_STATIC
-    Code:
-      stack=2, locals=1, args_size=1
-         0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
-         3: ldc           #3                  // String 严
-         5: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
-         8: return
-      LineNumberTable:
-        line 5: 0
-        line 6: 8
-}
-````
-`ldc`命令就是直接把常量池的值压如操作数栈。
-
-接下来看看非静态的字段在加`final`或不加会不会有什么不同呢
+接下来看看实例字段在加`final`或不加会不会有什么不同呢
 
 # 不加final的实例字段
 
@@ -289,49 +273,187 @@ public class test{
 }
 
 ````
-`getfield`不见了，变成了熟悉的`ldc`,很明显了，加了`final`之后还是去常量池去找。
+`getfield`指令变成了熟悉的`ldc`,很明显了，加了`final`之后还是去常量池去找。
 
+上面的字段是字符串，那接下来看看数字的字段会怎么样呢
 
-# 其他东西
+# 数字的非`final`静态字段
 
-## 静态字段的赋值
+上代码
 
-上面的静态字段在没有`final`的情况下，是生成一段静态块的，这块代码在类加载的时候执行，在加`final`之后，所有用到这个静态字段都变成直接去常量池里面取，所以就没必要一个一个静态块了
+````java
+public class test{
+  public static int i=100;
+
+  public static void main(String[] args){
+        System.out.println(i);
+  }
+}
+````
+
+javap结果
 
 ````
+//省略常量池
+{
+  public static int i;
+    flags: ACC_PUBLIC, ACC_STATIC
+
+  public test();
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+      LineNumberTable:
+        line 1: 0
+
+  public static void main(java.lang.String[]);
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=2, locals=1, args_size=1
+         0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         3: getstatic     #3                  // Field i:I
+         6: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+         9: return
+      LineNumberTable:
+        line 6: 0
+        line 7: 9
+
   static {};
     flags: ACC_STATIC
     Code:
       stack=1, locals=0, args_size=0
-         0: ldc           #5                  // String 严
-         2: putstatic     #3                  // Field str:Ljava/lang/String;
+         0: bipush        100
+         2: putstatic     #3                  // Field i:I
          5: return
       LineNumberTable:
-        line 2: 0
-````
-
-## 实例字段的赋值
-
-明明没有加任何构造函数（使用默认构造函数），可是构造函数里面居然有那么多代码，仔细看一下，其实就是实例字段的赋值都放在这里了，只是不管有没有加`final`，都没有区别。
+        line 3: 0
+}
 
 ````
-public test();
+
+基本差不多，只是`ldc`换成了`bipush`。`bipush`就是把后面的操作数（100）压入栈。如果压入的不是100，而是更大或更小，那么用的指令就会不同的了，例如`iconst_1`指令，就是压入1到栈。
+
+# 数字的`final`静态字段
+
+上代码
+
+````java
+public class test{
+  public static final int i=100;
+
+  public static void main(String[] args){
+        System.out.println(i);
+  }
+}
+````
+
+javap结果
+
+````
+
+{
+  public static final int i;
+    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL
+    ConstantValue: int 100
+
+  public test();
     flags: ACC_PUBLIC
     Code:
-      stack=2, locals=1, args_size=1
+      stack=1, locals=1, args_size=1
          0: aload_0
          1: invokespecial #1                  // Method java/lang/Object."<init>":()V
-         4: aload_0
-         5: ldc           #2                  // String 严
-         7: putfield      #3                  // Field str:Ljava/lang/String;
-        10: return
+         4: return
       LineNumberTable:
         line 1: 0
-        line 2: 4
+
+  public static void main(java.lang.String[]);
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=2, locals=1, args_size=1
+         0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         3: bipush        100
+         5: invokevirtual #3                  // Method java/io/PrintStream.println:(I)V
+         8: return
+      LineNumberTable:
+        line 6: 0
+        line 7: 8
+}
+
+````
+没啥惊喜的，就是静态块去掉，需要引用字段的地方从`getstatic`变成了`bipush`。
+
+至于实例字段是怎么样的，应该都差不多了，就不列举了，接下来看看字段类型是引用的是怎么样呢。
+
+# 加`final`的引用类型字段
+
+上代码
+
+````java
+public class test{
+  public static final Object o=new Object();
+
+  public static void main(String[] args){
+        System.out.println(o);
+  }
+}
+````
+
+javap结果
 
 ````
 
+{
+  public static final java.lang.Object o;
+    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL
+
+  public test();
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+      LineNumberTable:
+        line 1: 0
+
+  public static void main(java.lang.String[]);
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=2, locals=1, args_size=1
+         0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         3: getstatic     #3                  // Field o:Ljava/lang/Object;
+         6: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/Object;)V
+         9: return
+      LineNumberTable:
+        line 6: 0
+        line 7: 9
+
+  static {};
+    flags: ACC_STATIC
+    Code:
+      stack=2, locals=0, args_size=0
+         0: new           #5                  // class java/lang/Object
+         3: dup
+         4: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         7: putstatic     #3                  // Field o:Ljava/lang/Object;
+        10: return
+      LineNumberTable:
+        line 3: 0
+}
+
+````
+
+这里直接上`final`的版本，是因为加不加`final`，其实都是一样的，都是有静态块，引用的时候不再有什么其他指令了，老老实实的用`getstatic`。
+
+
 # 总结
+
+对于字符串或者数字类型，他们都是属于字面量，所以他们要么存在常量池里面，要么存在指令的操作数里面，所以他们在`final`标识下，是有特殊指令去用的。
+
+对于引用类型，这个基本要到运行时才能确认他们的引用地址，所以加不加`final`都是一样。
 
 看来字节码才是最能确定java是怎么运行的，所以与其找网上的说法不如`javap`一下看看。
 
