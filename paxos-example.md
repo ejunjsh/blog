@@ -1,4 +1,9 @@
-Paxos示例
+---
+title: Paxos示例
+date: 2018-07-24 20:11:55
+tags: Paxos
+categories: 分布式
+---
 
 这篇文章通过一个有效的例子描述了一个名为Paxos 的分布式一致性算法。
 
@@ -7,6 +12,8 @@ Paxos示例
 在分布式系统中，这很难，因为机器之间的消息可能会丢失或无限期延迟，或者机器本身可能会发生故障。
 
 Paxos保证节点只会选择单个值（意味着它保证安全），但不保证在大多数节点不可用时能不能去到值
+
+<!-- more -->
 
 # 一般的做法
 
@@ -19,7 +26,8 @@ Paxos保证节点只会选择单个值（意味着它保证安全），但不保
 对于Paxos接受的值，大多数`acceptor`必须选择相同的值。实际上，单个节点可以承担许多或所有这些角色，但在本节的示例中，每个角色都在一个单独的节点上运行，如下所示。
 
 [![](https://angus.nyc/wp-content/uploads/2012/06/0.png)](https://angus.nyc/wp-content/uploads/2012/06/0.png)
-图1：基本Paxos架构。一些`proposer`向`acceptor`提出建议。当`acceptor`接受一个值时，它会将结果发送给`learner`节点。
+<center>图1：基本Paxos架构。一些`proposer`向`acceptor`提出建议。当`acceptor`接受一个值时，它会将结果发送给`learner`节点。
+</center>
 
 # Paxos示例
 
@@ -32,14 +40,14 @@ Paxos保证节点只会选择单个值（意味着它保证安全），但不保
 在下面说明的示例中，有两个`proposer`，两个都提出准备请求。来自`proposer A`的请求和来自`proposer B`的请求首先到达`acceptor X`和`acceptor Y`，而来自`proposer B`的请求首先到达`acceptor Z`。
 
 [![](https://angus.nyc/wp-content/uploads/2012/06/2.png)](https://angus.nyc/wp-content/uploads/2012/06/2.png)
-图2：proposer A和B各自向每个接受者发送准备请求。在这个例子中，proposer A的请求首先到达接acceptor X和Y，而proposer B的请求首先到达acceptor Z.
+<center>图2：proposer A和B各自向每个接受者发送准备请求。在这个例子中，proposer A的请求首先到达接acceptor X和Y，而proposer B的请求首先到达acceptor Z.</center>
 
 如果接收准备请求的`acceptor`没有看到另一个提议，则`acceptor`以准备响应作出响应，该准备响应承诺永远不接受具有较低提议编号的另一提议。
 
 这在下面的图3中说明，其显示了每个接受者对他们收到的第一个准备请求的响应。
 
 [![](https://angus.nyc/wp-content/uploads/2012/06/3.png)](https://angus.nyc/wp-content/uploads/2012/06/3.png)
-图3：每个`acceptor`响应它收到的第一个准备请求消息。
+<center>图3：每个`acceptor`响应它收到的第一个准备请求消息。</center>
 
 最终，`acceptor Z`接收`proposer A`的请求，`acceptor X`和`acceptor Y`接收`proposer B`的请求。
 
@@ -50,7 +58,7 @@ Paxos保证节点只会选择单个值（意味着它保证安全），但不保
 `proposer B`对`acceptor X`和`acceptor Y`的请求就是这种情况，如下图所示：
 
 [![](https://angus.nyc/wp-content/uploads/2012/06/4.png)](https://angus.nyc/wp-content/uploads/2012/06/4.png)
-图4：acceptor Z忽略了proposer A的请求，因为它已经看到了更高编号的提议（4> 2）。acceptor X和Y用他们先前确认的最高请求来响应proposer B的请求，并承诺忽略任何编号较低的提议。
+<center>图4：acceptor Z忽略了proposer A的请求，因为它已经看到了更高编号的提议（4> 2）。acceptor X和Y用他们先前确认的最高请求来响应proposer B的请求，并承诺忽略任何编号较低的提议。</center>
 
 一旦`proposer`收到大多数`acceptor`的准备响应，它就可以发出接受请求。
 
@@ -63,7 +71,7 @@ Paxos保证节点只会选择单个值（意味着它保证安全），但不保
 请注意，这不是`proposer B`最初提出的值，而是它看到的准备响应消息中的最高值。
 
 [![](https://angus.nyc/wp-content/uploads/2012/06/5.png)](https://angus.nyc/wp-content/uploads/2012/06/5.png)
-图5，`proposer B`发送一个接受请求给每个`acceptor`,这个请求包含了它之前的提议号(4)和它从[n=2,v=8]中看到的值（8）
+<center>图5，`proposer B`发送一个接受请求给每个`acceptor`,这个请求包含了它之前的提议号(4)和它从[n=2,v=8]中看到的值（8）</center>
 
 如果`acceptor`收到的接受请求的提议号大于或等于之前它保证的，那么它接受并向每个`learner`节点发送通知。
 

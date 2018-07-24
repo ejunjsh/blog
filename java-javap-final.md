@@ -5,7 +5,7 @@ tags: [javap,java]
 categories: java
 ---
 
-> 一直很好奇`final`的类字段在class文件是怎么表示的，所以用javap看看怎么回事
+> 一直很好奇`final`的类字段在class文件是怎么表示的，所以用javap看看怎么回事,也顺便复习下字节码指令👿
 
 # 没有`final`修饰的类的静态字段
 
