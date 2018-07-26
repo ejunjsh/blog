@@ -7,7 +7,8 @@ categories: 分布式
 
 > 很好理解的动画，一看就懂了👿
 
+<!-- more -->
+
 <iframe src="http://idiotsky.top/raft/raft/index.html" style="width:100%;height:700px;border-width: 0px;">
 </iframe>
 
-<!-- more -->
