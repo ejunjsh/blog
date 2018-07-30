@@ -41,7 +41,6 @@ HTTP/1.1 虽然是无状态协议，但是为了实现期望的保持状态的�
 | PATCH | 更新部分文件内容| 1.1| **当资源存在的时候**，PATCH 用于资源的部分内容的更新，例如更新某一个字段。具体比如说只更新用户信息的电话号码字段，而 PUT 用于更新某个资源较完整的内容，比如说用户要重填完整表单更新所有信息，后台处理更新时可能只是保留内部记录 ID 不变。<br>**当资源不存在的时候**，PATCH 是修改原来的内容，也可能会产生一个新的版本。比如当资源不存在的时候，PATCH 可能会去创建一个新的资源，这个意义上像是 saveOrUpdate 操作。而 PUT 只对已有资源进行更新操作，所以是 update 操作|
 | LINK | 建立和资源之间的联系 | 1.0 | ✖︎最新版中已经废弃✖︎|
 | UNLINK | 断开连接关系 | 1.0 | ✖︎最新版中已经废弃✖︎|
-|  |  |  | |
 | PROPFIND | 获取属性 | 1.1 | WebDAV 获取属性|
 | PROPPATCH | 修改属性 | 1.1 | WebDAV 修改属性|
 | MKCOL | 创建属性 | 1.1 | WebDAV 创建属性|
@@ -132,102 +131,6 @@ HTTP 方法的安全性指的是不会改变服务器状态，也就是说它只
 -  **500 Internal Server Error** ：服务器正在执行请求时发生错误。
 
 -  **503 Service Unavilable** ：服务器暂时处于超负载或正在进行停机维护，现在无法处理请求。
-
-------------------------------------------------------------
-
-## RFC 2616 状态码
-
-| 状态码 | 类别 | 原因短语 |含义||
-| :---: | :---: | :---: |:---: |:---:|
-| 100 | Informational（信息性状态码） | Continue（继续） |收到了请求的起始部分，客户端应该继续请求。|❤|
-| 101 | Informational（信息性状态码） | Switching Protocols（切换协议）|服务器正根据客户端的指示将协议切换成 Update 首部列出的协议。|❤|
-|||||
-| 200 | Success（成功状态码）| OK |服务器已成功处理请求|❤|
-| 201 | Success（成功状态码）|Created（已创建）| 对那些要服务器创建对象的请求来说，资源已创建完毕|
-| 202 | Success（成功状态码）|Accepted（已接受）| 请求已接受，但服务器尚未处理|
-| 203 | Success（成功状态码）|Non-Authoritative Information（非权威信息）| 服务器已将事务成功处理，只是实体首部包含的信息不是来自原始服务器，而是来自资源的副本|
-| 204 | Success（成功状态码）|No Content（没有内容）| 响应报文包含一些首部和一个状态行，**但不包含实体的主体内容**，**一般在只需要从客户端往服务器发送信息，而对客户端不需要发送新信息内容的情况下使用**|❤|
-| 205 | Success（成功状态码）|Reset Content（重置内容）| 另一个主要用于浏览器的代码。意思是浏览器应该重置当前页面上所有的 HTML 表单 |
-| 206 | Success（成功状态码） |Partial Content（部分内容）| 成功执行了一个部分或者 Range (范围)请求，客户端可以通过一些特殊的首部来获取部分或某个范围内的文档<br>**响应报文中包含由 Content-Range、Date、以及 ETag 或者 Content-Location 指定范围的实体内容**|❤|
-|||||
-|300| Redirection（重定向状态码） |Multiple Choices（多项选择）| 客户端请求了实际指向多个资源的 URL。这个代码是和一个选项列表一起返回的，然后用户就可以选择他希望使用的选项了。服务器可以在 Location 首部包含首选 URL| 
-|301| Redirection（重定向状态码） | Moved Permanently（永久移除）| **永久性重定向**，请求的 URL 已移走。响应中应该包含一个 Location URL，说明资源现在所处的位置|❤|
-|302| Redirection（重定向状态码）| Found（已找到）| **临时性重定向**，与状态码 301 类似， 但这里的移除是临时的。客户端应该用 Location 首部给出的 URL 对资源进行临时定位|❤|
-|303| Redirection（重定向状态码）| See Other（参见其他）| 告诉客户端应该用另一个 URL 获取资源。这个新的 URL 位于响应报文的 Location 首部。303 状态码 和 302 状态码有相同的功能，**但是 303 明确表示客户端应采用 GET 方法获取资源**。|❤|
-||||当 301、302、303 响应状态码返回时，几乎所有的浏览器都会把 POST 改成 GET，并删除请求报文内的主体，之后请求会自动再次发送。<br>301、302 标准是禁止将 POST 方法改变成 GET 方法的，但实际使用时大家都会这么做||
-|304| Redirection（重定向状态码）| Not Modified（未修改）| 该状态码表示客户端发送附带条件的请求时，服务器允许请求访问资源，但因发生请求未满足条件的情况后，直接返回 304 Not Modified（服务器端资源未改变，可直接使用客户端未过期的缓存）304 状态码返回时，不包含任何响应的主体部分。**304 虽然被划分在 3XX 类别中，但是和重定向一点关系也没有**|❤|
-||||（附带条件的请求是指采用 GET 方法的请求报文中包含 If-Match，If-Modified-Since,If-None-Match，If-Range，If-Unmodified-Since 中任一首部）||
-|305| Redirection（重定向状态码）| Use Proxy（使用代理）| 必须通过代理访问 资源，代理的位置是在 Location 首部中给出的|
-|306|（未使用）||这个状态码当前并未使用|
-|307| Redirection（重定向状态码）| Temporary Redirect（临时重定向）| 和状态码 302 类似。但客户端应该用 Location 首部给出的 URL 对资源进行临时定位。<br>307 会遵守浏览器标准，不会从 POST 变成 GET|❤|
-|||||
-|400|Client Error（客户端错误状态码）| Bad request（坏请求）| 告诉客户端它发送了一条异常请求|❤|
-|401|Client Error（客户端错误状态码）| Unauthorized（未授权）| 与适当的首部一起返回，在客户端获得资源访问权之前，请它进行身份认证|❤|
-|402|Client Error（客户端错误状态码）| Payment Required（要求付款）| 当前此状态码并未使用，是为未来使用预留的 |
-|403|Client Error（客户端错误状态码）| Forbidden（禁止）| 服务器拒绝了请求|❤| 
-|404|Client Error（客户端错误状态码）| Not Found（未找到）| 服务器无法找到 所请求的 URL|❤|
-|405|Client Error（客户端错误状态码）| Method Not Allowed（不允许使用的方法）|请求中有一个所请求的 URI 不支持的方法。响应中应该包含一个 Allow 首部，以告知客户端所请求的资源支持使用哪些方法| 
-|406|Client Error（客户端错误状态码）| Not Acceptable（无法接受）| 客户端可以指定一些参数来说明希望接受哪些类型的实体。服务器没有资源与客户端可接受的 URL 相匹配时可使用此代码| 
-|407|Client Error（客户端错误状态码）| Proxy Authentication Required（要求进行代理认证）|和状态码 401 类似，但用于需要进行资源认证的代理服务器|
-|408|Client Error（客户端错误状态码）| Request Timeout（请求超时）| 如果客户端完成其请求时花费的时间太长，服务器可以回送这个状态码并关闭连接 |
-|409|Client Error（客户端错误状态码）| Conflict（ 冲突）| 发出的请求在资源上造成了一些冲突| 
-|410|Client Error（客户端错误状态码）| Gone（消失了）| 除了服务器曾持有这些资源之外，与状态码 404 类似 |
-|411|Client Error（客户端错误状态码）| Length Required（要求长度指示）| 服务器要求在请求报文中包含 Content- Length 首部时会使用这个代码。发起的请求中若没有 Content-Length 首部，服务器 是不会接受此资源请求的| 
-|412|Client Error（客户端错误状态码）|Precondition Failed（先决条件失败）| 如果客户端发起了一个条件请求， 如果服务器无法满足其中的某个条件，就返回这个响应码| 
-|413|Client Error（客户端错误状态码）| Request Entity Too Large（请求实体太大）| 客户端发送的实体主体部分比 服务器能够或者希望处理的要大|
-|414|Client Error（客户端错误状态码）| Request URI Too Long（请求 URI 太长）| 客户端发送的请求所携带的请求 URL 超过了服务器能够或者希望处理的长度|
-|415 |Client Error（客户端错误状态码）|Unsupported Media Type（不支持的媒体类型）| 服务器无法理解或不支持客户端所发送的实体的内容类型| 
-|416 |Client Error（客户端错误状态码）|Requested Range Not Satisfiable（所请求的范围未得到满足）| 请求报文请求的是某范围内的指定资源，但那个范围无效，或者未得到满足 |
-|417|Client Error（客户端错误状态码）| Expectation Failed（无法满足期望）| 请求的 Expect 首部包含了一个预期内容，但服务器无法满足||
-|||||
-|500|Server Error（服务器错误状态码）| Internal Server Error（内部服务器错误）| 服务器遇到了一个错误，使其无法为请求提供服务|❤|
-|501 |Server Error（服务器错误状态码）|Not Implemented（未实现）| 服务器无法满足客户端请求的某个功能 |
-|502 |Server Error（服务器错误状态码）|Bad Gateway（网关故障）| 作为代理或网关使用的服务器遇到了来自响应链中上游的无效响应 |
-|503|Server Error（服务器错误状态码）| Service Unavailable（未提供此服务）| 服务器目前无法为请求提供服务，但过一段时间就可以恢复服务|❤|
-|504|Server Error（服务器错误状态码） |Gateway Timeout（网关超时）| 与状态码 408 类似，但是响应来自网关或代理，此网关或代理在等待另一台服务器的响应时出现了超时 |
-|505|Server Error（服务器错误状态码）| HTTP Version Not Supported（不支持的 HTTP 版本）| 服务器收到的请求是以它不支持或不愿支持的协议版本表示的|
-
->在 RFC2616 中定义了 40 种 HTTP 状态码，webDAV ( Web-based Distributed Authoring and Versioning，基于万维网的分布式创作和版本控制)在 RFC4918 和 RFC5842 中，定义了一些特殊的状态码，在 RFC2518、RFC2817、RFC2295、RFC2774、RFC6585 中还额外定义了一些附加的 HTTP 状态码。总共有 60+ 种。具体链接可以见 [HTTP状态码 (wikipedia)](https://zh.wikipedia.org/wiki/HTTP%E7%8A%B6%E6%80%81%E7%A0%81)
-
-
-webDAV 新增状态码
-
-| 状态码 | 类别 | 原因短语 |含义||
-| :---: | :---: | :---: |:---: |:---:|
-| 102 | Informational（信息性状态码） | Processing（处理中）|可正常处理请求，但目前是处理中状态。WebDAV请求可能包含许多涉及文件操作的子请求，需要很长时间才能完成请求。该代码表示​​服务器已经收到并正在处理请求，但无响应可用。这样可以防止客户端超时，并假设请求丢失。||
-| 207 | Success（成功状态码） | Multi-Status（多种状态）| 存在多种状态。代表之后的消息体将是一个 XML 消息，并且可能依照之前子请求数量的不同，包含一系列独立的响应代码。||
-| 208 | Success（成功状态码） | Already Reported（已经响应）| DAV绑定的成员已经在（多状态）响应之前的部分被列举，且未被再次包含。||
-|422|Client Error（客户端错误状态码）| Unprocessable Entity（不可处理的实体）| 格式正确，内容有误，无法处理响应||
-|423|Client Error（客户端错误状态码）| Locked（被锁定）| 资源已被加锁||
-|424|Client Error（客户端错误状态码）| Failed Dependency（失败的依赖）| 处理与某请求关联的请求失败，因为不再维持依赖关系。||
-|507|Server Error（服务器错误状态码）| Insufficient Storage（存储空间不足）| 服务器无法存储完成请求所必须的内容。这个状况被认为是临时的。||
-|508|Server Error（服务器错误状态码）| Loop Detected（检测到环）| 服务器在处理请求时陷入死循环。|
-
-# MIME 媒体内容
-
-
-HTTP 仔细地给每种要通过 Web 传输的对象都打上了名为 MIME 类型（MIME type）的数据格式标签。最初设计 MIME（Multipurpose Internet Mail Extension，多用途因特网邮件扩展）是为了解决在不同的电子邮件系统之间搬移报文时存在的问题。MIME 在电子邮件系统中工作得非常好，因此 HTTP 也采纳了它，用它来描述并标记多媒体内容。
-
-
-RFC2045，“ MIME: Format of Internet Message Bodies”（“ MIME：因特网报文主体的格式”）
-
-
-常见的主 MIME 类型
-
-| 类型| 描述 | 
-| :---: | :---: |
-|application |应用程序特有的内容格式（离散类型）|
-|audio| 音频格式（离散类型） |
-|chemical |化学数据集（离散 IETF 扩展类型）| 
-|image| 图片格式（离散类型） |
-|message |报文格式（复合类型）| 
-|model| 三维模型格式（离散 IETF 扩展类型）| 
-|multipart |多部分对象集合（复合类型）|
-| text |文本格式（离散类型）| 
-|video |视频电影格式（离散类型）|
-
-
-
 
 # HTTP 报文结构
 
@@ -408,216 +311,6 @@ If-None-Match：
 [![](http://idiotsky.top/images3/http-summary-33.jpg)](http://idiotsky.top/images3/http-summary-33.jpg)
 
 
-# 请求首部
-
-## 请求信息性首部
-
-| 首部 | 描述 | 
-| :---: | :---: |
-|Client-IP4| 提供了运行客户端的机器的 IP 地址|
-|From| 提供了客户端用户的 E-mail 地址 |
-|Host |给出了接收请求的服务器的主机名和端口号 |
-|Referer |提供了包含当前请求 URI 的文档的 URL（正确的拼写其实应该是Referrer ，大家一致沿用错误至今） |
-|UA-Color |提供了与客户端显示器的显示颜色有关的信息 |
-|UA-CPU |给出了客户端 CPU 的类型或制造商 |
-|UA-Disp |提供了与客户端显示器（屏幕）能力有关的信息| 
-|UA-OS |给出了运行在客户端机器上的操作系统名称及版本 |
-|UA-Pixels |提供了客户端显示器的像素信息 |
-|User-Agent |将发起请求的应用程序名称告知服务器|
-
-## Accept 首部
-
-| 首部 | 描述 | 
-| :---: | :---: |
-|Accept |告诉服务器能够发送哪些媒体类型 |
-|Accept- Charset |告诉服务器能够发送哪些字符集 |
-|Accept- Encoding |告诉服务器能够发送哪些编码方式 |
-|Accept- Language |告诉服务器能够发送哪些语言 |
-|TE | 告诉服务器可以使用哪些扩展传输的编码|
-
-
-常见内容编码
-
-常用的内容编码有以下几种：
-
-- gzip（GNU zip）  
-  由文件压缩程序 gzip（GNU zip）生成的编码格式（RFC1952），采用 Lempel-Ziv 算法（LZ77）及 32 位循环冗余校验（Cyclic Redundancy Check，统称 CRC）
-- compress（UNIX 系统的标准压缩）  
-  由 UNIX 文件压缩程序 compress 生成的编码格式，采用 Lempel-Ziv-Welch 算法 （LZW）
-- deflate（zlib）  
-  组合使用 zlib 格式（RFC1950）及由 deflate 压缩算法（RFC1951）生成的编码格式
-- identity（不进行编码）  
-  不执行压缩或不会变化的默认编码格式
-
-
-## 条件请求首部
-
-| 首部 | 描述 | 
-| :---: | :---: |
-|Expect |允许客户端列出某请求所要求的服务器行为 |
-|If-Match| 如果实体标记与文档当前的实体标记相匹配，就获取这份文档 |
-|If-Modified-Since |除非在某个指定的日期之后资源被修改过，否则就限制这个请求 |
-|If-None-Match |如果提供的实体标记与当前文档的实体标记不相符，就获取文档 |
-|If-Range |允许对文档的某个范围进行条件请求 |
-|If-Unmodified-Since| 除非在某个指定日期之后资源没有被修改过，否则就限制这个请求 |
-|Range |如果服务器支持范围请求，就请求资源的指定范围|
-
-## 安全请求首部
-
-| 首部 | 描述 | 
-| :---: | :---: |
-|Authorization |包含了客户端提供给服务器，以便对其自身进行认证的数据 |
-|Cookie |客户端用它向服务器传送一个令牌 —— 它并不是真正的安全首部，但确实隐含了安全功能 |
-| Cookie | 用来说明请求端支持的 cookie 版本|
-
- 
-## 代理请求首部
-
-| 首部 | 描述 | 
-| :---: | :---: |
-|Max-Forward |在通往源端服务器的路径上，将请求转发给其他代理或网关的最大次数 —— 与 TRACE 方法一同使用 |
-|Proxy-Authorization |与 Authorization 首部相同， 但这个首部是在与代理进行认证时使用的 |
-|Proxy-Connection |与 Connection 首部相同， 但这个首部是在与代理建立连接时使用的|
-
-
-# 响应首部
-
-## 响应信息性首部
-
-| 首部 | 描述 | 
-| :---: | :---: |
-|Age |（从最初创建开始）响应持续时间 |
-|Public | 服务器为其资源支持的请求方法列表 |
-|Retry-After |如果资源不可用的话，在此日期或时间重试 Server 服务器应用程序软件的名称和版本 |
-|Title | 对 HTML 文档来说，就是 HTML 文档 的源端给出的标题 |
-|Warning| 比原因短语中更详细一些的警告报文|
-
-
-## 协商首部
-
-| 首部 | 描述 | 
-| :---: | :---: |
-|Accept-Ranges |对此资源来说，服务器可接受的范围类型 |
-|Vary |服务器查看的其他首部的列表，可能会使响应发生变化；也就是说，这是一个首部列表，服务器会根据这些首部的内容挑选出最适合的资源版本发送给客户端。首部字段 Vary 可对缓存进行控制。源服务器会向代理服务器传达关于本地缓存使用方法的命令。从代理服务器接收到源服务器返回包含 Vary 指定项的响应之后，若再进行缓存，仅对请求中含有相同 Vary 指定首部字段的请求返回缓存。即使对相同资源发起请求，但由于 Vary 指定的首部字段不相同，因此必须要从源服务器重新获取资源。|
-
-## 安全响应首部
-
-| 首部 | 描述 | 
-| :---: | :---: |
-|Proxy-Authenticate| 来自代理的对客户端的质询列表 |
-|Set-Cookie |不是真正的安全首部，但隐含有安全功能；可以在客户端设置一个令牌，以便服务器对客户端进行标识 |
-|Set-Cookie2 |与 Set-Cookie 类似，RFC 2965 Cookie 定义； |
-|WWW-Authenticate| 来自服务器的对客户端的质询列表。它会告知客户端适用于访问请求 URI 所指定资源的认证方案（Basic 或是 Digest）和带参数提示的质询（challenge）|
-
-
-Cookie 的 HttpOnly 属性是 Cookie 的扩展功能，它使 JavaScript 脚本无法获得 Cookie。其主要目的为了防止跨站脚本攻击（Cross-site scripting，XSS）对 Cookie 的信息窃取。
-
-````http
-Set-Cookie: name-value;HttpOnly
-
-````
-
-顺带一提，该扩展并非是为了防止 XSS 而开发的。
-
-# 实体首部
-
-
-## 实体信息性首部
-
-| 首部 | 描述 | 
-| :---: | :---: |
-|Allow |列出了可以对此实体执行的请求方法 |
-|Location |告知客户端实体实际上位于何处；用于将接收端定向到资源的（可能是新的）位置（URL）上去|
-
-
-## 内容首部
-
-| 首部 | 描述 | 
-| :---: | :---: |
-|Content-Base16 |解析主体中的相对 URL 时使用的基础 URL |
-|Content-Encoding |对主体执行的任意编码方式 |
-|Content-Language| 理解主体时最适宜使用的自然语言 |
-|Content-Length |主体的长度或尺寸|
-| Content-Location |资源实际所处的位置 |
-|Content-MD5 |主体的 MD5 校验和|
-| Content-Range |在整个资源中此实体表示的字节范围 |
-|Content-Type |这个主体的对象类型|
-
-
-由于 HTTP 首部无法记录二进制值，所以要通过 Base-64 编码处理。采用 Content-MD5 这种方法，对内容上的偶发性改变是无从查证的，也无法检测出恶意篡改。原因在于，内容如果被篡改了，那么同时意味着 Content-MD5 也可以被重新计算后更新，被篡改。所以处在接收阶段的客户端是无法意识到报文主体以及首部字段 Content-MD5 是已经被篡改过的。
-
-## 实体缓存首部
-
-| 首部 | 描述 | 
-| :---: | :---: |
-|ETag |与此实体相关的实体标记 |
-|Expires |实体不再有效，要从原始的源端再次获取此实体的日期和时间 |
-|Last-Modified |这个实体最后一次被修改的日期和时间|
-
-
-Expires 是 Web 服务器响应消息头字段，在响应 http 请求时告诉浏览器在过期时间前浏览器可以直接从浏览器缓存取数据，而无需再次请求。
-
-Expires 的缺点是：响应报文中 Expires 所定义的缓存时间是相对服务器上的时间而言的，其定义的是资源“失效时刻”，如果客户端上的时间跟服务器上的时间不一致，缓存将失效。  
-
-另外，Expires 主要使用在 HTTP1.0 版本。
-
-
-
-
-如果两者的 URI 是相同，所以仅凭 URI 指定缓存的资源是很困难的。若下载过程中出现连续中断、再连接的情况，都会依据 ETag 值指定资源。
-
-ETag 也分为强 ETag 值和弱 ETag 值：
-
-强 ETag 值：
-
-强 ETag 值，不论实体发生多少细微的变化都会改变其值。
-
-````http  
-ETag: "usagi-1234"
-
-````
-
-弱 ETag 值：
-
-弱 ETag 值只用于提示资源是否相同。只有资源发生了根本改变，产生差异时才会改变 ETag 值。这时，会在字段值最开始处附加 W/
-
-````http  
-ETag: W/"usagi-1234"
-
-````
-
-
-
-
-# 扩展首部
-
-
-## X-Frame-Options
-
-首部字段 X-Frame-Options 属于 HTTP 响应首部，用于控制网站内容在其他 Web 网站的 Frame 标签内的显示问题。其主要目的是为了防止点击劫持（clickjacking）攻击。
-
-## X-XSS-Protection
-
-首部字段 X-XSS-Protection 属于 HTTP 响应首部，它是针对跨站脚本攻击（XSS）的一种对策，用于控制浏览器 XSS 防护机制的开关。0：将 XSS 过滤设置成无效状态，1：将 XSS 过滤设置成有效状态。
-
-## DNT
-
-首部字段 DNT 属于 HTTP 请求首部，其中 DNT 是 Do Not Track 的简称，意为拒绝个人信息被收集，是表示拒绝被精准广告追踪的一种方法。0：同意被追踪，1：拒绝被追踪。
-
-## P3P
-
-首部字段 P3P 属于 HTTP 响应首部，通过利用 P3P（The Platform for Privacy Preferences，在线隐私偏好平台）技术，可以让 Web 网站上的个人隐私变成一种仅供程序可理解的形式，以达到保护用户隐私的目的。
-
->在 HTTP 等多种协议中，通过给非标准参数加上前缀 X- ，来区别于标准参数，并使那些非标准的参数作为扩展变成可能。但是这种简单粗暴的做法有百害而无一益，因此在 “RFC6648 - Deprecating the "X-" Prefix and Similar Constructs in Application Protocols ”中提议停止该做法。然而，对已经在使用中的 X- 前缀来说，不应该要求其变更。
-
-
-
-HTTP 首部字段将定义成缓存代理和非缓存代理的行为，分为 端到端首部（End-to-end Header）、逐跳首部（Hop-by-hop Header）
-
-- 端到端首部：分在此类别中的首部会转发给请求 / 响应对应的最终接收目标，且必须保存在由缓存生成的相应中，另外规定它必须被转发。
-- 逐跳首部：分在此类别中的首部只对单次转发有效，会因通过缓存或代理而不再转发。HTTP/1.1 和之后版本中，如果要使用 hop-by-hop 首部，需提供 Connection 首部字段。（Connection、Keep-Alive、Proxy-Authenticate、Proxy-Authorization、Trailer、TE、Transfer-Encoding、Upgrade 这 8 个首部字段属于逐跳首部，除此以外的字段都属于端到端首部）
-
-
 # 提高 HTTP 性能
 
 ## 并行连接
@@ -718,39 +411,108 @@ DELETE /idX/delete HTTP/1.1   -> Returns 404
 
 在使用 XMLHttpRequest 的 POST 方法时，浏览器会先发送 Header 再发送 Data。但并不是所有浏览器会这么做，例如火狐就不会。
 
+# HTTP/2.0
 
-# HTTP 各版本比较
+## HTTP/1.x 缺陷
 
-## HTTP/1.0 与 HTTP/1.1 的区别
+HTTP/1.x 实现简单是以牺牲应用性能为代价的：
 
-1. HTTP/1.1 默认是持久连接
-2. HTTP/1.1 支持管线化处理
-3. HTTP/1.1 支持虚拟主机
-4. HTTP/1.1 新增状态码 100
-5. HTTP/1.1 支持分块传输编码
-6. HTTP/1.1 新增缓存处理指令 max-age
+* 客户端需要使用多个连接才能实现并发和缩短延迟；
+* 不会压缩请求和响应首部，从而导致不必要的网络流量；
+* 不支持有效的资源优先级，致使底层 TCP 连接的利用率低下。
 
-具体内容见上文
+## 二进制分帧层
 
-## HTTP/1.1 与 HTTP/2.0 的区别
+HTTP/2.0 将报文分成 HEADERS 帧和 DATA 帧，它们都是二进制格式的。
 
-> [HTTP/2 简介](https://developers.google.com/web/fundamentals/performance/http2/?hl=zh-cn)
+[![](http://idiotsky.top/images3/http-summary-52.png)](http://idiotsky.top/images3/http-summary-52.png)
 
-### 多路复用
+在通信过程中，只会有一个 TCP 连接存在，它承载了任意数量的双向数据流（Stream）。一个数据流都有一个唯一标识符和可选的优先级信息，用于承载双向信息。消息（Message）是与逻辑请求或响应消息对应的完整的一系列帧。帧（Fram）是最小的通信单位，来自不同数据流的帧可以交错发送，然后再根据每个帧头的数据流标识符重新组装。
 
-HTTP/2.0 使用多路复用技术，同一个 TCP 连接可以处理多个请求。
+[![](http://idiotsky.top/images3/http-summary-53.png)](http://idiotsky.top/images3/http-summary-53.png)
 
-###  首部压缩
+## 服务端推送
 
-HTTP/1.1 的首部带有大量信息，而且每次都要重复发送。HTTP/2.0 要求通讯双方各自缓存一份首部字段表，从而避免了重复传输。
+HTTP/2.0 在客户端请求一个资源时，会把相关的资源一起发送给客户端，客户端就不需要再次发起请求了。例如客户端请求 page.html 页面，服务端就把 script.js 和 style.css 等与之相关的资源一起发给客户端。
 
-###  服务端推送
+[![](http://idiotsky.top/images3/http-summary-54.png)](http://idiotsky.top/images3/http-summary-54.png)
 
-HTTP/2.0 在客户端请求一个资源时，会把相关的资源一起发送给客户端，客户端就不需要再次发起请求了。例如客户端请求 index.html 页面，服务端就把 index.js 一起发给客户端。
+## 首部压缩
 
-###  二进制格式
+HTTP/1.1 的首部带有大量信息，而且每次都要重复发送。HTTP/2.0 要求客户端和服务器同时维护和更新一个包含之前见过的首部字段表，从而避免了重复传输。不仅如此，HTTP/2.0 也使用 Huffman 编码对首部字段进行压缩。
 
-HTTP/1.1 的解析是基于文本的，而 HTTP/2.0 采用二进制格式。
+[![](http://idiotsky.top/images3/http-summary-55.png)](http://idiotsky.top/images3/http-summary-55.png)
+
+# HTTPS
+
+HTTP 有以下安全性问题：
+
+* 使用明文进行通信，内容可能会被窃听；
+* 不验证通信方的身份，通信方的身份有可能遭遇伪装；
+* 无法证明报文的完整性，报文有可能遭篡改。
+
+HTTPs 并不是新协议，而是让 HTTP 先和 SSL（Secure Sockets Layer）通信，再由 SSL 和 TCP 通信。也就是说 HTTPs 使用了隧道进行通信。
+
+通过使用 SSL，HTTPs 具有了加密（防窃听）、认证（防伪装）和完整性保护（防篡改）。
+
+[![](http://idiotsky.top/images3/http-summary-56.jpg)](http://idiotsky.top/images3/http-summary-56.jpg)
+
+## 加密
+
+### 1. 对称密钥加密
+
+对称密钥加密（Symmetric-Key Encryption），加密和解密使用同一密钥。
+
+- 优点：运算速度快；
+- 缺点：无法安全地将密钥传输给通信方。
+
+[![](http://idiotsky.top/images3/http-summary-57.png)](http://idiotsky.top/images3/http-summary-57.png)
+
+### 2.非对称密钥加密
+
+非对称密钥加密，又称公开密钥加密（Public-Key Encryption），加密和解密使用不同的密钥。
+
+公开密钥所有人都可以获得，通信发送方获得接收方的公开密钥之后，就可以使用公开密钥进行加密，接收方收到通信内容后使用私有密钥解密。
+
+非对称密钥除了用来加密，还可以用来进行签名。因为私有密钥无法被其他人获取，因此通信发送方使用其私有密钥进行签名，通信接收方使用发送方的公开密钥对签名进行解密，就能判断这个签名是否正确。
+
+- 优点：可以更安全地将公开密钥传输给通信发送方；
+- 缺点：运算速度慢。
+
+[![](http://idiotsky.top/images3/http-summary-58.png)](http://idiotsky.top/images3/http-summary-58.png)
+
+### 3. HTTPs 采用的加密方式
+
+HTTPs 采用混合的加密机制，使用非对称密钥加密用于传输对称密钥来保证安全性，之后使用对称密钥加密进行通信来保证效率。（下图中的 Session Key 就是对称密钥）
+
+[![](http://idiotsky.top/images3/http-summary-59.png)](http://idiotsky.top/images3/http-summary-59.png)
+
+## 认证
+
+通过使用  **证书**  来对通信方进行认证。
+
+数字证书认证机构（CA，Certificate Authority）是客户端与服务器双方都可信赖的第三方机构。
+
+服务器的运营人员向 CA 提出公开密钥的申请，CA 在判明提出申请者的身份之后，会对已申请的公开密钥做数字签名，然后分配这个已签名的公开密钥，并将该公开密钥放入公开密钥证书后绑定在一起。
+
+进行 HTTPs 通信时，服务器会把证书发送给客户端。客户端取得其中的公开密钥之后，先使用数字签名进行验证，如果验证通过，就可以开始通信了。
+
+通信开始时，客户端需要使用服务器的公开密钥将自己的私有密钥传输给服务器，之后再进行对称密钥加密。
+
+[![](http://idiotsky.top/images3/http-summary-60.png)](http://idiotsky.top/images3/http-summary-60.png)
+
+## 完整性保护
+
+SSL 提供报文摘要功能来进行完整性保护。
+
+HTTP 也提供了 MD5 报文摘要功能，但不是安全的。例如报文内容被篡改之后，同时重新计算 MD5 的值，通信接收方是无法意识到发生了篡改。
+
+HTTPs 的报文摘要功能之所以安全，是因为它结合了加密和认证这两个操作。试想一下，加密之后的报文，遭到篡改之后，也很难重新计算报文摘要，因为无法轻易获取明文。
+
+## HTTPs 的缺点
+
+- 因为需要进行加密解密等过程，因此速度会更慢；
+- 需要支付证书授权的高费用。
 
 
 # 浏览器同源政策及其规避方法
