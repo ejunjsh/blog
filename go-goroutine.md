@@ -61,13 +61,60 @@ goroutine的调度可以理解为多线程调度协程（goroutine）。所以�
 
 [![](http://idiotsky.top/images2/go-goroutine-1.jpg)](http://idiotsky.top/images2/go-goroutine-1.jpg)
 
-* M代表系统线程，也就是前面说的普通线程。
-* P代表调度器，我们可以把它当做单线程的本地调度器。（注：GOMAXPROCS环境变量代表的个数是P的个数，推荐值为CPU的核心数）
-* G代表goroutine，它包含了SP、PC寄存器，以及其它调度相关信息。
+* G: 表示goroutine，存储了goroutine的执行stack信息、goroutine状态以及goroutine的任务函数等；另外G对象是可以重用的。
+* P: 表示逻辑processor，P的数量决定了系统内最大可并行的G的数量（前提：系统的物理cpu核数>=P的数量，GOMAXPROCS环境变量代表的个数是P的个数，推荐值为CPU的核心数）；P的最大作用还是其拥有的各种G对象队列、链表、一些cache和状态。
+* M: M代表着真正的执行计算资源。在绑定有效的p后，进入schedule循环；而schedule循环的机制大致是从各种队列、p的本地队列中获取G，切换到G的执行栈上并执行G的函数，调用goexit做清理工作并回到m，如此反复。M并不保留G状态，这是G可以跨M调度的基础。
+
+__下面是G、P、M定义的代码片段：__
+````go
+//src/runtime/runtime2.go
+type g struct {
+        stack      stack   // offset known to runtime/cgo
+        sched     gobuf
+        goid        int64
+        gopc       uintptr // pc of go statement that created this goroutine
+        startpc    uintptr // pc of goroutine function
+        ... ...
+}
+
+type p struct {
+    lock mutex
+
+    id          int32
+    status      uint32 // one of pidle/prunning/...
+
+    mcache      *mcache
+    racectx     uintptr
+
+    // Queue of runnable goroutines. Accessed without lock.
+    runqhead uint32
+    runqtail uint32
+    runq     [256]guintptr
+
+    runnext guintptr
+
+    // Available G's (status == Gdead)
+    gfree    *g
+    gfreecnt int32
+
+  ... ...
+}
+
+type m struct {
+    g0      *g     // goroutine with scheduling stack
+    mstartfn      func()
+    curg          *g       // current running goroutine
+ .... ..
+}
+````
 
 [![](http://idiotsky.top/images2/go-goroutine-2.jpg)](http://idiotsky.top/images2/go-goroutine-2.jpg)
 
 上图是2个M（线程），每个线程对应一个处理器（P），M是必须关联P才能执行协程（G）的。图中蓝G代表的是运行中的goroutine，灰G表示的待执行的Goroutine，待执行的Goroutine存储在 P 中的一个局部队列中，此时P执行Goroutine会这个队列中取，不用加锁，提高了并发度。（Go1.0版本中，调度器取Goroutine是去一个全局队列中取，需要加锁，线程会经常阻塞等待锁）
+
+下面更加清晰说明整个结构
+
+[![](http://tonybai.com/wp-content/uploads/goroutine-scheduler-model.png)](http://tonybai.com/wp-content/uploads/goroutine-scheduler-model.png)
 
 __如果其中一个G执行的时候，发生了系统调用，阻塞了怎么办？__
 
@@ -89,17 +136,97 @@ __当P局部队列不均衡时怎么处理？如果有多个P，其中一个P的
 
 如果一个P局部队列为空，那么它尝试从全局队列中取Goroutine，如全局队列为空，则会随机从其它P的局部队列中“挪”一半Goroutine到自己的队列当中， 以保证所有的M都是有任务执行的，间接做到负载均衡（可以参考go源码的findrunnable()函数 ）
 
-__最后一个问题，关于抢占。如果一个P连续执行长时间，没有切换G，怎么处理？__
+__channel阻塞怎么办__
 
-虽然协程强调的是协作式调度，但是如果其中一个协程不够“合作”，不主动让出控制权，那么会导致这个线程一直被占用，降低并发度。Go中有相应的处理方案~
+如果G被阻塞在某个channel操作上时，G会被放置到某个wait队列中，而M会尝试运行下一个runnable的G；如果此时没有runnable的G供m运行，那么m将解绑P，并进入sleep状态。当channel操作完成，在wait队列中的G会被唤醒，标记为runnable，放入到某P的队列中，绑定一个M继续执行。
 
-首先，Go 在启动时会创建一个系统线程，这个系统线程会监控所有Goroutine的状态。它是通过遍历所有的P，如果P连续长时间执行，就会被抢占。表现为改P对应当前执行的G会被移除，放置到全局Goroutine队列中，然后P去捞新的G来执行。
+__网络I/O和文件I/O怎么办__
 
-下面这张图总结下
+Go runtime已经实现了[netpoller](http://morsmachine.dk/netpoller)，这使得即便G发起网络I/O操作也不会导致M被阻塞（仅阻塞G），从而不会导致大量M被创建出来。但是对于regular file的I/O操作一旦阻塞，那么M将进入sleep状态，等待I/O返回后被唤醒；这种情况下P将与sleep的M分离，再选择一个idle的M。如果此时没有idle的M，则会新创建一个M，这就是为何大量I/O操作导致大量Thread被创建的原因。
 
-[![](http://tonybai.com/wp-content/uploads/goroutine-scheduler-model.png)](http://tonybai.com/wp-content/uploads/goroutine-scheduler-model.png)
+__遇到锁怎么办__
 
-> to be continue....
+go的锁不是系统级别的MUTEX锁，而是轻量级的CAS锁，所以抢锁失败不会阻塞M，而是阻塞G(阻塞之前还自旋一下看看能不能再抢到锁)，然后这个G就会被正常的调度出去，在某个时刻又调度回来继续抢锁。
 
-ref
+__如果一个P连续执行长时间，没有切换G，怎么处理？__
+
+和操作系统按时间片调度线程不同，Go并没有时间片的概念。如果某个G没有进行system call调用、没有进行I/O操作、没有阻塞在一个channel操作上，那么m是如何让G停下来并调度下一个runnable G的呢？答案是：__G是被抢占调度的__。
+
+除非极端的无限循环或死循环，否则只要G调用函数，Go runtime就有抢占G的机会。Go程序启动时，runtime会去启动一个名为sysmon的m(一般称为监控线程)，该m无需绑定p即可运行，该m在整个Go程序的运行过程中至关重要：
+
+````go
+//$GOROOT/src/runtime/proc.go
+
+// The main goroutine.
+func main() {
+     ... ...
+    systemstack(func() {
+        newm(sysmon, nil)
+    })
+    .... ...
+}
+
+// Always runs without a P, so write barriers are not allowed.
+//
+//go:nowritebarrierrec
+func sysmon() {
+    // If a heap span goes unused for 5 minutes after a garbage collection,
+    // we hand it back to the operating system.
+    scavengelimit := int64(5 * 60 * 1e9)
+    ... ...
+
+    if  .... {
+        ... ...
+        // retake P's blocked in syscalls
+        // and preempt long running G's
+        if retake(now) != 0 {
+            idle = 0
+        } else {
+            idle++
+        }
+       ... ...
+    }
+}
+
+````
+
+sysmon每20us~10ms启动一次，按照《Go语言学习笔记》中的总结，sysmon主要完成如下工作：
+
+* 释放闲置超过5分钟的span物理内存；
+* 如果超过2分钟没有垃圾回收，强制执行；
+* 将长时间未处理的netpoll结果添加到任务队列；
+* 向长时间运行的G任务发出抢占调度；
+* 收回因syscall长时间阻塞的P；
+
+我们看到sysmon将“向长时间运行的G任务发出抢占调度”，这个事情由retake实施：
+
+````go
+// forcePreemptNS is the time slice given to a G before it is
+// preempted.
+const forcePreemptNS = 10 * 1000 * 1000 // 10ms
+
+func retake(now int64) uint32 {
+          ... ...
+           // Preempt G if it's running for too long.
+            t := int64(_p_.schedtick)
+            if int64(pd.schedtick) != t {
+                pd.schedtick = uint32(t)
+                pd.schedwhen = now
+                continue
+            }
+            if pd.schedwhen+forcePreemptNS > now {
+                continue
+            }
+            preemptone(_p_)
+         ... ...
+}
+````
+
+可以看出，如果一个G任务运行10ms，sysmon就会认为其运行时间太久而发出抢占式调度的请求。一旦G的抢占标志位被设为true，那么待这个G下一次调用函数或方法时，runtime便可以将G抢占，并移出运行状态，放入P中局部队列中，等待下一次被调度。
+
+
+# 参考
+
 https://zhuanlan.zhihu.com/p/32497435
+
+https://tonybai.com/2017/06/23/an-intro-about-goroutine-scheduler/
