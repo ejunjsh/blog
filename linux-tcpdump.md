@@ -80,7 +80,7 @@ tcpdump的表达式由一个或多个"单元"组成，每个单元一般包含ID
 
 所以，一个基本的表达式单元格式为"proto dir type ID"
 
-[![](https://images2018.cnblogs.com/blog/733013/201806/733013-20180621121410609-1741572810.png)](https://images2018.cnblogs.com/blog/733013/201806/733013-20180621121410609-1741572810.png)
+[![](http://idiotsky.top/images3/tcpdump.png)](http://idiotsky.top/images3/tcpdump.png)
 
 除了使用修饰符和ID组成的表达式单元，还有关键字表达式单元：gateway，broadcast，less，greater以及算术表达式。
 

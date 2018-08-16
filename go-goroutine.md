@@ -1,6 +1,6 @@
 ---
 title: 深入go之goroutine
-date: 2018-02-26 19:56:31
+date: 2018-08-12 19:56:31
 tags: [go,goroutine,协程,并发,并行,多线程]
 categories: go
 ---
@@ -114,7 +114,7 @@ type m struct {
 
 下面更加清晰说明整个结构
 
-[![](http://tonybai.com/wp-content/uploads/goroutine-scheduler-model.png)](http://tonybai.com/wp-content/uploads/goroutine-scheduler-model.png)
+[![](http://idiotsky.top/images2/go-goroutine-5.png)](http://idiotsky.top/images2/go-goroutine-5.png)
 
 __如果其中一个G执行的时候，发生了系统调用，阻塞了怎么办？__
 
