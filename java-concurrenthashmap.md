@@ -375,7 +375,7 @@ ConcurrentHashMap定义了三个原子操作，用于对指定位置的节点进
 
 在代码的69行有一个判断，如果遍历到的节点是forward节点，就向后继续遍历，再加上给节点上锁的机制，就完成了多线程的控制。多线程遍历节点，处理了一个节点，就把对应点的值set为forward，另一个线程看到forward，就向后遍历。这样交叉就完成了复制工作。而且还很好的解决了线程安全的问题。 这个方法的设计实在是让我膜拜。
 
-[](![](http://static.oschina.net/uploads/space/2016/0516/173132_DQMG_2243330.jpg))
+[![](http://static.oschina.net/uploads/space/2016/0516/173132_DQMG_2243330.jpg)](http://static.oschina.net/uploads/space/2016/0516/173132_DQMG_2243330.jpg)
 
 ````java
 /**
@@ -651,7 +651,7 @@ ConcurrentHashMap定义了三个原子操作，用于对指定位置的节点进
 这个方法用于将过长的链表转换为TreeBin对象。但是他并不是直接转换，而是进行一次容量判断，如果容量没有达到转换的要求，直接进行扩容操作并返回；如果满足条件才链表的结构抓换为TreeBin ，这与HashMap不同的是，它并没有把TreeNode直接放入红黑树，而是利用了TreeBin这个小容器来封装所有的TreeNode.
  
  
- ## get方法
+## get方法
  
 get方法比较简单，给定一个key来确定value的时候，必须满足两个条件  key相同  hash值相同，对于节点可能在链表或树上的情况，需要分别去查找。
 
@@ -825,5 +825,6 @@ jdk7中ConcurrentHashmap中，当长度过长碰撞会很频繁，链表的增�
 # 参考
 
 http://www.jianshu.com/p/4806633fcc55
+
 http://blog.csdn.net/u010723709/article/details/48007881
  
