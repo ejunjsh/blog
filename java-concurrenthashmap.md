@@ -208,6 +208,54 @@ Node是最核心的内部类，它包装了key-value键值对，所有插入Conc
 
 这里仅贴出它的构造方法。可以看到在构造TreeBin节点时，仅仅指定了它的hash值为TREEBIN常量，这也就是个标识为。同时也看到我们熟悉的红黑树构造方法
 
+````java
+/**
+         * Creates bin with initial set of nodes headed by b.
+         */
+        TreeBin(TreeNode<K,V> b) {
+            super(TREEBIN, null, null, null);
+            this.first = b;
+            TreeNode<K,V> r = null;
+            for (TreeNode<K,V> x = b, next; x != null; x = next) {
+                next = (TreeNode<K,V>)x.next;
+                x.left = x.right = null;
+                if (r == null) {
+                    x.parent = null;
+                    x.red = false;
+                    r = x;
+                }
+                else {
+                    K k = x.key;
+                    int h = x.hash;
+                    Class<?> kc = null;
+                    for (TreeNode<K,V> p = r;;) {
+                        int dir, ph;
+                        K pk = p.key;
+                        if ((ph = p.hash) > h)
+                            dir = -1;
+                        else if (ph < h)
+                            dir = 1;
+                        else if ((kc == null &&
+                                  (kc = comparableClassFor(k)) == null) ||
+                                 (dir = compareComparables(kc, k, pk)) == 0)
+                            dir = tieBreakOrder(k, pk);
+                            TreeNode<K,V> xp = p;
+                        if ((p = (dir <= 0) ? p.left : p.right) == null) {
+                            x.parent = xp;
+                            if (dir <= 0)
+                                xp.left = x;
+                            else
+                                xp.right = x;
+                            r = balanceInsertion(r, x);
+                            break;
+                        }
+                    }
+                }
+            }
+            this.root = r;
+            assert checkInvariants(root);
+        }
+````
 
 ### ForwardingNode
 
