@@ -1,7 +1,7 @@
 ---
-title: TCMalloc：Thread-Caching（线程缓存） Malloc
+title: TCMalloc：Thread-Caching(线程缓存)Malloc
 date: 2018-09-17 22:56:41
-tags: [tcmalloc]
+tags: [tcmalloc,malloc]
 categories: c
 ---
 
