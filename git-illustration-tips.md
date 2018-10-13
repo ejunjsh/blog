@@ -14,7 +14,7 @@ categories: git
 [![](http://idiotsky.top/images3/git-1.png)](http://idiotsky.top/images3/git-1.png)
 
 上面的四条命令在工作目录、暂存目录(也叫做索引)和仓库之间复制文件。
-
+<!-- more -->
 * git add files 把当前文件放入暂存区域。
 * git commit 给暂存区域生成快照并提交。
 * git reset -- files 用来撤销最后一次git add files，你也可以用git reset 撤销所有暂存区域文件。
