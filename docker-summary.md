@@ -101,6 +101,33 @@ Docker 平台基本上由三部分组成：
 
 > to be continue ...
 
+# Docker 镜像分层,COW 和 镜像大小（size）
+
+## 镜像分层和容器层
+
+一个 Docker 镜像是基于基础镜像的多层叠加，最终构成和容器的 rootfs （根文件系统）。当 Docker 创建一个容器时，它会在基础镜像的容器层之上添加一层新的薄薄的可写容器层。接下来，所有对容器的变化，比如写新的文件，修改已有文件和删除文件，都只会作用在这个容器层之中。因此，通过不拷贝完整的 rootfs，Docker 减少了容器所占用的空间，以及减少了容器启动所需时间。
+
+[![](http://idiotsky.top/images3/docker-summary-3.jpg)](http://idiotsky.top/images3/docker-summary-3.jpg)
+
+## COW 和镜像大小
+
+COW，copy-on-write 技术，一方面带来了容器启动的快捷，另一方也造成了容器镜像大小的增加。每一次 RUN 命令都会在镜像上增加一层，每一层都会占用磁盘空间。举个例子，在 Ubuntu 14.04 基础镜像中运行 RUN apt-get upgrade 会在保留基础层的同时再创建一个新层来放所有新的文件，而不是修改老的文件，因此，新的镜像大小会超过直接在老的文件系统上做更新时的文件大小。因此，为了减少镜像大小起见，所有文件相关的操作，比如删除，释放和移动等，都需要尽可能地放在一个 RUN 指令中进行。
+
+## 使用容器需要避免的一些做法
+
+这篇文章 [10 things to avoid in docker containers](http://developers.redhat.com/blog/2016/02/24/10-things-to-avoid-in-docker-containers/) 列举了一些在使用容器时需要避免的做法，包括：
+
+* 不要在容器中保存数据（Don’t store data in containers）
+* 将应用打包到镜像再部署而不是更新到已有容器（Don’t ship your application in two pieces）
+* 不要产生过大的镜像 （Don’t create large images）
+* 不要使用单层镜像 （Don’t use a single layer image）
+* 不要从运行着的容器上产生镜像 （Don’t create images from running containers ）
+* 不要只是使用 “latest”标签 （Don’t use only the “latest” tag）
+* 不要在容器内运行超过一个的进程 （Don’t run more than one process in a single container ）
+* 不要在容器内保存 credentials，而是要从外面通过环境变量传入 （ Don’t store credentials in the image. Use environment variables）
+* 不要使用 root 用户跑容器进程（Don’t run processes as a root user ）
+* 不要依赖于IP地址，而是要从外面通过环境变量传入 （Don’t rely on IP addresses ）
+
 # 参考
 
 http://www.cnblogs.com/sammyliu/p/5875470.html
