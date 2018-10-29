@@ -99,7 +99,6 @@ Docker 平台基本上由三部分组成：
 * Docker 主机：从 Docker registry 上下载镜像并启动容器
 * Docker registry：Docker 镜像仓库，用于保存镜像，并提供镜像上传和下载
 
-> to be continue ...
 
 # Docker 镜像分层,COW 和 镜像大小（size）
 
@@ -127,6 +126,34 @@ COW，copy-on-write 技术，一方面带来了容器启动的快捷，另一方
 * 不要在容器内保存 credentials，而是要从外面通过环境变量传入 （ Don’t store credentials in the image. Use environment variables）
 * 不要使用 root 用户跑容器进程（Don’t run processes as a root user ）
 * 不要依赖于IP地址，而是要从外面通过环境变量传入 （Don’t rely on IP addresses ）
+
+
+
+# Linux namespace 的概念
+
+Linux 内核从版本 2.4.19 开始陆续引入了 namespace 的概念。其目的是将某个特定的全局系统资源（global system resource）通过抽象方法使得namespace 中的进程看起来拥有它们自己的隔离的全局系统资源实例（The purpose of each namespace is to wrap a particular global system resource in an abstraction that makes it appear to the processes within the namespace that they have their own isolated instance of the global resource. ）。Linux 内核中实现了六种 namespace，按照引入的先后顺序，列表如下：
+
+
+namespace	|引入的相关内核版本	|被隔离的全局系统资源	|在容器语境下的隔离效果
+-------|-----------|-----------|----------------
+Mount namespaces|	Linux 2.4.19|	文件系统挂接点	|每个容器能看到不同的文件系统层次结构
+UTS namespaces|	Linux 2.6.19|	nodename 和 domainname	|每个容器可以有自己的 hostname 和 domainame
+IPC namespaces|	Linux 2.6.19|	特定的进程间通信资源，包括System V IPC 和  POSIX message queues	|每个容器有其自己的 System V IPC 和 POSIX 消息队列文件系统，因此，只有在同一个 IPC namespace 的进程之间才能互相通信
+PID namespaces|	Linux 2.6.24	|进程 ID 数字空间 （process ID number space）	|每个 PID namespace 中的进程可以有其独立的 PID； 每个容器可以有其 PID 为 1 的root 进程；也使得容器可以在不同的 host 之间迁移，因为 namespace 中的进程 ID 和 host 无关了。这也使得容器中的每个进程有两个PID：容器中的 PID 和 host 上的 PID。
+Network namespaces|	始于Linux 2.6.24 完成于 Linux 2.6.29|	网络相关的系统资源	|每个容器用有其独立的网络设备，IP 地址，IP 路由表，/proc/net 目录，端口号等等。这也使得一个 host 上多个容器内的同一个应用都绑定到各自容器的 80 端口上。
+User namespaces	|始于 Linux 2.6.23 完成于 Linux 3.8)|	用户和组 ID 空间|	 在 user namespace 中的进程的用户和组 ID 可以和在 host 上不同； 每个 container 可以有不同的 user 和 group id；一个 host 上的非特权用户可以成为 user namespace 中的特权用户；
+
+Linux namespace 的概念说简单也简单说复杂也复杂。简单来说，我们只要知道，处于某个 namespace 中的进程，能看到独立的它自己的隔离的某些特定系统资源；复杂来说，可以去看看 Linux 内核中实现 namespace 的原理，网络上也有大量的文档供参考，这里不再赘述。
+
+
+# Docker 容器使用 linux namespace 做运行环境隔离
+
+当 Docker 创建一个容器时，它会创建新的以上六种 namespace 的实例，然后把容器中的所有进程放到这些 namespace 之中，使得Docker 容器中的进程只能看到隔离的系统资源。 
+
+
+
+> to be continue ...
+
 
 # 参考
 
