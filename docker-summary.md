@@ -157,6 +157,21 @@ Linux namespace 的概念说简单也简单说复杂也复杂。简单来说，�
 * 在容器内 PID 是 1，PPID 是 0。
 * 在容器外 PID 是 2198， PPID 是 2179 即 docker-containerd-shim 进程.
 
+````
+root@devstack:/home/sammy# ps -ef | grep python
+root 2198 2179 0 00:06 ? 00:00:00 python app.py
+
+root@devstack:/home/sammy# ps -ef | grep 2179
+root 2179 765 0 00:06 ? 00:00:00 docker-containerd-shim 8b7dd09fbcae00373207f01e2acde45740871c9e3b98286b5458b4ea09f41b3e /var/run/docker/libcontainerd/8b7dd09fbcae00373207f01e2acde45740871c9e3b98286b5458b4ea09f41b3e docker-runc
+root 2198 2179 0 00:06 ? 00:00:00 python app.py
+root 2249 1692 0 00:06 pts/0 00:00:00 grep --color=auto 2179
+
+
+root@devstack:/home/sammy# docker exec -it web31 ps -ef
+UID PID PPID C STIME TTY TIME CMD
+root 1 0 0 16:06 ? 00:00:00 python app.py
+````
+
 关于 containerd，containerd-shim 和 container 的关系，[文章](https://github.com/crosbymichael/dockercon-2016/blob/master/Creating%20Containerd.pdf) 中的下图可以说明：
 
 [![](http://idiotsky.top/images3/docker-summary-3.jpg)](http://idiotsky.top/images3/docker-summary-3.jpg)
@@ -174,7 +189,102 @@ Linux namespace 的概念说简单也简单说复杂也复杂。简单来说，�
 
 类似地，容器可以有自己的 hostname 和 domainname：
 
+````
+root@devstack:/home/sammy# hostname
+devstack
+root@devstack:/home/sammy# docker exec -it web31 hostname
+8b7dd09fbcae
+````
 
+## user namespace
+
+在 Docker 1.10 版本之前，Docker 是不支持 user namespace。也就是说，默认地，容器内的进程的运行用户就是 host 上的 root 用户，这样的话，当 host 上的文件或者目录作为 volume 被映射到容器以后，容器内的进程其实是有 root 的几乎所有权限去修改这些 host 上的目录的，这会有很大的安全问题。
+
+举例：
+
+* 启动一个容器： docker run -d -v /bin:/host/bin --name web34 training/webapp python app.py
+* 此时进程的用户在容器内和外都是root，它在容器内可以对 host 上的 /bin 目录做任意修改
+
+而 Docker 1.10 中引入的 user namespace 就可以让容器有一个 “假”的  root 用户，它在容器内是 root，在容器外是一个非 root 用户。也就是说，user namespace 实现了 host users 和 container users 之间的映射。
+
+启用步骤：
+
+1. 修改 /etc/default/docker 文件，添加行  DOCKER_OPTS="--userns-remap=default"
+2. 重启 docker 服务，此时 dockerd 进程为 /usr/bin/dockerd --userns-remap=default --raw-logs
+3. 然后创建一个容器：docker run -d -v /bin:/host/bin --name web35 training/webapp python app.py
+4. 查看进程在容器内外的用户：
+
+````
+root@devstack:/home/sammy# ps -ef | grep python
+231072    1726  1686  0 01:44 ?        00:00:00 python app.py
+
+root@devstack:/home/sammy# docker exec web35 ps -ef
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 17:44 ?        00:00:00 python app.py
+````
+查看文件/etc/subuid 和 /etc/subgid，可以看到 dockermap 用户在host 上的 uid 和 gid 都是 231072：
+
+````
+root@devstack:/home/sammy# cat /etc/subuid
+sammy:100000:65536
+stack:165536:65536
+dockremap:231072:65536
+root@devstack:/home/sammy# cat /etc/subgid
+sammy:100000:65536
+stack:165536:65536
+dockremap:231072:65536
+````
+
+再看文件/proc/1726/uid_map，它表示了容器内外用户的映射关系，即将host 上的 231072 用户映射为容器内的 0 （即root）用户。
+
+````
+root@devstack:/home/sammy# cat /proc/1726/uid_map
+         0     231072      65536
+````
+
+现在，我们试图在容器内修改 host 上的 /bin 文件夹，就会提示权限不足了：
+
+````
+root@80993d821f7b:/host/bin# touch test2
+touch: cannot touch 'test2': Permission denied
+````
+
+这说明通过使用 user namespace，我们就成功地限制了容器内进程的权限。
+
+## network namespace
+
+默认情况下，当 docker 实例被创建出来后，使用 ip netns  命令无法看到容器实例对应的 network namespace。这是因为 ip netns 命令是从 /var/run/netns 文件夹中读取内容的。
+
+步骤：
+
+1. 找到容器的主进程 ID
+    ````
+    root@devstack:/home/sammy# docker inspect --format '{{.State.Pid}}' web5
+    2704
+    ````
+2. 创建  /var/run/netns 目录以及符号连接
+    ````
+    root@devstack:/home/sammy# mkdir /var/run/netns
+    root@devstack:/home/sammy# ln -s /proc/2704/ns/net /var/run/netns/web5
+    ````
+3. 此时可以使用 ip netns 命令了
+    ````
+    root@devstack:/home/sammy# ip netns
+    web5
+    root@devstack:/home/sammy# ip netns exec web5 ip addr
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+    valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+    valid_lft forever preferred_lft forever
+    15: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default
+    link/ether 02:42:ac:11:00:03 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.3/16 scope global eth0
+    valid_lft forever preferred_lft forever
+    inet6 fe80::42:acff:fe11:3/64 scope link
+    valid_lft forever preferred_lft forever
+    ````
 > to be continue ...
 
 
