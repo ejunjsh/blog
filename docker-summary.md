@@ -285,6 +285,93 @@ touch: cannot touch 'test2': Permission denied
     inet6 fe80::42:acff:fe11:3/64 scope link
     valid_lft forever preferred_lft forever
     ````
+
+# Linux control groups
+
+## 概念
+
+Linux Cgroup 可​​​让​​​您​​​为​​​系​​​统​​​中​​​所​​​运​​​行​​​任​​​务​​​（进​​​程​​​）的​​​用​​​户​​​定​​​义​​​组​​​群​​​分​​​配​​​资​​​源​​​ — 比​​​如​​​ CPU 时​​​间​​​、​​​系​​​统​​​内​​​存​​​、​​​网​​​络​​​带​​​宽​​​或​​​者​​​这​​​些​​​资​​​源​​​的​​​组​​​合​​​。​​​您​​​可​​​以​​​监​​​控​​​您​​​配​​​置​​​的​​​ cgroup，拒​​​绝cgroup 访​​​问​​​某​​​些​​​资​​​源​​​，甚​​​至​​​在​​​运​​​行​​​的​​​系​​​统​​​中​​​动​​​态​​​配​​​置​​​您​​​的​​​ cgroup。所以，可以将 controll groups 理解为 controller （system resource） （for） （process）groups，也就是是说它以一组进程为目标进行系统资源分配和控制。
+
+它主要提供了如下功能： 
+
+* Resource limitation: 限制资源使用，比如内存使用上限以及文件系统的缓存限制。
+* Prioritization: 优先级控制，比如：CPU利用和磁盘IO吞吐。
+* Accounting: 一些审计或一些统计，主要目的是为了计费。
+* Control: 挂起进程，恢复执行进程。
+
+使​​​用​​​ cgroup，系​​​统​​​管​​​理​​​员​​​可​​​更​​​具​​​体​​​地​​​控​​​制​​​对​​​系​​​统​​​资​​​源​​​的​​​分​​​配​​​、​​​优​​​先​​​顺​​​序​​​、​​​拒​​​绝​​​、​​​管​​​理​​​和​​​监​​​控​​​。​​​可​​​更​​​好​​​地​​​根​​​据​​​任​​​务​​​和​​​用​​​户​​​分​​​配​​​硬​​​件​​​资​​​源​​​，提​​​高​​​总​​​体​​​效​​​率​​​。
+
+在实践中，系统管理员一般会利用CGroup做下面这些事（有点像为某个虚拟机分配资源似的）：
+
+* 隔离一个进程集合（比如：nginx的所有进程），并限制他们所消费的资源，比如绑定CPU的核。
+* 为这组进程分配其足够使用的内存
+* 为这组进程分配相应的网络带宽和磁盘存储限制
+* 限制访问某些设备（通过设置设备的白名单）
+
+Linux 系统中，一切皆文件。Linux 也将 cgroups 实现成了文件系统，方便用户使用。
+
+````
+root@devstack:/home/sammy# mount -t cgroup
+cgroup on /sys/fs/cgroup/cpuset type cgroup (rw,relatime,cpuset)
+cgroup on /sys/fs/cgroup/cpu type cgroup (rw,relatime,cpu)
+systemd on /sys/fs/cgroup/systemd type cgroup (rw,noexec,nosuid,nodev,none,name=systemd)
+
+root@devstack:/home/sammy# lssubsys -m
+cpuset /sys/fs/cgroup/cpuset
+cpu /sys/fs/cgroup/cpu
+cpuacct /sys/fs/cgroup/cpuacct
+memory /sys/fs/cgroup/memory
+devices /sys/fs/cgroup/devices
+freezer /sys/fs/cgroup/freezer
+blkio /sys/fs/cgroup/blkio
+perf_event /sys/fs/cgroup/perf_event
+hugetlb /sys/fs/cgroup/hugetlb
+
+root@devstack:/home/sammy# ls /sys/fs/cgroup/ -l
+total 0
+drwxr-xr-x 3 root root 0 Sep 18 21:46 blkio
+drwxr-xr-x 3 root root 0 Sep 18 21:46 cpu
+drwxr-xr-x 3 root root 0 Sep 18 21:46 cpuacct
+drwxr-xr-x 3 root root 0 Sep 18 21:46 cpuset
+drwxr-xr-x 3 root root 0 Sep 18 21:46 devices
+drwxr-xr-x 3 root root 0 Sep 18 21:46 freezer
+drwxr-xr-x 3 root root 0 Sep 18 21:46 hugetlb
+drwxr-xr-x 3 root root 0 Sep 18 21:46 memory
+drwxr-xr-x 3 root root 0 Sep 18 21:46 perf_event
+drwxr-xr-x 3 root root 0 Sep 18 21:46 systemd
+````
+
+我们看到 /sys/fs/cgroup 目录中有若干个子目录，我们可以认为这些都是受 cgroups 控制的资源以及这些资源的信息。
+
+* blkio — 这​​​个​​​子​​​系​​​统​​​为​​​块​​​设​​​备​​​设​​​定​​​输​​​入​​​/输​​​出​​​限​​​制​​​，比​​​如​​​物​​​理​​​设​​​备​​​（磁​​​盘​​​，固​​​态​​​硬​​​盘​​​，USB 等​​​等​​​）。
+* cpu — 这​​​个​​​子​​​系​​​统​​​使​​​用​​​调​​​度​​​程​​​序​​​提​​​供​​​对​​​ CPU 的​​​ cgroup 任​​​务​​​访​​​问​​​。​​​
+* cpuacct — 这​​​个​​​子​​​系​​​统​​​自​​​动​​​生​​​成​​​ cgroup 中​​​任​​​务​​​所​​​使​​​用​​​的​​​ CPU 报​​​告​​​。​​​
+* cpuset — 这​​​个​​​子​​​系​​​统​​​为​​​ cgroup 中​​​的​​​任​​​务​​​分​​​配​​​独​​​立​​​ CPU（在​​​多​​​核​​​系​​​统​​​）和​​​内​​​存​​​节​​​点。
+* devices — 这​​​个​​​子​​​系​​​统​​​可​​​允​​​许​​​或​​​者​​​拒​​​绝​​​ cgroup 中​​​的​​​任​​​务​​​访​​​问​​​设​​​备​​​。​​​
+* freezer — 这​​​个​​​子​​​系​​​统​​​挂​​​起​​​或​​​者​​​恢​​​复​​​ cgroup 中​​​的​​​任​​​务​​​。​​​
+* memory — 这​​​个​​​子​​​系​​​统​​​设​​​定​​​ cgroup 中​​​任​​​务​​​使​​​用​​​的​​​内​​​存​​​限​​​制​​​，并​​​自​​​动​​​生​​​成​​​​​内​​​存​​​资​源使用​​​报​​​告​​​。​​​
+* net_cls — 这​​​个​​​子​​​系​​​统​​​使​​​用​​​等​​​级​​​识​​​别​​​符​​​（classid）标​​​记​​​网​​​络​​​数​​​据​​​包​​​，可​​​允​​​许​​​ Linux 流量​​​控​​​制​​​程​​​序​​​（tc）识​​​别​​​从​​​具​​​体​​​ cgroup 中​​​生​​​成​​​的​​​数​​​据​​​包​​​。​​​
+* net_prio — 这个子系统用来设计网络流量的优先级
+* hugetlb — 这个子系统主要针对于HugeTLB系统进行限制，这是一个大页文件系统。
+
+
+默认的话，在 Ubuntu 系统中，你可能看不到 net_cls 和 net_prio 目录，它们需要你手工做 mount：
+
+````
+root@devstack:/sys/fs/cgroup# modprobe cls_cgroup
+root@devstack:/sys/fs/cgroup# mkdir net_cls
+root@devstack:/sys/fs/cgroup# mount -t cgroup -o net_cls none net_cls
+
+root@devstack:/sys/fs/cgroup# modprobe netprio_cgroup
+root@devstack:/sys/fs/cgroup# mkdir net_prio
+root@devstack:/sys/fs/cgroup# mount -t cgroup -o net_prio none net_prio
+
+root@devstack:/sys/fs/cgroup# ls net_prio/cgroup.clone_children  cgroup.procs          net_prio.ifpriomap  notify_on_release  tasks
+cgroup.event_control   cgroup.sane_behavior  net_prio.prioidx    release_agent
+root@devstack:/sys/fs/cgroup# ls net_cls/
+cgroup.clone_children  cgroup.event_control  cgroup.procs  cgroup.sane_behavior  net_cls.classid  notify_on_release  release_agent  tasks
+````
+
 > to be continue ...
 
 
