@@ -372,6 +372,216 @@ root@devstack:/sys/fs/cgroup# ls net_cls/
 cgroup.clone_children  cgroup.event_control  cgroup.procs  cgroup.sane_behavior  net_cls.classid  notify_on_release  release_agent  tasks
 ````
 
+## 实验
+
+### 通过 cgroups 限制进程的 CPU
+
+写一段最简单的 C 程序：
+
+````c
+int main(void)
+{
+    int i = 0;
+    for(;;) i++;
+    return 0;
+}
+````
+
+编译，运行，发现它占用的 CPU 几乎到了 100%：
+
+````
+ PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+ 2204 root      20   0    4188    356    276 R 99.6  0.0   0:46.03 hello
+````
+
+接下来我们做如下操作：
+
+````
+root@devstack:/home/sammy/c# mkdir /sys/fs/cgroup/cpu/hello
+root@devstack:/home/sammy/c# cd /sys/fs/cgroup/cpu/hello
+root@devstack:/sys/fs/cgroup/cpu/hello# ls
+cgroup.clone_children  cgroup.procs       cpu.cfs_quota_us  cpu.stat           tasks
+cgroup.event_control   cpu.cfs_period_us  cpu.shares        notify_on_release
+root@devstack:/sys/fs/cgroup/cpu/hello# cat cpu.cfs_quota_us
+-1
+root@devstack:/sys/fs/cgroup/cpu/hello# echo 20000 > cpu.cfs_quota_us
+root@devstack:/sys/fs/cgroup/cpu/hello# cat cpu.cfs_quota_us
+20000
+root@devstack:/sys/fs/cgroup/cpu/hello# echo 2428 > tasks
+````
+
+然后再来看看这个进程的 CPU 占用情况：
+
+````
+ PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+ 2428 root      20   0    4188    356    276 R 19.9  0.0   0:46.03 hello
+````
+
+它占用的 CPU 几乎就是 20%，也就是我们预设的阈值。这说明我们通过上面的步骤，成功地将这个进程运行所占用的 CPU 资源限制在某个阈值之内了。
+
+如果此时再启动另一个 hello 进程并将其 id 加入 tasks 文件，则两个进程会共享设定的 CPU 限制：
+
+````
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+ 2428 root      20   0    4188    356    276 R 10.0  0.0 285:39.54 hello
+12526 root      20   0    4188    356    276 R 10.0  0.0   0:25.09 hello
+````
+
+### 通过 cgroups 限制进程的 Memory
+
+同样地，我们针对它占用的内存做如下操作：
+
+````
+root@devstack:/sys/fs/cgroup/memory# mkdir hello
+root@devstack:/sys/fs/cgroup/memory# cd hello/
+root@devstack:/sys/fs/cgroup/memory/hello# cat memory.limit_in_bytes
+18446744073709551615
+root@devstack:/sys/fs/cgroup/memory/hello# echo 64k > memory.limit_in_bytes
+root@devstack:/sys/fs/cgroup/memory/hello# echo 2428 > tasks
+root@devstack:/sys/fs/cgroup/memory/hello#
+````
+
+上面的步骤会把进程 2428 说占用的内存阈值设置为 64K。超过的话，它会被杀掉。
+
+
+### 限制进程的 I/O
+
+运行命令：
+
+````
+sudo dd if=/dev/sda1 of=/dev/null
+````
+
+通过 iotop 命令看 IO （此时磁盘在快速转动），此时其写速度为 242M/s：
+
+````
+ TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO>    COMMAND
+ 2555 be/4 root      242.60 M/s    0.00 B/s  0.00 % 61.66 % dd if=/dev/sda1 of=/dev/null
+````
+
+接着做下面的操作：
+
+````
+root@devstack:/home/sammy# mkdir /sys/fs/cgroup/blkio/io
+root@devstack:/home/sammy# cd /sys/fs/cgroup/blkio/io
+root@devstack:/sys/fs/cgroup/blkio/io# ls -l /dev/sda1
+brw-rw---- 1 root disk 8, 1 Sep 18 21:46 /dev/sda1
+root@devstack:/sys/fs/cgroup/blkio/io# echo '8:0 1048576'  > /sys/fs/cgroup/blkio/io/blkio.throttle.read_bps_device
+root@devstack:/sys/fs/cgroup/blkio/io# echo 2725 > /sys/fs/cgroup/blkio/io/tasks
+````
+
+结果，这个进程的IO 速度就被限制在 1Mb/s 之内了：
+
+````
+ TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO>    COMMAND
+ 2555 be/4 root      990.44 K/s    0.00 B/s  0.00 % 96.29 % dd if=/dev/sda1 of=/dev/null
+````
+
+## 术语
+
+cgroups 的术语包括：
+
+* 任务（Tasks）：就是系统的一个进程。
+* 控制组（Control Group）：一组按照某种标准划分的进程，比如官方文档中的Professor和Student，或是WWW和System之类的，其表示了某进程组。Cgroups中的资源控制都是以控制组为单位实现。一个进程可以加入到某个控制组。而资源的限制是定义在这个组上，就像上面示例中我用的 hello 一样。简单点说，cgroup的呈现就是一个目录带一系列的可配置文件。
+* 层级（Hierarchy）：控制组可以组织成hierarchical的形式，既一颗控制组的树（目录结构）。控制组树上的子节点继承父结点的属性。简单点说，hierarchy就是在一个或多个子系统上的cgroups目录树。
+* 子系统（Subsystem）：一个子系统就是一个资源控制器，比如CPU子系统就是控制CPU时间分配的一个控制器。子系统必须附加到一个层级上才能起作用，一个子系统附加到某个层级以后，这个层级上的所有控制族群都受到这个子系统的控制。Cgroup的子系统可以有很多，也在不断增加中。
+
+# Docker 对 cgroups 的使用
+
+## 默认情况
+
+默认情况下，Docker 启动一个容器后，会在 /sys/fs/cgroup 目录下的各个资源目录下生成以容器 ID 为名字的目录（group），比如：
+
+````
+/sys/fs/cgroup/cpu/docker/03dd196f415276375f754d51ce29b418b170bd92d88c5e420d6901c32f93dc14
+````
+
+此时 cpu.cfs_quota_us 的内容为 -1，表示默认情况下并没有限制容器的 CPU 使用。在容器被 stopped 后，该目录被删除。
+
+运行命令 docker run -d --name web41 --cpu-quota 25000 --cpu-period 100 --cpu-shares 30 training/webapp python app.py 启动一个新的容器，结果：
+
+````
+root@devstack:/sys/fs/cgroup/cpu/docker/06bd180cd340f8288c18e8f0e01ade66d066058dd053ef46161eb682ab69ec24# cat cpu.cfs_quota_us
+25000
+root@devstack:/sys/fs/cgroup/cpu/docker/06bd180cd340f8288c18e8f0e01ade66d066058dd053ef46161eb682ab69ec24# cat tasks
+3704
+root@devstack:/sys/fs/cgroup/cpu/docker/06bd180cd340f8288c18e8f0e01ade66d066058dd053ef46161eb682ab69ec24# cat cpu.cfs_period_us
+2000
+````
+
+Docker 会将容器中的进程的 ID 加入到各个资源对应的 tasks 文件中。表示 Docker 也是以上面的机制来使用 cgroups 对容器的 CPU 使用进行限制。
+
+相似地，可以通过 docker run 中 mem 相关的参数对容器的内存使用进行限制：
+
+````
+      --cpuset-mems string          MEMs in which to allow execution (0-3, 0,1)
+      --kernel-memory string        Kernel memory limit
+  -m, --memory string               Memory limit
+      --memory-reservation string   Memory soft limit
+      --memory-swap string          Swap limit equal to memory plus swap: '-1' to enable unlimited swap
+      --memory-swappiness int       Tune container memory swappiness (0 to 100) (default -1)
+````
+
+比如  docker run -d --name web42 --blkio-weight 100 --memory 10M --cpu-quota 25000 --cpu-period 2000 --cpu-shares 30 training/webapp python app.py：
+
+````
+root@devstack:/sys/fs/cgroup/memory/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410# cat memory.limit_in_bytes
+10485760
+  root@devstack:/sys/fs/cgroup/blkio/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410# cat blkio.weight
+  100
+````
+
+目前 docker 已经几乎支持了所有的 cgroups 资源，可以限制容器对包括 network，device，cpu 和 memory 在内的资源的使用，比如：
+
+````
+root@devstack:/sys/fs/cgroup# find -iname ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./net_prio/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./net_cls/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./systemd/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./hugetlb/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./perf_event/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./blkio/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./freezer/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./devices/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./memory/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./cpuacct/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./cpu/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+./cpuset/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410
+````
+
+# Docker run 命令中 cgroups 相关命令 
+
+````
+block IO:
+      --blkio-weight value          Block IO (relative weight), between 10 and 1000
+      --blkio-weight-device value   Block IO weight (relative device weight) (default [])
+      --cgroup-parent string        Optional parent cgroup for the container
+CPU:
+      --cpu-percent int             CPU percent (Windows only)
+      --cpu-period int              Limit CPU CFS (Completely Fair Scheduler) period
+      --cpu-quota int               Limit CPU CFS (Completely Fair Scheduler) quota
+  -c, --cpu-shares int              CPU shares (relative weight)
+      --cpuset-cpus string          CPUs in which to allow execution (0-3, 0,1)
+      --cpuset-mems string          MEMs in which to allow execution (0-3, 0,1)
+Device:    
+      --device value                Add a host device to the container (default [])
+      --device-read-bps value       Limit read rate (bytes per second) from a device (default [])
+      --device-read-iops value      Limit read rate (IO per second) from a device (default [])
+      --device-write-bps value      Limit write rate (bytes per second) to a device (default [])
+      --device-write-iops value     Limit write rate (IO per second) to a device (default [])
+Memory:      
+      --kernel-memory string        Kernel memory limit
+  -m, --memory string               Memory limit
+      --memory-reservation string   Memory soft limit
+      --memory-swap string          Swap limit equal to memory plus swap: '-1' to enable unlimited swap
+      --memory-swappiness int       Tune container memory swappiness (0 to 100) (default -1)
+````
+
+一些说明：
+
+1. cgroup 只能限制 CPU 的使用，而不能保证CPU的使用。也就是说， 使用 cpuset-cpus，可以让容器在指定的CPU或者核上运行，但是不能确保它独占这些CPU；cpu-shares 是个相对值，只有在CPU不够用的时候才其作用。也就是说，当CPU够用的时候，每个容器会分到足够的CPU；不够用的时候，会按照指定的比重在多个容器之间分配CPU。
+2. 对内存来说，cgroups 可以限制容器最多使用的内存。使用 -m 参数可以设置最多可以使用的内存。
+
 > to be continue ...
 
 
@@ -381,3 +591,4 @@ http://www.cnblogs.com/sammyliu/p/5875470.html
 
 http://www.cnblogs.com/sammyliu/p/5878973.html
 
+http://www.cnblogs.com/sammyliu/p/5886833.html
