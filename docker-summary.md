@@ -582,6 +582,75 @@ Memory:
 1. cgroup 只能限制 CPU 的使用，而不能保证CPU的使用。也就是说， 使用 cpuset-cpus，可以让容器在指定的CPU或者核上运行，但是不能确保它独占这些CPU；cpu-shares 是个相对值，只有在CPU不够用的时候才其作用。也就是说，当CPU够用的时候，每个容器会分到足够的CPU；不够用的时候，会按照指定的比重在多个容器之间分配CPU。
 2. 对内存来说，cgroups 可以限制容器最多使用的内存。使用 -m 参数可以设置最多可以使用的内存。
 
+
+# Docker 网络概况
+
+用一张图来说明 Docker 网络的基本概况：
+
+[![](http://idiotsky.top/images3/docker-summary-5.jpg)](http://idiotsky.top/images3/docker-summary-5.jpg)
+
+# 四种单节点网络模式
+
+## bridge 模式
+
+Docker 容器默认使用 bridge 模式的网络。其特点如下：
+
+* 使用一个 linux bridge，默认为 docker0
+* 使用 veth 对，一头在容器的网络 namespace 中，一头在 docker0 上
+* 该模式下Docker Container不具有一个公有IP，因为宿主机的IP地址与veth pair的 IP地址不在同一个网段内
+* Docker采用 NAT 方式，将容器内部的服务监听的端口与宿主机的某一个端口port 进行“绑定”，使得宿主机以外的世界可以主动将网络报文发送至容器内部
+* 外界访问容器内的服务时，需要访问宿主机的 IP 以及宿主机的端口 port
+* NAT 模式由于是在三层网络上的实现手段，故肯定会影响网络的传输效率。
+* 容器拥有独立、隔离的网络栈；让容器和宿主机以外的世界通过NAT建立通信
+
+iptables 的 SNTA 规则，使得从容器离开去外界的网络包的源 IP 地址被转换为 Docker 主机的IP地址：
+
+````
+Chain POSTROUTING (policy ACCEPT)
+target     prot opt source               destination
+MASQUERADE  all  --  172.17.0.0/16        0.0.0.0/0
+MASQUERADE  all  --  172.18.0.0/16        0.0.0.0/0
+````
+
+示意图：
+
+[![](http://idiotsky.top/images3/docker-summary-6.jpg)](http://idiotsky.top/images3/docker-summary-6.jpg)
+
+
+## Host 模式
+
+定义：
+
+Host 模式并没有为容器创建一个隔离的网络环境。而之所以称之为host模式，是因为该模式下的 Docker 容器会和 host 宿主机共享同一个网络 namespace，故 Docker Container可以和宿主机一样，使用宿主机的eth0，实现和外界的通信。换言之，Docker Container的 IP 地址即为宿主机 eth0 的 IP 地址。其特点包括：
+
+* 这种模式下的容器没有隔离的 network namespace
+* 容器的 IP 地址同 Docker host 的 IP 地址
+* 需要注意容器中服务的端口号不能与 Docker host 上已经使用的端口号相冲突
+* host 模式能够和其它模式共存
+
+示意图：
+
+[![](http://idiotsky.top/images3/docker-summary-7.jpg)](http://idiotsky.top/images3/docker-summary-7.jpg)
+
+
+## container 模式
+
+定义：
+
+Container 网络模式是 Docker 中一种较为特别的网络的模式。处于这个模式下的 Docker 容器会共享其他容器的网络环境，因此，至少这两个容器之间不存在网络隔离，而这两个容器又与宿主机以及除此之外其他的容器存在网络隔离。  
+
+示意图：
+
+[![](http://idiotsky.top/images3/docker-summary-8.jpg)](http://idiotsky.top/images3/docker-summary-8.jpg)
+
+## none 模式
+
+定义：
+
+网络模式为 none，即不为 Docker 容器构造任何网络环境。一旦Docker 容器采用了none 网络模式，那么容器内部就只能使用loopback网络设备，不会再有其他的网络资源。Docker Container的none网络模式意味着不给该容器创建任何网络环境，容器只能使用127.0.0.1的本机网络。
+
+
+
 > to be continue ...
 
 
