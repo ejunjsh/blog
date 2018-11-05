@@ -150,6 +150,16 @@ Linux namespace 的概念说简单也简单说复杂也复杂。简单来说，�
 
 当 Docker 创建一个容器时，它会创建新的以上六种 namespace 的实例，然后把容器中的所有进程放到这些 namespace 之中，使得Docker 容器中的进程只能看到隔离的系统资源。 
 
+## Mount Namespace
+
+Mount namespace用来隔离文件系统的挂载点, 使得不同的mount namespace拥有自己独立的挂载点信息，不同的namespace之间不会相互影响，这对于构建用户或者容器自己的文件系统目录非常有用。
+
+当前进程所在mount namespace里的所有挂载信息可以在/proc/[pid]/mounts、/proc/[pid]/mountinfo和/proc/[pid]/mountstats里面找到。
+
+Mount namespaces是第一个被加入Linux的namespace，由于当时没想到还会引入其它的namespace，所以取名为CLONE_NEWNS，而没有叫CLONE_NEWMOUNT。
+
+每个mount namespace都拥有一份自己的挂载点列表，当用clone或者unshare函数创建新的mount namespace时，新创建的namespace将拷贝一份老namespace里的挂载点列表，但从这之后，他们就没有关系了，通过mount和umount增加和删除各自namespace里面的挂载点都不会相互影响。
+
 ## PID namespace
 
 我们能看到同一个进程，在容器内外的 PID 是不同的：
@@ -195,6 +205,11 @@ devstack
 root@devstack:/home/sammy# docker exec -it web31 hostname
 8b7dd09fbcae
 ````
+
+## IPC Namespace
+
+IPC全称 Inter-Process Communication，是Unix/Linux下进程间通信的一种方式，IPC有共享内存、信号量、消息队列等方法。所以，为了隔离，我们也需要把IPC给隔离开来，这样，只有在同一个Namespace下的进程才能相互通信。如果你熟悉IPC的原理的话，你会知道，IPC需要有一个全局的ID，即然是全局的，那么就意味着我们的Namespace需要对这个ID隔离，不能让别的Namespace的进程看到。
+
 
 ## user namespace
 
@@ -661,3 +676,7 @@ http://www.cnblogs.com/sammyliu/p/5875470.html
 http://www.cnblogs.com/sammyliu/p/5878973.html
 
 http://www.cnblogs.com/sammyliu/p/5886833.html
+
+https://segmentfault.com/a/1190000006912742
+
+https://coolshell.cn/articles/17010.html
