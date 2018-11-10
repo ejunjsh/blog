@@ -99,6 +99,24 @@ Docker 平台基本上由三部分组成：
 * Docker 主机：从 Docker registry 上下载镜像并启动容器
 * Docker registry：Docker 镜像仓库，用于保存镜像，并提供镜像上传和下载
 
+# Host OS VS Guest OS VS Base image
+
+比如，一台主机安装的是 Centos 操作系统，现在在上面跑一个 Ubuntu 容器。此时，Host OS 是 Centos，Guest OS 是 Ubuntu。Guest OS 也被成为容器的 Base Image。
+
+[![](http://idiotsky.top/images3/docker-summary-9.png)](http://idiotsky.top/images3/docker-summary-9.png)
+
+一些说明：
+
+* 关于 linux 内核和版本：所有 Linux 发行版都采用相同的 Linux 内核（kernel），然后所有发行版对内核都有轻微改动。这些改动都会上传回 linux 社区，并被合并。
+* 关于Linux 容器环境：因为所有Linux发行版都包含同一个linux 内核（有轻微修改），以及不同的自己的软件，因此，会很容易地将某个 userland 软件安装在linux 内核上，来模拟不同的发行版环境。比如说，在 Ubuntu 上运行 Centos 容器，这意味着从 Centos 获取 userland 软件，运行在 Ubuntu 内核上。因此，这就像在同一个操作系统（linux 内核）上运行不同的 userland 软件（发行版的）。这就是为什么Docker 不支持在 Linux 主机上运行 FreeBSD 或者windows 容器。
+
+可见，容器的 base image 并不真的是 base OS。Base image 会远远比 base OS 更轻量。它只安装发行版特殊的部分（userland 软件）。
+
+[![](http://idiotsky.top/images3/docker-summary-10.png)](http://idiotsky.top/images3/docker-summary-10.png)
+
+那为什么还需要 base image 呢？这是因为，docker 容器文件系统与 host OS 是隔离的。容器镜像中的应用软件无法看到主机文件系统，除非将主机文件系统挂载为容器的卷。因此，可以想像一下，你容器中的应用依赖于各种操作系统库，因此我们不得不将这些库打包到镜像之中。另外，base image 会让我们使用到各个发行版的包管理系统，比如 yum 和 apt-get。而且，各个linux 发行版的 base image 也不是普通的发行版，而是一个简化了的版本。而且，base image 并不带有 linux 内核，因为容器会使用主机的内核。
+
+因此，需要注重理解 image 和 OS 这两个概念。之所以成为 base image，而不是 base OS，是因为 base image 中并不包括完整的 OS。而这一点，是容器与虚拟机之前的本质区别之一。那就是，容器并没有虚拟化，而是共享主机上的linux 内核。
 
 # Docker 镜像分层,COW 和 镜像大小（size）
 
