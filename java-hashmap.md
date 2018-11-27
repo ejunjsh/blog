@@ -447,4 +447,6 @@ class Key implements Comparable<Key> {
 4. JDK1.8引入红黑树大程度优化了HashMap的性能。
 5. 还没升级JDK1.8的，现在开始升级吧。HashMap的性能提升仅仅是JDK1.8的冰山一角。
 
-参考 https://tech.meituan.com/java-hashmap.html
+# 参考
+
+* https://tech.meituan.com/java-hashmap.html
