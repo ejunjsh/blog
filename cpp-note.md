@@ -26,3 +26,5 @@ p=&b//正确：p可以多次赋值，p存储b的地址
 ````
 
 # 参考
+
+https://www.zhihu.com/question/37608201
