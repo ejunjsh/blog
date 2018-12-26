@@ -247,9 +247,33 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 65535 byte
 
 总的来说，tcpdump对基本的数据包抓取方法还是较简单的。只要掌握有限的几个选项(-nn -XX -vvv -i -c -q)，再组合表达式即可。
 
-ref https://www.cnblogs.com/f-ck-need-u/p/7064286.html
+# 解决tcpdump "drop by kernel" 问题
 
+经常用tcpdump的人都会遇到"drop by kernel"
+````
+579204 packets captured
+579346 packets received by filter
+142 packets dropped by kernel
+````
+原因：Tcpdump 通过网络接口捕获原始数据包，数据包必须解析和执行过滤条件，执行过滤条件需要耗费一些时间，因此传入数据包必须排队（数据缓存）进行处理，当数据包过多时（处理速度跟不上缓存速度），缓存区就会被撑爆（缓存区大小默认是2M），此时就会丢弃新近的数据包，直到缓存区有空间保存新到数据。
 
+解决很简单，就是在tcpdump命令加`-B <size>`,size的单位是KiB.
+
+````shell
+$ tcpdump -i eth1 -B 20000 #20M
+````
+
+# flags
+
+Flags are some combination  of  S  (SYN),  F(FIN), P (PUSH), R (RST), U (URG),
+
+W (ECN CWR), E (ECN-Echo) or `.' (ACK), or `none' if no flags are set. 
+
+# 参考
+
+https://www.cnblogs.com/f-ck-need-u/p/7064286.html
+https://blog.csdn.net/kuaidfkuai/article/details/45752329
+http://blog.51cto.com/990487026/1846517
 
 
 

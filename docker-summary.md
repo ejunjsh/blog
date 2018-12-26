@@ -89,6 +89,12 @@ categories: docker
     info      Display system-wide information （显示Docker 主机系统范围内的信息）
 ````
 
+# docker save和docker export的区别
+
+1. docker save保存的是镜像（image），docker export保存的是容器（container）；
+2. docker load用来载入镜像包，docker import用来载入容器包，但两者都会恢复为镜像；
+3. docker load不能对载入的镜像重命名，而docker import可以为镜像指定新名称。
+
 # Doker 平台的基本构成
 
 [![](http://idiotsky.top/images3/docker-summary-2.jpg)](http://idiotsky.top/images3/docker-summary-2.jpg)
