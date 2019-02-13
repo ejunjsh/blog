@@ -18,6 +18,9 @@ HTTP协议从1991年的HTTP 0.9 到 HTTP 1.0、HTTP 1.1 再到 2015年开始至�
 [![](https://upload-images.jianshu.io/upload_images/2250588-0942ff5daff5e5db.png)](https://upload-images.jianshu.io/upload_images/2250588-0942ff5daff5e5db.png)
 
 ## HTTP/2 & HTTPS
-HTTPS是建构在SSL/TLS之上的HTTP协议，一种保证信息传输安全的协议，HTTP/2的定义本身是和HTTPS无关的。但是，在开放的互联网上HTTP/2将只用于https://网址，而 http://网址将继续使用HTTP/1.x，目的是在开放互联网上增加使用加密技术，以提供强有力的保护去遏制主动攻击。所以，在进行HTTP/2推广的同时也在强制推广HTTPS。
+HTTPS是建构在SSL/TLS之上的HTTP协议，一种保证信息传输安全的协议，HTTP/2的定义本身是和HTTPS无关的。但是，在开放的互联网上HTTP/2将只用于`https://网址`，而 `http://网址`将继续使用HTTP/1.x，目的是在开放互联网上增加使用加密技术，以提供强有力的保护去遏制主动攻击。所以，在进行HTTP/2推广的同时也在强制推广HTTPS。
 目前大部分HTTP/2的实现都是要强制使用HTTPS的，很少能见到有直接在TCP层之上实现的HTTP/2。
 因此，可能会有人说建立在HTTPS之上会额外消耗很多性能，这个答案是肯定的。HTTP使用TCP三次握手建立连接，客户端和服务器需要交换3个包，HTTPS除了TCP的三个包，还要加上SSL/TLS握手需要的9个包，所以一共是12个包，增加了建立连接的时间。但是HTTP/2的多路复用技术，建立一次连接可以一直发送请求，因此HTTPS带来的性能影响可以忽略不计。
+
+ref
+https://www.jianshu.com/p/569193b41e61
